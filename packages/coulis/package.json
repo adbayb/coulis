@@ -1,0 +1,27 @@
+{
+  "name": "coulis",
+  "version": "0.1.0",
+  "description": "",
+  "main": "./dist/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "watch": "tsc --watch",
+    "build": "tsc",
+    "prepublish": "npm run build"
+  },
+  "keywords": [],
+  "author": {
+    "name": "Ayoub Adib",
+    "email": "adbayb@gmail.com"
+  },
+  "license": "MIT",
+  "files": [
+    "./dist/*"
+  ],
+  "typings": "./dist/index.d.ts",
+  "devDependencies": {
+    "@types/node": "14.0.1",
+    "csstype": "2.6.10",
+    "typescript": "3.9.2"
+  }
+}

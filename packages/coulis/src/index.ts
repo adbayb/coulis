@@ -17,22 +17,22 @@ import { UNITLESS_PROPERTIES, SHORTHAND_PROPERTIES } from "./constants";
 */
 
 const hash = (str: string) => {
-  // hash content based with FNV-1a algorithm:
-  const FNVOffsetBasis = 2166136261;
-  const FNVPrime = 16777619;
-  let hash = FNVOffsetBasis;
+	// hash content based with FNV-1a algorithm:
+	const FNVOffsetBasis = 2166136261;
+	const FNVPrime = 16777619;
+	let hash = FNVOffsetBasis;
 
-  for (let i = 0; i < str.length; i++) {
-    hash ^= str.charCodeAt(i);
-    hash *= FNVPrime;
-  }
+	for (let i = 0; i < str.length; i++) {
+		hash ^= str.charCodeAt(i);
+		hash *= FNVPrime;
+	}
 
-  // @note: we convert hashed value to 32-bit unsigned integer
-  // via logical unsigned shift operator >>>
-  const uHash = hash >>> 0;
+	// @note: we convert hashed value to 32-bit unsigned integer
+	// via logical unsigned shift operator >>>
+	const uHash = hash >>> 0;
 
-  // @note: we convert to hexadecimal
-  return Number(uHash).toString(16);
+	// @note: we convert to hexadecimal
+	return Number(uHash).toString(16);
 };
 
 type Property = string;
@@ -40,71 +40,71 @@ type Value = string | number | undefined;
 type DeclarationBlock = Record<Property, Value | Record<Property, Value>>;
 
 const isValidDeclarationBlock = (
-  value: DeclarationBlock[number]
+	value: DeclarationBlock[number]
 ): value is Exclude<DeclarationBlock[number], undefined> => {
-  return value !== undefined;
+	return value !== undefined;
 };
 
 const toClassName = (property: Property, value: Value) => {
-  return "c" + hash(`${property}${value}`);
+	return "c" + hash(`${property}${value}`);
 };
 
 const toDeclaration = (property: Property, value: Value) => {
-  // @todo: check isValidDeclarationBlock(value) here !
-  // @section: from JS camelCase to CSS kebeb-case
-  const normalizedProperty = property.replace(
-    /([A-Z])/g,
-    (matched) => `-${matched.toLowerCase()}`
-  );
-  // @section: format value to follow CSS specs (unitless number)
-  const normalizedValue =
-    typeof value !== "number" || UNITLESS_PROPERTIES[property]
-      ? value
-      : `${value}px`;
+	// @todo: check isValidDeclarationBlock(value) here !
+	// @section: from JS camelCase to CSS kebeb-case
+	const normalizedProperty = property.replace(
+		/([A-Z])/g,
+		(matched) => `-${matched.toLowerCase()}`
+	);
+	// @section: format value to follow CSS specs (unitless number)
+	const normalizedValue =
+		typeof value !== "number" || UNITLESS_PROPERTIES[property]
+			? value
+			: `${value}px`;
 
-  return `${normalizedProperty}:${normalizedValue}`;
+	return `${normalizedProperty}:${normalizedValue}`;
 };
 
 const toManyDeclaration = (rules: Record<string, Value>) => {
-  const processedRules = [];
+	const processedRules = [];
 
-  for (const property of Object.keys(rules)) {
-    processedRules.push(toDeclaration(property, rules[property]));
-  }
+	for (const property of Object.keys(rules)) {
+		processedRules.push(toDeclaration(property, rules[property]));
+	}
 
-  return processedRules.join(";");
+	return processedRules.join(";");
 };
 
 const toRule = (property: string, declaration: string) => {
-  const className = toClassName(property, declaration);
+	const className = toClassName(property, declaration);
 
-  const formatRule = (selector: string, body: string) => {
-    return `${selector}{${body}}`;
-  };
+	const formatRule = (selector: string, body: string) => {
+		return `${selector}{${body}}`;
+	};
 
-  const toClassNameSelector = (className: string) => {
-    return `.${className}`;
-  };
+	const toClassNameSelector = (className: string) => {
+		return `.${className}`;
+	};
 
-  switch (true) {
-    // @todo: support of multiple pseudo class ":hover, :focus"
-    // @todo: check support of pseudo elements
-    case property.startsWith(":"):
-      return formatRule(
-        `${toClassNameSelector(className)}${property}`,
-        declaration
-      );
-    // @todo: @keyframes
-    // @todo: nesting of @media > :hover
-    case property.startsWith("@media"):
-      return formatRule(
-        property,
-        formatRule(toClassNameSelector(className), declaration)
-      );
-    default:
-      // @note: atomic css with single property
-      return formatRule(toClassNameSelector(className), declaration);
-  }
+	switch (true) {
+		// @todo: support of multiple pseudo class ":hover, :focus"
+		// @todo: check support of pseudo elements
+		case property.startsWith(":"):
+			return formatRule(
+				`${toClassNameSelector(className)}${property}`,
+				declaration
+			);
+		// @todo: @keyframes
+		// @todo: nesting of @media > :hover
+		case property.startsWith("@media"):
+			return formatRule(
+				property,
+				formatRule(toClassNameSelector(className), declaration)
+			);
+		default:
+			// @note: atomic css with single property
+			return formatRule(toClassNameSelector(className), declaration);
+	}
 };
 
 let styleElementForShorthand: any = null;
@@ -114,27 +114,27 @@ const CACHE: Record<string, boolean> = {};
 const isDevelopment = process.env.NODE_ENV === "development";
 
 const insertRule = (
-  className: string,
-  rule: string,
-  stl: any = styleElement
+	className: string,
+	rule: string,
+	stl: any = styleElement
 ) => {
-  // @note: already inserted (no need to re-add it)
-  if (CACHE[className]) {
-    return;
-  }
+	// @note: already inserted (no need to re-add it)
+	if (CACHE[className]) {
+		return;
+	}
 
-  // @note: insert rule
-  if (isDevelopment) {
-    stl.innerHTML = `${stl.innerHTML}${rule}`;
-  } else {
-    stl.sheet.insertRule(rule);
-  }
+	// @note: insert rule
+	if (isDevelopment) {
+		stl.innerHTML = `${stl.innerHTML}${rule}`;
+	} else {
+		stl.sheet.insertRule(rule);
+	}
 
-  CACHE[className] = true;
+	CACHE[className] = true;
 };
 
 const isObject = (value: any): value is object => {
-  return value !== null && typeof value === "object";
+	return value !== null && typeof value === "object";
 };
 
 // @note: Anatomy of a css syntax:
@@ -146,170 +146,187 @@ const isObject = (value: any): value is object => {
 // blue = value (or property value)
 
 export const css = (cssObject: DeclarationBlock) => {
-  // @note: order is important for css overwrite and specificity
-  if (styleElementForShorthand === null) {
-    styleElementForShorthand = document.createElement("style");
-    styleElementForShorthand.id = "shorthand";
-    document.head.appendChild(styleElementForShorthand);
-  }
-  if (styleElement === null) {
-    styleElement = document.createElement("style");
-    document.head.appendChild(styleElement);
-  }
-  if (styleElementForMedia === null) {
-    styleElementForMedia = document.createElement("style");
-    styleElementForMedia.id = "media";
-    document.head.appendChild(styleElementForMedia);
-  }
+	// @note: order is important for css overwrite and specificity
+	if (styleElementForShorthand === null) {
+		styleElementForShorthand = document.createElement("style");
+		styleElementForShorthand.id = "shorthand";
+		document.head.appendChild(styleElementForShorthand);
+	}
+	if (styleElement === null) {
+		styleElement = document.createElement("style");
+		document.head.appendChild(styleElement);
+	}
+	if (styleElementForMedia === null) {
+		styleElementForMedia = document.createElement("style");
+		styleElementForMedia.id = "media";
+		document.head.appendChild(styleElementForMedia);
+	}
 
-  const properties = Object.keys(cssObject);
-  const classNames: Array<Property> = [];
+	const properties = Object.keys(cssObject);
+	const classNames: Array<Property> = [];
 
-  for (const property of properties) {
-    const declarationBlock = cssObject[property];
-    // @note: filter undefined declarationBlock
-    if (isValidDeclarationBlock(declarationBlock)) {
-      const cssBody = isObject(declarationBlock)
-        ? toManyDeclaration(declarationBlock)
-        : toDeclaration(property, declarationBlock);
-      const className = toClassName(property, cssBody);
+	for (const property of properties) {
+		const declarationBlock = cssObject[property];
+		// @note: filter undefined declarationBlock
+		if (isValidDeclarationBlock(declarationBlock)) {
+			const cssBody = isObject(declarationBlock)
+				? toManyDeclaration(declarationBlock)
+				: toDeclaration(property, declarationBlock);
+			const className = toClassName(property, cssBody);
 
-      insertRule(
-        className,
-        toRule(property, cssBody),
-        SHORTHAND_PROPERTIES[property]
-          ? styleElementForShorthand
-          : property.startsWith("@media")
-          ? styleElementForMedia
-          : styleElement
-      );
-      classNames.push(className);
-    }
-  }
+			insertRule(
+				className,
+				toRule(property, cssBody),
+				SHORTHAND_PROPERTIES[property]
+					? styleElementForShorthand
+					: property.startsWith("@media")
+					? styleElementForMedia
+					: styleElement
+			);
+			classNames.push(className);
+		}
+	}
 
-  return classNames.join(" ");
+	return classNames.join(" ");
 };
 
 const merge = (
-  target: DeclarationBlock,
-  ...sources: DeclarationBlock[]
+	target: DeclarationBlock,
+	...sources: DeclarationBlock[]
 ): DeclarationBlock => {
-  if (sources.length === 0) {
-    return target;
-  }
+	if (sources.length === 0) {
+		return target;
+	}
 
-  const source = sources[0];
+	const source = sources[0];
 
-  for (const key of Object.keys(source)) {
-    const sourceValue = source[key];
-    const targetValue = target[key];
+	for (const key of Object.keys(source)) {
+		const sourceValue = source[key];
+		const targetValue = target[key];
 
-    if (isObject(sourceValue) && isObject(targetValue)) {
-      target[key] = merge(targetValue, sourceValue) as Record<string, Value>;
-    } else {
-      target[key] = sourceValue;
-    }
-  }
+		if (isObject(sourceValue) && isObject(targetValue)) {
+			target[key] = merge(targetValue, sourceValue) as Record<string, Value>;
+		} else {
+			target[key] = sourceValue;
+		}
+	}
 
-  sources.shift();
+	sources.shift();
 
-  return merge(target, ...sources);
+	return merge(target, ...sources);
 };
 
 export const composeCss = (...cssObjects: DeclarationBlock[]) => {
-  return css(merge({}, ...cssObjects));
+	return css(merge({}, ...cssObjects));
 };
 
 type StatefulValue = { default: Value; ":hover": Value }; // @todo: accepts only pseudo class and pseudo elements (::after:hover)
 type DeclarationBlock2 = Record<string, Value | StatefulValue>;
 
 const getStyleSheet = () => {
-  // @todo: globalStyleElement
-  if (styleElementForShorthand === null) {
-    styleElementForShorthand = document.createElement("style");
-    styleElementForShorthand.id = "shorthand";
-    document.head.appendChild(styleElementForShorthand);
-  }
-  if (styleElement === null) {
-    styleElement = document.createElement("style");
-    document.head.appendChild(styleElement);
-  }
-  if (styleElementForMedia === null) {
-    styleElementForMedia = document.createElement("style");
-    styleElementForMedia.id = "media";
-    document.head.appendChild(styleElementForMedia);
-  }
+	// @todo: globalStyleElement
+	if (styleElementForShorthand === null) {
+		styleElementForShorthand = document.createElement("style");
+		styleElementForShorthand.id = "shorthand";
+		document.head.appendChild(styleElementForShorthand);
+	}
+	if (styleElement === null) {
+		styleElement = document.createElement("style");
+		document.head.appendChild(styleElement);
+	}
+	if (styleElementForMedia === null) {
+		styleElementForMedia = document.createElement("style");
+		styleElementForMedia.id = "media";
+		document.head.appendChild(styleElementForMedia);
+	}
 
-  return {
-    atomic: styleElement,
-    shorthand: styleElementForShorthand,
-  };
+	return {
+		atomic: styleElement,
+		shorthand: styleElementForShorthand,
+	};
 };
 
 export const css2 = (declarationBlock: DeclarationBlock2) => {
-  const styleSheet = getStyleSheet();
-  const classNames: Array<Property> = [];
+	const styleSheet = getStyleSheet();
+	const classNames: Array<Property> = [];
 
-  for (const property in declarationBlock) {
-    const value = declarationBlock[property];
+	for (const property in declarationBlock) {
+		const value = declarationBlock[property];
 
-    if (value === undefined) {
-      break;
-    }
+		if (value === undefined) {
+			break;
+		}
 
-    const destinationSheet = SHORTHAND_PROPERTIES[property]
-      ? styleSheet.shorthand
-      : styleSheet.atomic;
+		const destinationSheet = SHORTHAND_PROPERTIES[property]
+			? styleSheet.shorthand
+			: styleSheet.atomic;
 
-    if (isObject(value)) {
-      for (const state in value) {
-        // initial value:
-        let finalProperty = property;
-        const isStateProperty = state.startsWith(":");
+		if (isObject(value)) {
+			for (const state in value) {
+				// initial value:
+				let finalProperty = property;
+				const isStateProperty = state.startsWith(":");
 
-        if (isStateProperty) {
-          finalProperty = `${property}${state}`;
-        }
+				if (isStateProperty) {
+					finalProperty = `${property}${state}`;
+				}
 
-        const className = toClassName(finalProperty, state);
-        const block = toDeclaration(
-          property,
-          value[state as keyof StatefulValue]
-        );
-        const ruleSet = `.${className}${
-          isStateProperty ? state : ""
-        }{${block}}`;
+				const className = toClassName(finalProperty, state);
+				const block = toDeclaration(
+					property,
+					value[state as keyof StatefulValue]
+				);
+				const ruleSet = `.${className}${
+					isStateProperty ? state : ""
+				}{${block}}`;
 
-        insertRule(className, ruleSet, destinationSheet);
+				insertRule(className, ruleSet, destinationSheet);
 
-        classNames.push(className);
-      }
-    } else {
-      const className = toClassName(property, value);
-      const block = toDeclaration(property, value);
-      const ruleSet = `.${className}{${block}}`;
+				classNames.push(className);
+			}
+		} else {
+			const className = toClassName(property, value);
+			const block = toDeclaration(property, value);
+			const ruleSet = `.${className}{${block}}`;
 
-      insertRule(className, ruleSet, destinationSheet);
+			insertRule(className, ruleSet, destinationSheet);
 
-      classNames.push(className);
-    }
-  }
+			classNames.push(className);
+		}
+	}
 
-  return classNames.join(" ");
+	return classNames.join(" ");
 };
 
-// co("@support (display: grid)", { display: "grid" }) // co alias for conditional
+export const cx = merge;
+
+const warn = (message: string) => {
+	console.warn(message);
+};
+
+export const cif = (rule: string, declarationBlock: DeclarationBlock2) => {
+	const allowedRules = /^@(media|document|supports)/;
+
+	if (!allowedRules.test(rule)) {
+		warn("Not allowed rule conditions");
+	}
+
+	const styleSheet = getStyleSheet();
+};
+
+// cssIf("@support (display: grid)", { display: "grid" }) // co alias for conditional
 // css({ backgroundColor: "red" })
-// cx({ backgroundColor: "red" }, { backgroundColor: "purple" })
-// <CollectStyles /> for SSR (insert style element in the react root before all elements)
+// cssCompose({ backgroundColor: "red" }, { backgroundColor: "purple" })
+// cssGlobal({ "div": { border: "1px solid black" }, "@page": { margin: 10 }, "@font-face": { fontFamily: "Open Sans", src: "url("/fonts/OpenSans-Regular-webfont.woff2") format("woff2"), url("/fonts/OpenSans-Regular-webfont.woff") format("woff")" } })
+// <CollectStyles /> or extractStyle api for SSR (insert style element in the react root before all elements)
 
 console.log(
-  "TO",
-  css2({
-    color: "purple",
-    backgroundColor: {
-      default: "purple",
-      ":hover": "red",
-    },
-  })
+	"TO",
+	css2({
+		color: "purple",
+		backgroundColor: {
+			default: "purple",
+			":hover": "red",
+		},
+	})
 );

@@ -1,20 +1,22 @@
 import React from "react";
-import { css2 } from "coulis";
+import { css } from "coulis";
 
 function App() {
   return (
     <div className="App">
       <header
-        className={css2({
+        className={css({
           flex: 1,
           backgroundColor: "lightcoral",
           color: {
-            default: "purple",
+            default: "blue",
             ":hover": "red",
           },
         })}
       >
-        <p>
+        <p className={css({
+          color: "blue"
+        })}>
           Edit <code>src/App.tsx</code> and save to reload.
         </p>
         <a

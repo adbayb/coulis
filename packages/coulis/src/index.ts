@@ -1,6 +1,7 @@
 // @todo: benchmarks
 // - if multiple insert of styles per atomic css declaration is more or less efficient than one single style element ?
 // @todo: always & to reference parent in selector ? Quid :hover, :focus
+// @todo: server side extraction
 // @todo: hydrate CACHE client side from data-coulis tag ?
 import { UNITLESS_PROPERTIES, SHORTHAND_PROPERTIES } from "./constants";
 import { hash } from "./helpers/hash";

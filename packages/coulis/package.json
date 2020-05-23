@@ -2,11 +2,18 @@
   "name": "coulis",
   "version": "0.1.0",
   "description": "",
-  "main": "./dist/index.js",
+  "source": "./src/index.ts",
+  "main": "./dist/lib.js",
+  "module": "./dist/lib.mjs",
+  "types": "./dist/index.d.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "watch": "tsc --watch",
-    "build": "tsc",
+    "clean": "rm -rf dist",
+    "generate:types": "tsc --outDir dist --declaration --emitDeclarationOnly",
+    "prewatch": "npm run clean",
+    "watch": "tsc --watch --outDir dist --declaration",
+    "prebuild": "npm run clean",
+    "build": "npm run generate:types && rollup -c",
     "prepublish": "npm run build"
   },
   "keywords": [],
@@ -20,8 +27,11 @@
   ],
   "typings": "./dist/index.d.ts",
   "devDependencies": {
+    "@rollup/plugin-typescript": "4.1.2",
     "@types/node": "14.0.1",
     "csstype": "2.6.10",
+    "rollup": "2.10.8",
+    "rollup-plugin-terser": "6.0.1",
     "typescript": "3.9.2"
   }
 }

@@ -25,3 +25,6 @@ export const getStyleSheet = () => {
 		grouped: groupedElement,
 	};
 };
+
+// @todo: insertRule isomorphic
+// Same interface with insertRule but different implementations following server / browser but also dev / prod environment

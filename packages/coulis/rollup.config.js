@@ -1,5 +1,5 @@
-import path from "path";
-import typescript from "@rollup/plugin-typescript";
+// @note issue with @rollup/plugin-typescript in watch mode https://github.com/rollup/plugins/issues/225
+import typescript from "rollup-plugin-typescript2";
 import { terser } from "rollup-plugin-terser";
 import pkg from "./package.json";
 
@@ -9,13 +9,11 @@ export default {
 	input: pkg.source,
 	output: [
 		{
-			dir: path.dirname(pkg.main),
-			entryFileNames: path.basename(pkg.main),
+			file: pkg.main,
 			format: "cjs",
 		},
 		{
-			dir: path.dirname(pkg.module),
-			entryFileNames: path.basename(pkg.module),
+			file: pkg.module,
 			format: "es",
 		},
 	],

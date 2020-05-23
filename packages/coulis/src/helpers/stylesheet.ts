@@ -1,26 +1,27 @@
-let styleElementForShorthand: any = null;
-let styleElementForMedia: any = null;
-let styleElement: any = null;
+let shorthandElement: any = null;
+let groupedElement: any = null;
+let longhandElement: any = null;
 
 export const getStyleSheet = () => {
 	// @todo: globalStyleElement
-	if (styleElementForShorthand === null) {
-		styleElementForShorthand = document.createElement("style");
-		styleElementForShorthand.id = "shorthand";
-		document.head.appendChild(styleElementForShorthand);
+	if (shorthandElement === null) {
+		shorthandElement = document.createElement("style");
+		shorthandElement.id = "shorthand";
+		document.head.appendChild(shorthandElement);
 	}
-	if (styleElement === null) {
-		styleElement = document.createElement("style");
-		document.head.appendChild(styleElement);
+	if (longhandElement === null) {
+		longhandElement = document.createElement("style");
+		document.head.appendChild(longhandElement);
 	}
-	if (styleElementForMedia === null) {
-		styleElementForMedia = document.createElement("style");
-		styleElementForMedia.id = "media";
-		document.head.appendChild(styleElementForMedia);
+	if (groupedElement === null) {
+		groupedElement = document.createElement("style");
+		groupedElement.id = "media";
+		document.head.appendChild(groupedElement);
 	}
 
 	return {
-		atomic: styleElement,
-		shorthand: styleElementForShorthand,
+		longhand: longhandElement,
+		shorthand: shorthandElement,
+		grouped: groupedElement,
 	};
 };

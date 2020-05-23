@@ -44,7 +44,8 @@ const isDevelopment = process.env.NODE_ENV === "development";
 const commitStyle = (rule: string, stl: any) => {
 	// @note: insert rule
 	if (isDevelopment) {
-		stl.innerHTML = `${stl.innerHTML}${rule}`;
+		// stl.innerHTML = `${stl.innerHTML}${rule}`;
+		stl.appendChild(document.createTextNode(rule));
 	} else {
 		stl.sheet.insertRule(rule);
 	}

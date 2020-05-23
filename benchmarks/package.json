@@ -1,0 +1,23 @@
+{
+  "name": "benchmarks",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "coulis": "react-benchmark ./cases/coulis.js",
+    "emotion": "react-benchmark ./cases/emotion.js",
+    "styled-components": "react-benchmark ./cases/styled-components.js"
+  },
+  "keywords": [],
+  "author": "Ayoub Adib <adbayb@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "coulis": "file:../packages/coulis",
+    "emotion": "10.0.27",
+    "react-benchmark": "2.1.1",
+    "styled-components": "5.1.0"
+  },
+  "devDependencies": {
+    "@babel/preset-react": "7.9.4"
+  }
+}

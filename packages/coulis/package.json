@@ -7,13 +7,11 @@
   "module": "./dist/lib.mjs",
   "types": "./dist/index.d.ts",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "clean": "rm -rf dist",
-    "generate:types": "tsc --outDir dist --declaration --emitDeclarationOnly",
     "prewatch": "npm run clean",
-    "watch": "tsc --watch --outDir dist --declaration",
+    "watch": "rollup -c --watch",
     "prebuild": "npm run clean",
-    "build": "npm run generate:types && rollup -c",
+    "build": "NODE_ENV=production rollup -c",
     "prepublish": "npm run build"
   },
   "keywords": [],

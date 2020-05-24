@@ -2,6 +2,7 @@
   "private": true,
   "scripts": {
     "sandbox": "npm start --prefix examples/sandbox-react",
+    "benchmark": "npm run coulis:simple --prefix benchmarks && npm run emotion:simple --prefix benchmarks",
     "dev": "concurrently \"npm run watch --prefix packages/coulis\" \"npm run sandbox\" --names \"lib,sandbox\""
   },
   "keywords": [],

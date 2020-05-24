@@ -4,11 +4,11 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "coulis": "react-benchmark ./cases/coulis.js",
-    "emotion": "react-benchmark ./cases/emotion.js",
-    "coulis-simple": "react-benchmark ./cases/coulis-simple.js",
-    "emotion-simple": "react-benchmark ./cases/emotion-simple.js",
-    "styled-components": "react-benchmark ./cases/styled-components.js"
+    "coulis:simple": "react-benchmark ./cases/coulis-simple.js",
+    "emotion:simple": "react-benchmark ./cases/emotion-simple.js",
+    "coulis:table": "react-benchmark ./cases/coulis.js",
+    "emotion:table": "react-benchmark ./cases/emotion.js",
+    "styled-components:table": "react-benchmark ./cases/styled-components.js"
   },
   "keywords": [],
   "author": "Ayoub Adib <adbayb@gmail.com>",

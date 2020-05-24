@@ -2,7 +2,7 @@
 // - if multiple insert of styles per atomic css declaration is more or less efficient than one single style element ?
 // @todo: always & to reference parent in selector ? Quid :hover, :focus
 // @todo: server side extraction
-// @todo: hydrate CACHE client side from data-coulis tag ?
+// @todo: hydrate createProcessor cache client side from data-coulis tag ?
 import { UNITLESS_PROPERTIES, SHORTHAND_PROPERTIES } from "./constants";
 import { hash } from "./helpers/hash";
 import { getStyleSheet } from "./helpers/stylesheet";
@@ -38,7 +38,6 @@ const toDeclaration = (property: Property, value: Value) => {
 	return `${normalizedProperty}:${normalizedValue}`;
 };
 
-const CACHE: Record<string, boolean> = {};
 const isDevelopment = process.env.NODE_ENV === "development";
 
 const commitStyle = (rule: string, stl: HTMLStyleElement) => {
@@ -64,31 +63,39 @@ const toClassName = (...hashInputs: Value[]) => {
 	return `c${hash(hashInputs.join(""))}`;
 };
 
-const processStyle = (
-	property: string,
-	value: Value,
-	hashInputs: (Property | Value)[],
-	ruleSetFormatter: (className: string, declaration: string) => string,
-	insertionTarget: any
-) => {
-	if (value === undefined) {
-		return null;
-	}
+const createProcessor = () => {
+	// for memoization purposes:
+	const cache: Record<string, string | null> = {};
 
-	const className = toClassName(hashInputs.join(""));
+	return (
+		key: string,
+		property: string,
+		value: Value,
+		ruleSetFormatter: (className: string, declaration: string) => string,
+		insertionTarget: any
+	) => {
+		const cacheValue = cache[key];
 
-	if (CACHE[className]) {
+		if (cacheValue) {
+			return cacheValue;
+		}
+
+		if (value === undefined) {
+			return null;
+		}
+
+		const className = toClassName(key);
+		const normalizedDeclaration = toDeclaration(property, value);
+		const ruleSet = ruleSetFormatter(className, normalizedDeclaration);
+
+		commitStyle(ruleSet, insertionTarget);
+		cache[key] = className;
+
 		return className;
-	}
-
-	const normalizedDeclaration = toDeclaration(property, value);
-	const ruleSet = ruleSetFormatter(className, normalizedDeclaration);
-
-	commitStyle(ruleSet, insertionTarget);
-	CACHE[className] = true;
-
-	return className;
+	};
 };
+
+const processStyle = createProcessor();
 
 export const createCss = (groupRule: string) => {
 	const styleSheet = getStyleSheet();
@@ -112,18 +119,20 @@ export const createCss = (groupRule: string) => {
 				: styleSheet.longhand;
 
 			if (isObject(value)) {
-				for (const state in value) {
-					const stateValue = value[state as keyof typeof value];
-					const isDefaultProperty = state === "default";
+				for (const stateProperty in value) {
+					const stateValue = value[stateProperty as keyof typeof value];
+					const isDefaultProperty = stateProperty === "default";
 					const className = processStyle(
+						isDefaultProperty
+							? `${groupRule}${property}${stateValue}`
+							: `${groupRule}${property}${stateValue}${stateProperty}`,
 						property,
 						stateValue,
-						isDefaultProperty
-							? [groupRule, property, stateValue]
-							: [groupRule, property, stateValue, state],
 						(className, declaration) =>
 							formatRuleSetWithScope(
-								`.${className}${isDefaultProperty ? "" : state}{${declaration}}`
+								`.${className}${
+									isDefaultProperty ? "" : stateProperty
+								}{${declaration}}`
 							),
 						destinationSheet
 					);
@@ -134,9 +143,9 @@ export const createCss = (groupRule: string) => {
 				}
 			} else {
 				const className = processStyle(
+					`${groupRule}${property}${value}`,
 					property,
 					value,
-					[groupRule, property, value],
 					(className, declaration) =>
 						formatRuleSetWithScope(`.${className}{${declaration}}`),
 					destinationSheet

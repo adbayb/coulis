@@ -10,15 +10,13 @@ export const merge = <ItemShape extends Record<string, any>>(
 
 	const source = sources[0];
 
-	for (const key of Object.keys(source)) {
+	for (const key in source) {
 		const sourceValue = source[key];
 		const targetValue = target[key];
 
 		if (isObject(sourceValue) && isObject(targetValue)) {
-			// @ts-ignore
 			target[key] = merge(targetValue, sourceValue);
 		} else {
-			// @ts-ignore
 			target[key] = sourceValue;
 		}
 	}

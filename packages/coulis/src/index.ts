@@ -10,7 +10,7 @@ import { Value, Property, DeclarationBlock } from "./types";
 import { merge } from "./helpers/merge";
 import { isObject } from "./helpers/object";
 
-// @todo: atomic stateful selector generation ? Advantages: could be reused same atomic declaration in the
+// @todo: atomic selectorful selector generation ? Advantages: could be reused same atomic declaration in the
 // same media query type in another context of consumption (for example, another component which use the
 // same declaration with the same media query rule)
 /* @media (min-width: 400px) {
@@ -99,15 +99,14 @@ const processStyle = createProcessor();
 
 export const createCss = (groupRule: string) => {
 	const styleSheet = getStyleSheet();
+	const formatRuleSetWithScope = (ruleSet: string) => {
+		return !groupRule ? ruleSet : `${groupRule}{${ruleSet}}`;
+	};
 
 	return (...cssBlocks: DeclarationBlock[]) => {
 		const cssBlock =
 			cssBlocks.length <= 1 ? cssBlocks[0] : merge({}, ...cssBlocks);
-		const classNames: Array<Property> = [];
-
-		const formatRuleSetWithScope = (ruleSet: string) => {
-			return !groupRule ? ruleSet : `${groupRule}{${ruleSet}}`;
-		};
+		let classNames = "";
 
 		for (const property in cssBlock) {
 			const value = cssBlock[property];
@@ -119,26 +118,26 @@ export const createCss = (groupRule: string) => {
 				: styleSheet.longhand;
 
 			if (isObject(value)) {
-				for (const stateProperty in value) {
-					const stateValue = value[stateProperty as keyof typeof value];
-					const isDefaultProperty = stateProperty === "default";
+				for (const selectorProperty in value) {
+					const selectorValue = value[selectorProperty as keyof typeof value];
+					const isDefaultProperty = selectorProperty === "default";
 					const className = processStyle(
 						isDefaultProperty
-							? `${groupRule}${property}${stateValue}`
-							: `${groupRule}${property}${stateValue}${stateProperty}`,
+							? `${groupRule}${property}${selectorValue}`
+							: `${groupRule}${property}${selectorValue}${selectorProperty}`,
 						property,
-						stateValue,
+						selectorValue,
 						(className, declaration) =>
 							formatRuleSetWithScope(
 								`.${className}${
-									isDefaultProperty ? "" : stateProperty
+									isDefaultProperty ? "" : selectorProperty
 								}{${declaration}}`
 							),
 						destinationSheet
 					);
 
 					if (className !== null) {
-						classNames.push(className);
+						classNames = `${classNames} ${className}`;
 					}
 				}
 			} else {
@@ -152,12 +151,12 @@ export const createCss = (groupRule: string) => {
 				);
 
 				if (className !== null) {
-					classNames.push(className);
+					classNames = `${classNames} ${className}`;
 				}
 			}
 		}
 
-		return classNames.join(" ");
+		return classNames;
 	};
 };
 

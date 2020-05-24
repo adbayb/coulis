@@ -1,3 +1,4 @@
+import replace from "@rollup/plugin-replace";
 // @note issue with @rollup/plugin-typescript in watch mode https://github.com/rollup/plugins/issues/225
 import typescript from "rollup-plugin-typescript2";
 import { terser } from "rollup-plugin-terser";
@@ -19,12 +20,16 @@ export default {
 	],
 	plugins: [
 		typescript(),
+		// @note: environment raw value injection for dead code elimination:
+		replace({ "process.env.NODE_ENV": JSON.stringify(process.env.NODE_ENV) }),
 		...(!isDevelopment
-			? terser({
-					output: {
-						comments: false,
-					},
-			  })
+			? [
+					terser({
+						output: {
+							comments: false,
+						},
+					}),
+			  ]
 			: []),
 	],
 };

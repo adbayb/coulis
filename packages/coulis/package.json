@@ -11,8 +11,7 @@
     "prewatch": "npm run clean",
     "watch": "rollup -c --watch",
     "prebuild": "npm run clean",
-    "build": "NODE_ENV=production rollup -c",
-    "prepublish": "npm run build"
+    "build": "NODE_ENV=production rollup -c"
   },
   "keywords": [],
   "author": {
@@ -25,6 +24,7 @@
   ],
   "typings": "./dist/index.d.ts",
   "devDependencies": {
+    "@rollup/plugin-replace": "2.3.2",
     "@types/node": "14.0.1",
     "csstype": "2.6.10",
     "rollup": "2.10.8",

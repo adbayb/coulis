@@ -41,13 +41,14 @@ const toDeclaration = (property: Property, value: Value) => {
 const CACHE: Record<string, boolean> = {};
 const isDevelopment = process.env.NODE_ENV === "development";
 
-const commitStyle = (rule: string, stl: any) => {
-	// @note: insert rule
+const commitStyle = (rule: string, stl: HTMLStyleElement) => {
 	if (isDevelopment) {
 		// stl.innerHTML = `${stl.innerHTML}${rule}`;
-		stl.appendChild(document.createTextNode(rule));
+		// stl.appendChild(document.createTextNode(rule));
+		// @note: faster than other insertion alternatives https://jsperf.com/insertadjacenthtml-perf/22 :
+		stl.insertAdjacentHTML("beforeend", rule);
 	} else {
-		stl.sheet.insertRule(rule);
+		stl.sheet!.insertRule(rule);
 	}
 };
 
@@ -89,40 +90,55 @@ const processStyle = (
 	return className;
 };
 
-export const createCss = (groupRule: string) => (
-	...cssBlocks: DeclarationBlock[]
-) => {
-	const cssBlock = merge({}, ...cssBlocks);
+export const createCss = (groupRule: string) => {
 	const styleSheet = getStyleSheet();
-	const classNames: Array<Property> = [];
 
-	const formatRuleSetWithScope = (ruleSet: string) => {
-		return !groupRule ? ruleSet : `${groupRule}{${ruleSet}}`;
-	};
+	return (...cssBlocks: DeclarationBlock[]) => {
+		const cssBlock =
+			cssBlocks.length <= 1 ? cssBlocks[0] : merge({}, ...cssBlocks);
+		const classNames: Array<Property> = [];
 
-	for (const property in cssBlock) {
-		const value = cssBlock[property];
+		const formatRuleSetWithScope = (ruleSet: string) => {
+			return !groupRule ? ruleSet : `${groupRule}{${ruleSet}}`;
+		};
 
-		const destinationSheet = Boolean(groupRule)
-			? styleSheet.grouped
-			: SHORTHAND_PROPERTIES[property]
-			? styleSheet.shorthand
-			: styleSheet.longhand;
+		for (const property in cssBlock) {
+			const value = cssBlock[property];
 
-		if (isObject(value)) {
-			for (const state in value) {
-				const stateValue = value[state as keyof typeof value];
-				const isDefaultProperty = state === "default";
+			const destinationSheet = Boolean(groupRule)
+				? styleSheet.grouped
+				: SHORTHAND_PROPERTIES[property]
+				? styleSheet.shorthand
+				: styleSheet.longhand;
+
+			if (isObject(value)) {
+				for (const state in value) {
+					const stateValue = value[state as keyof typeof value];
+					const isDefaultProperty = state === "default";
+					const className = processStyle(
+						property,
+						stateValue,
+						isDefaultProperty
+							? [groupRule, property, stateValue]
+							: [groupRule, property, stateValue, state],
+						(className, declaration) =>
+							formatRuleSetWithScope(
+								`.${className}${isDefaultProperty ? "" : state}{${declaration}}`
+							),
+						destinationSheet
+					);
+
+					if (className !== null) {
+						classNames.push(className);
+					}
+				}
+			} else {
 				const className = processStyle(
 					property,
-					stateValue,
-					isDefaultProperty
-						? [groupRule, property, stateValue]
-						: [groupRule, property, stateValue, state],
+					value,
+					[groupRule, property, value],
 					(className, declaration) =>
-						formatRuleSetWithScope(
-							`.${className}${isDefaultProperty ? "" : state}{${declaration}}`
-						),
+						formatRuleSetWithScope(`.${className}{${declaration}}`),
 					destinationSheet
 				);
 
@@ -130,23 +146,10 @@ export const createCss = (groupRule: string) => (
 					classNames.push(className);
 				}
 			}
-		} else {
-			const className = processStyle(
-				property,
-				value,
-				[groupRule, property, value],
-				(className, declaration) =>
-					formatRuleSetWithScope(`.${className}{${declaration}}`),
-				destinationSheet
-			);
-
-			if (className !== null) {
-				classNames.push(className);
-			}
 		}
-	}
 
-	return classNames.join(" ");
+		return classNames.join(" ");
+	};
 };
 
 export const css = createCss("");

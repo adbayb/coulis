@@ -1,6 +1,6 @@
 import { isObject } from "./object";
 
-export const merge = <ItemShape extends Record<string, any>>(
+export const merge = <ItemShape extends Record<string, unknown>>(
 	target: ItemShape,
 	...sources: ItemShape[]
 ): ItemShape => {

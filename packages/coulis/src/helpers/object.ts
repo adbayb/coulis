@@ -1,3 +1,3 @@
-export const isObject = (value: any): value is object => {
+export const isObject = (value: unknown): value is Record<string, unknown> => {
 	return value !== null && typeof value === "object";
 };

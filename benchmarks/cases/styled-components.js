@@ -20,7 +20,7 @@ const Cell2 = styled.td`
 	}
 `;
 
-const Component = () => {
+export default function BenchmarkCase() {
 	return (
 		<Table>
 			<thead>
@@ -41,8 +41,4 @@ const Component = () => {
 			</tbody>
 		</Table>
 	);
-};
-
-export default function () {
-	return <Component />;
 }

@@ -1,4 +1,4 @@
-import type CSS from "csstype";
+// import type CSS from "csstype";
 
 export type Property = string;
 export type Value = string | number | undefined;

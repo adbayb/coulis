@@ -1,10 +1,6 @@
 import React from "react";
 import { css } from "coulis";
 
-const Component = () => {
+export default function BenchmarkCase() {
 	return <div className={css({ color: "lightcoral" })}>Simple</div>;
-};
-
-export default function () {
-	return <Component />;
 }

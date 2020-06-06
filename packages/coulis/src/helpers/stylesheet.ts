@@ -1,6 +1,6 @@
-let shorthandElement: any = null;
-let groupedElement: any = null;
-let longhandElement: any = null;
+let shorthandElement: HTMLStyleElement | null = null;
+let groupedElement: HTMLStyleElement | null = null;
+let longhandElement: HTMLStyleElement | null = null;
 
 export const getStyleSheet = () => {
 	// @todo: globalStyleElement
@@ -9,10 +9,12 @@ export const getStyleSheet = () => {
 		shorthandElement.id = "shorthand";
 		document.head.appendChild(shorthandElement);
 	}
+
 	if (longhandElement === null) {
 		longhandElement = document.createElement("style");
 		document.head.appendChild(longhandElement);
 	}
+
 	if (groupedElement === null) {
 		groupedElement = document.createElement("style");
 		groupedElement.id = "media";

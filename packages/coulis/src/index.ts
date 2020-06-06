@@ -3,10 +3,10 @@
 // @todo: always & to reference parent in selector ? Quid :hover, :focus
 // @todo: server side extraction
 // @todo: hydrate createProcessor cache client side from data-coulis tag ?
-import { UNITLESS_PROPERTIES, SHORTHAND_PROPERTIES } from "./constants";
+import { SHORTHAND_PROPERTIES, UNITLESS_PROPERTIES } from "./constants";
 import { hash } from "./helpers/hash";
 import { getStyleSheet } from "./helpers/stylesheet";
-import { Value, Property, DeclarationBlock } from "./types";
+import { DeclarationBlock, Property, Value } from "./types";
 import { merge } from "./helpers/merge";
 import { isObject } from "./helpers/object";
 
@@ -39,7 +39,6 @@ const toDeclaration = (property: Property, value: Value) => {
 };
 
 const isDevelopment = process.env.NODE_ENV === "development";
-
 const commitStyle = (rule: string, stl: HTMLStyleElement) => {
 	if (isDevelopment) {
 		// stl.innerHTML = `${stl.innerHTML}${rule}`;
@@ -72,7 +71,7 @@ const createProcessor = () => {
 		property: string,
 		value: Value,
 		ruleSetFormatter: (className: string, declaration: string) => string,
-		insertionTarget: any
+		insertionTarget: HTMLStyleElement
 	) => {
 		const cacheValue = cache[key];
 
@@ -110,8 +109,7 @@ export const createCss = (groupRule: string) => {
 
 		for (const property in cssBlock) {
 			const value = cssBlock[property];
-
-			const destinationSheet = Boolean(groupRule)
+			const destinationSheet = groupRule
 				? styleSheet.grouped
 				: SHORTHAND_PROPERTIES[property]
 				? styleSheet.shorthand
@@ -119,7 +117,8 @@ export const createCss = (groupRule: string) => {
 
 			if (isObject(value)) {
 				for (const selectorProperty in value) {
-					const selectorValue = value[selectorProperty as keyof typeof value];
+					const selectorValue =
+						value[selectorProperty as keyof typeof value];
 					const isDefaultProperty = selectorProperty === "default";
 					const className = processStyle(
 						isDefaultProperty
@@ -166,6 +165,6 @@ export const injectGlobal = () => {
 	return undefined;
 };
 
-const warn = (message: string) => {
-	console.warn(message);
-};
+// const warn = (message: string) => {
+// 	console.warn(message);
+// };

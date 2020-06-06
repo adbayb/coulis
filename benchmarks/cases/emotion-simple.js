@@ -1,7 +1,7 @@
 import React from "react";
 import { css } from "emotion";
 
-const Component = () => {
+export default function BenchmarkCase() {
 	return (
 		<div
 			className={css`
@@ -11,8 +11,4 @@ const Component = () => {
 			Simple
 		</div>
 	);
-};
-
-export default function () {
-	return <Component />;
 }

@@ -1,26 +1,47 @@
 {
-  "private": true,
-  "scripts": {
-    "sandbox": "npm start --prefix examples/sandbox-react",
-    "benchmark": "npm run coulis:table --prefix benchmarks && npm run emotion:table --prefix benchmarks && npm run styled-components:table --prefix benchmarks",
-    "dev": "concurrently \"npm run watch --prefix packages/coulis\" \"npm run sandbox\" --names \"lib,sandbox\"",
-    "format": "prettier --write --ignore-path .gitignore --ignore-path .prettierignore ."
-  },
-  "keywords": [],
-  "author": "Ayoub Adib <adbayb@gmail.com>",
-  "license": "MIT",
-  "directories": {
-    "example": "examples"
-  },
-  "description": "",
-  "devDependencies": {
-    "@typescript-eslint/eslint-plugin": "2.34.0",
-    "@typescript-eslint/parser": "2.34.0",
-    "concurrently": "5.2.0",
-    "eslint": "7.0.0",
-    "eslint-config-prettier": "6.11.0",
-    "eslint-plugin-prettier": "3.1.3",
-    "prettier": "2.0.5",
-    "typescript": "3.9.3"
-  }
+	"private": true,
+	"scripts": {
+		"sandbox": "npm start --prefix examples/react-browser",
+		"benchmark": "npm run coulis:table --prefix benchmarks && npm run emotion:table --prefix benchmarks && npm run styled-components:table --prefix benchmarks",
+		"dev": "concurrently \"npm run watch --prefix packages/coulis\" \"npm run sandbox\" --names \"lib,sandbox\"",
+		"check:format": "prettier . --ignore-path .gitignore --ignore-path .prettierignore",
+		"check:lint": "eslint . --ignore-path .gitignore",
+		"check:types": "tsc --noEmit",
+		"format": "npm run check:format -- --write",
+		"lint": "npm run check:lint -- --fix"
+	},
+	"directories": {
+		"example": "examples"
+	},
+	"devDependencies": {
+		"@adbayb/castor": "0.2.1",
+		"concurrently": "5.2.0"
+	},
+	"author": {
+		"name": "Ayoub Adib",
+		"email": "adbayb@gmail.com",
+		"url": "https://twitter.com/adbayb"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git@github.com:adbayb/coulis.git"
+	},
+	"license": "MIT",
+	"prettier": "@adbayb/prettier-config",
+	"eslintConfig": {
+		"extends": "@adbayb"
+	},
+	"husky": {
+		"hooks": {
+			"pre-commit": "lint-staged"
+		}
+	},
+	"lint-staged": {
+		"**/*.{js,jsx,ts,tsx}": [
+			"npm run lint"
+		],
+		"**/*.{json,md,mdx,html,css}": [
+			"npm run format"
+		]
+	}
 }

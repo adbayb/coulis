@@ -18,6 +18,8 @@ import React from "react";
 import ReactDOM from "react-dom";
 import { css } from "coulis";
 
+const cssSmallScreen = createCss("@media (max-width: 400px)");
+
 const App = () => {
 	return (
 		<div
@@ -30,10 +32,17 @@ const App = () => {
 			})}
 		>
 			<p
-				className={css({
-					textAlign: "center",
-					color: { default: "black", hover: "lightcoral" },
-				})}
+				className={[
+					css({
+						color: {
+							default: "black",
+							":hover": "lightcoral",
+						},
+						fontSize: 26,
+						textAlign: "center",
+					}),
+					cssSmallScreen({ fontSize: 20 }),
+				].join(" ")}
 			>
 				Hello 🤗
 			</p>
@@ -47,6 +56,13 @@ ReactDOM.render(<App />, document.getElementById("root"));
 </p>
 </details>
 
-## Principles
+## TODO
 
-<!-- TODO -->
+-   [x] Atomic API
+-   [x] Conditional at rule API
+-   [x] Client side support
+-   [ ] keyframes API
+-   [ ] Global css API
+-   [ ] Compose (cx) API ?
+-   [ ] Server side support
+-   [ ] Documentation (principles, homepage, ...)

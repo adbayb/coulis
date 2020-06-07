@@ -2,6 +2,8 @@
 	"private": true,
 	"scripts": {
 		"sandbox": "npm start --prefix examples/react-browser",
+		"pretest-server": "npm run build --prefix packages/coulis",
+		"test-server": "npm start --prefix examples/test-server",
 		"benchmark": "npm run coulis:table --prefix benchmarks && npm run emotion:table --prefix benchmarks && npm run styled-components:table --prefix benchmarks",
 		"dev": "concurrently \"npm run watch --prefix packages/coulis\" \"npm run sandbox\" --names \"lib,sandbox\"",
 		"check:format": "prettier . --ignore-path .gitignore --ignore-path .prettierignore",
@@ -14,7 +16,7 @@
 		"example": "examples"
 	},
 	"devDependencies": {
-		"@adbayb/castor": "0.2.1",
+		"@adbayb/castor": "0.2.3",
 		"concurrently": "5.2.0"
 	},
 	"author": {

@@ -3,27 +3,18 @@
 // @todo: always & to reference parent in selector ? Quid :hover, :focus
 // @todo: server side extraction
 // @todo: hydrate createProcessor cache client side from data-coulis tag ?
-import { SHORTHAND_PROPERTIES, UNITLESS_PROPERTIES } from "./constants";
+import {
+	IS_INMEMORY_ENV,
+	SHORTHAND_PROPERTIES,
+	UNITLESS_PROPERTIES,
+} from "./constants";
 import { hash } from "./helpers/hash";
-import { getStyleSheet } from "./helpers/stylesheet";
+import { StyleSheetAdapter, getStyleSheet } from "./helpers/stylesheet";
 import { DeclarationBlock, Property, Value } from "./types";
 import { merge } from "./helpers/merge";
 import { isObject } from "./helpers/object";
 
-// @todo: atomic selectorful selector generation ? Advantages: could be reused same atomic declaration in the
-// same media query type in another context of consumption (for example, another component which use the
-// same declaration with the same media query rule)
-/* @media (min-width: 400px) {
-	.c424af343:hover {
-		background-color: blue;
-	}
-	// with c424af343 = hash("@media (min-width: 400px)", ":hover", "background-color", "blue")
-	// and only one declaration (atomic declaration) per declaration block 
-} 
-*/
-
 const toDeclaration = (property: Property, value: Value) => {
-	// @todo: check isValidDeclarationBlock(value) here !
 	// @section: from JS camelCase to CSS kebeb-case
 	const normalizedProperty = property.replace(
 		/([A-Z])/g,
@@ -36,18 +27,6 @@ const toDeclaration = (property: Property, value: Value) => {
 			: `${value}px`;
 
 	return `${normalizedProperty}:${normalizedValue}`;
-};
-
-const isDevelopment = process.env.NODE_ENV === "development";
-const commitStyle = (rule: string, stl: HTMLStyleElement) => {
-	if (isDevelopment) {
-		// stl.innerHTML = `${stl.innerHTML}${rule}`;
-		// stl.appendChild(document.createTextNode(rule));
-		// @note: faster than other insertion alternatives https://jsperf.com/insertadjacenthtml-perf/22 :
-		stl.insertAdjacentHTML("beforeend", rule);
-	} else {
-		stl.sheet!.insertRule(rule);
-	}
 };
 
 // @note: Anatomy of a css syntax:
@@ -71,7 +50,7 @@ const createProcessor = () => {
 		property: string,
 		value: Value,
 		ruleSetFormatter: (className: string, declaration: string) => string,
-		insertionTarget: HTMLStyleElement
+		styleSheet: StyleSheetAdapter
 	) => {
 		const cacheValue = cache[key];
 
@@ -87,7 +66,7 @@ const createProcessor = () => {
 		const normalizedDeclaration = toDeclaration(property, value);
 		const ruleSet = ruleSetFormatter(className, normalizedDeclaration);
 
-		commitStyle(ruleSet, insertionTarget);
+		styleSheet.commit(ruleSet);
 		cache[key] = className;
 
 		return className;
@@ -95,9 +74,9 @@ const createProcessor = () => {
 };
 
 const processStyle = createProcessor();
+const styleSheet = getStyleSheet();
 
 export const createCss = (groupRule: string) => {
-	const styleSheet = getStyleSheet();
 	const formatRuleSetWithScope = (ruleSet: string) => {
 		return !groupRule ? ruleSet : `${groupRule}{${ruleSet}}`;
 	};
@@ -110,7 +89,7 @@ export const createCss = (groupRule: string) => {
 		for (const property in cssBlock) {
 			const value = cssBlock[property];
 			const destinationSheet = groupRule
-				? styleSheet.grouped
+				? styleSheet.conditional
 				: SHORTHAND_PROPERTIES[property]
 				? styleSheet.shorthand
 				: styleSheet.longhand;
@@ -161,10 +140,21 @@ export const createCss = (groupRule: string) => {
 
 export const css = createCss("");
 
-export const injectGlobal = () => {
-	return undefined;
+export const extractStyles = () => {
+	if (!IS_INMEMORY_ENV) {
+		// @todo: to remove ?
+		console.warn(
+			"`extractStyles` has no effect: it seems that you're using it in a non server environment. Make sure to consume it in the right environment"
+		);
+	} else {
+		console.log(styleSheet);
+	}
+
+	// @todo: stringified <style></style><style></style><style></style>
+	return "";
 };
 
-// const warn = (message: string) => {
-// 	console.warn(message);
-// };
+export const injectGlobal = () => {
+	// @todo
+	return undefined;
+};

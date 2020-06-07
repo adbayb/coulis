@@ -1,5 +1,9 @@
 type Indexable = Record<string, boolean>;
 
+export const IS_DEV_ENV = process.env.NODE_ENV === "development";
+
+export const IS_INMEMORY_ENV = typeof window === "undefined";
+
 // @note: Taken from https://raw.githubusercontent.com/facebook/react/b98adb648a27640db8467064e537b238b8c306ce/packages/react-dom/src/shared/CSSProperty.js
 export const UNITLESS_PROPERTIES: Indexable = {
 	animationIterationCount: true,

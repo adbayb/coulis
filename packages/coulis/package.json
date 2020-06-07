@@ -7,6 +7,7 @@
 	"module": "./dist/lib.mjs",
 	"types": "./dist/index.d.ts",
 	"scripts": {
+		"prepublishOnly": "npm run build",
 		"clean": "rm -rf dist",
 		"prewatch": "npm run clean",
 		"watch": "rollup -c --watch",

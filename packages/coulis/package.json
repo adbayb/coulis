@@ -1,11 +1,14 @@
 {
 	"name": "coulis",
 	"version": "0.1.0",
-	"description": "An atomic CSS-in-JS library",
+	"description": "Yet another atomic CSS-in-JS library",
 	"source": "./src/index.ts",
-	"main": "./dist/lib.js",
-	"module": "./dist/lib.mjs",
+	"main": "./dist/coulis.js",
+	"module": "./dist/coulis.mjs",
 	"types": "./dist/index.d.ts",
+	"files": [
+		"dist"
+	],
 	"scripts": {
 		"prepublishOnly": "npm run build",
 		"clean": "rm -rf dist",
@@ -23,12 +26,15 @@
 	],
 	"author": {
 		"name": "Ayoub Adib",
-		"email": "adbayb@gmail.com"
+		"email": "adbayb@gmail.com",
+		"url": "https://twitter.com/adbayb"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git@github.com:adbayb/coulis.git",
+		"directory": "packages/coulis"
 	},
 	"license": "MIT",
-	"files": [
-		"dist"
-	],
 	"devDependencies": {
 		"@rollup/plugin-replace": "2.3.2",
 		"@types/node": "14.0.1",

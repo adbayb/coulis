@@ -4,9 +4,6 @@
 </div>
 <p></p>
 
--   [⚙️ Core](./packages/coulis)
+## Packages
 
-## Usage
-
--   `cd my-project-root-folder`
--   `npx @adbayb/castor`
+:package: [**coulis**](./packages/coulis) Core library

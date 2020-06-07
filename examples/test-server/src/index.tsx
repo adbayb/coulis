@@ -3,7 +3,12 @@ import { renderToString } from "react-dom/server";
 import { createCss, css, extractStyles } from "coulis";
 
 const cssMobile = createCss("@media (max-width: 400px)");
-const Test = () => {
+const Child = () => {
+	return (
+		<p className={css({ backgroundColor: "red", fontSize: 24 })}>Titi</p>
+	);
+};
+const App = () => {
 	return (
 		<div
 			className={[
@@ -12,9 +17,10 @@ const Test = () => {
 			].join(" ")}
 		>
 			Plop
+			<Child />
 		</div>
 	);
 };
 
-console.log(renderToString(<Test />));
-extractStyles();
+console.log(renderToString(<App />));
+console.log(extractStyles());

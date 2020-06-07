@@ -3,13 +3,14 @@
 // @todo: always & to reference parent in selector ? Quid :hover, :focus
 // @todo: server side extraction
 // @todo: hydrate createProcessor cache client side from data-coulis tag ?
-import {
-	IS_INMEMORY_ENV,
-	SHORTHAND_PROPERTIES,
-	UNITLESS_PROPERTIES,
-} from "./constants";
+import { SHORTHAND_PROPERTIES, UNITLESS_PROPERTIES } from "./constants";
 import { hash } from "./helpers/hash";
-import { StyleSheetAdapter, getStyleSheet } from "./helpers/stylesheet";
+import {
+	StyleSheetAdapter,
+	StyleSheetKey,
+	createStyleSheets,
+	stringifyStyle,
+} from "./helpers/stylesheet";
 import { DeclarationBlock, Property, Value } from "./types";
 import { merge } from "./helpers/merge";
 import { isObject } from "./helpers/object";
@@ -74,7 +75,7 @@ const createProcessor = () => {
 };
 
 const processStyle = createProcessor();
-const styleSheet = getStyleSheet();
+const styleSheets = createStyleSheets();
 
 export const createCss = (groupRule: string) => {
 	const formatRuleSetWithScope = (ruleSet: string) => {
@@ -88,11 +89,11 @@ export const createCss = (groupRule: string) => {
 
 		for (const property in cssBlock) {
 			const value = cssBlock[property];
-			const destinationSheet = groupRule
-				? styleSheet.conditional
+			const styleSheet = groupRule
+				? styleSheets.conditional
 				: SHORTHAND_PROPERTIES[property]
-				? styleSheet.shorthand
-				: styleSheet.longhand;
+				? styleSheets.shorthand
+				: styleSheets.longhand;
 
 			if (isObject(value)) {
 				for (const selectorProperty in value) {
@@ -111,7 +112,7 @@ export const createCss = (groupRule: string) => {
 									isDefaultProperty ? "" : selectorProperty
 								}{${declaration}}`
 							),
-						destinationSheet
+						styleSheet
 					);
 
 					if (className !== null) {
@@ -125,7 +126,7 @@ export const createCss = (groupRule: string) => {
 					value,
 					(className, declaration) =>
 						formatRuleSetWithScope(`.${className}{${declaration}}`),
-					destinationSheet
+					styleSheet
 				);
 
 				if (className !== null) {
@@ -141,17 +142,23 @@ export const createCss = (groupRule: string) => {
 export const css = createCss("");
 
 export const extractStyles = () => {
-	if (!IS_INMEMORY_ENV) {
-		// @todo: to remove ?
-		console.warn(
-			"`extractStyles` has no effect: it seems that you're using it in a non server environment. Make sure to consume it in the right environment"
-		);
-	} else {
-		console.log(styleSheet);
-	}
+	let style = "";
+
+	Object.keys(styleSheets).map((key) => {
+		const declarationBlock = styleSheets[
+			key as StyleSheetKey
+		].getDeclarationBlock();
+
+		if (declarationBlock) {
+			style = `${style}${stringifyStyle(
+				key as StyleSheetKey,
+				declarationBlock
+			)}`;
+		}
+	});
 
 	// @todo: stringified <style></style><style></style><style></style>
-	return "";
+	return style;
 };
 
 export const injectGlobal = () => {

@@ -3,15 +3,16 @@ import { IS_DEV_ENV, IS_INMEMORY_ENV } from "../constants";
 // @todo: globalStyleElement
 export interface StyleSheetAdapter {
 	commit: (rule: string) => void;
+	getDeclarationBlock: () => string;
 }
 
-type StyleSheetType = "global" | "shorthand" | "longhand" | "conditional";
+export type StyleSheetKey = "global" | "shorthand" | "longhand" | "conditional";
 
 class VirtualStyleSheet implements StyleSheetAdapter {
 	static inMemoryCache: Record<string, string[]> = {};
 	target: typeof VirtualStyleSheet.inMemoryCache["global"];
 
-	constructor(key: StyleSheetType) {
+	constructor(key: StyleSheetKey) {
 		this.target = [];
 		VirtualStyleSheet.inMemoryCache[key] = this.target;
 	}
@@ -19,12 +20,16 @@ class VirtualStyleSheet implements StyleSheetAdapter {
 	commit(rule: string) {
 		this.target.push(rule);
 	}
+
+	getDeclarationBlock() {
+		return this.target.join("");
+	}
 }
 
 class WebStyleSheet implements StyleSheetAdapter {
 	target: HTMLStyleElement;
 
-	constructor(key: StyleSheetType) {
+	constructor(key: StyleSheetKey) {
 		let element = document.querySelector(
 			`[data-coulis=${key}]`
 		) as HTMLStyleElement | null;
@@ -49,9 +54,17 @@ class WebStyleSheet implements StyleSheetAdapter {
 			this.target.sheet!.insertRule(rule);
 		}
 	}
+
+	getDeclarationBlock() {
+		// @todo: to check, retrieve declaration block other ways
+		return this.target.innerText;
+	}
 }
 
-export const getStyleSheet = (): Record<StyleSheetType, StyleSheetAdapter> => {
+export const createStyleSheets = (): Record<
+	StyleSheetKey,
+	StyleSheetAdapter
+> => {
 	const StyleSheet = IS_INMEMORY_ENV ? VirtualStyleSheet : WebStyleSheet;
 	const globalSheet = new StyleSheet("global");
 	const longhandSheet = new StyleSheet("longhand");
@@ -64,4 +77,8 @@ export const getStyleSheet = (): Record<StyleSheetType, StyleSheetAdapter> => {
 		shorthand: shorthandSheet,
 		conditional: conditionalSheet,
 	};
+};
+
+export const stringifyStyle = (key: StyleSheetKey, value: string) => {
+	return `<style data-coulis="${key}">${value}</style>`;
 };

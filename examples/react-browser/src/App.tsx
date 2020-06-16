@@ -1,7 +1,23 @@
 import React from "react";
-import { css, createCss } from "coulis";
+import { css, createCss, keyframes, raw } from "coulis";
 
 const cssTablet = createCss("@media (min-width: 400px)");
+
+raw(`
+	html, body {
+		background-color: lightcoral;
+	}
+`);
+
+const animationName = keyframes(`
+from {
+	transform: scale(1);
+}
+
+to {
+	transform: scale(1.015);
+}
+`);
 
 function App() {
 	return (
@@ -65,6 +81,13 @@ function App() {
 				>
 					Learn React
 				</a>
+				<div
+					className={css({
+						animation: `${animationName} 500ms ease alternate infinite`,
+					})}
+				>
+					Some heartbeat effect
+				</div>
 			</header>
 		</div>
 	);

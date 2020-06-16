@@ -38,8 +38,8 @@ const toDeclaration = (property: Property, value: Value) => {
 // background-color = property (or property name)
 // blue = value (or property value)
 
-const toClassName = (...hashInputs: Value[]) => {
-	return `c${hash(hashInputs.join(""))}`;
+const toClassName = (hashInput: string, prefix = "c") => {
+	return `${prefix}${hash(hashInput)}`;
 };
 
 const createProcessor = () => {
@@ -67,6 +67,7 @@ const createProcessor = () => {
 		const normalizedDeclaration = toDeclaration(property, value);
 		const ruleSet = ruleSetFormatter(className, normalizedDeclaration);
 
+		// @todo: do not commit if rule already exists inside dom (hydratation + rerendering purposes :))
 		styleSheet.commit(ruleSet);
 		cache[key] = className;
 
@@ -135,11 +136,20 @@ export const createCss = (groupRule: string) => {
 			}
 		}
 
-		return classNames;
+		return classNames.trim();
 	};
 };
 
 export const css = createCss("");
+
+export const keyframes = (value: string) => {
+	const className = `${toClassName(value, "a")}`;
+	const declarationBlock = `@keyframes ${className}{${value}}`;
+
+	styleSheets.global.commit(declarationBlock);
+
+	return className;
+};
 
 export const extractStyles = () => {
 	let style = "";
@@ -161,7 +171,6 @@ export const extractStyles = () => {
 	return style;
 };
 
-export const injectGlobal = () => {
-	// @todo
-	return undefined;
+export const raw = (value: string) => {
+	styleSheets.global.commit(value);
 };

@@ -61,9 +61,8 @@ ReactDOM.render(<App />, document.getElementById("root"));
 -   [x] Atomic API
 -   [x] Conditional at rule API
 -   [x] Client side support
--   [ ] keyframes API
--   [ ] Global css API
--   [ ] Compose (cx) API ?
+-   [x] keyframes API
+-   [x] Global css API (naming proposal: raw => to also take advantage of global class names definition)
 -   [ ] Server side support
 -   [ ] Review API typings
 -   [ ] Documentation (principles, homepage, ...)

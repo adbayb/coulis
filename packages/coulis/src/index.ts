@@ -151,7 +151,7 @@ export const keyframes = (value: string) => {
 	return className;
 };
 
-export const extractStyles = () => {
+export const extractCss = () => {
 	let style = "";
 
 	Object.keys(styleSheets).map((key) => {

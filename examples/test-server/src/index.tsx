@@ -1,6 +1,22 @@
 import React from "react";
 import { renderToString } from "react-dom/server";
-import { createCss, css, extractStyles } from "coulis";
+import { createCss, css, extractCss, keyframes, raw } from "coulis";
+
+raw(`
+	html, body {
+		background-color: lightcoral;
+	}
+`);
+
+const animationName = keyframes(`
+from {
+	transform: scale(1);
+}
+
+to {
+	transform: scale(1.015);
+}
+`);
 
 const cssMobile = createCss("@media (max-width: 400px)");
 const Child = () => {
@@ -12,7 +28,10 @@ const App = () => {
 	return (
 		<div
 			className={[
-				css({ backgroundColor: "red" }),
+				css({
+					backgroundColor: "red",
+					animation: `${animationName} 500ms ease alternate infinite`,
+				}),
 				cssMobile({ color: "blue" }),
 			].join(" ")}
 		>
@@ -23,4 +42,4 @@ const App = () => {
 };
 
 console.log(renderToString(<App />));
-console.log(extractStyles());
+console.log(extractCss());

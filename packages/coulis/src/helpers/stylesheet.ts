@@ -1,4 +1,4 @@
-import { IS_DEV_ENV, IS_INMEMORY_ENV } from "../constants";
+import { IS_BROWSER_ENV, IS_PROD_ENV } from "../constants";
 
 // @todo: globalStyleElement
 export interface StyleSheetAdapter {
@@ -45,13 +45,13 @@ class WebStyleSheet implements StyleSheetAdapter {
 	}
 
 	commit(rule: string) {
-		if (IS_DEV_ENV) {
+		if (IS_PROD_ENV) {
+			this.target.sheet!.insertRule(rule);
+		} else {
 			// stl.innerHTML = `${stl.innerHTML}${rule}`;
 			// stl.appendChild(document.createTextNode(rule));
 			// @note: faster than other insertion alternatives https://jsperf.com/insertadjacenthtml-perf/22 :
 			this.target.insertAdjacentHTML("beforeend", rule);
-		} else {
-			this.target.sheet!.insertRule(rule);
 		}
 	}
 
@@ -65,7 +65,7 @@ export const createStyleSheets = (): Record<
 	StyleSheetKey,
 	StyleSheetAdapter
 > => {
-	const StyleSheet = IS_INMEMORY_ENV ? VirtualStyleSheet : WebStyleSheet;
+	const StyleSheet = IS_BROWSER_ENV ? WebStyleSheet : VirtualStyleSheet;
 	const globalSheet = new StyleSheet("global");
 	const longhandSheet = new StyleSheet("longhand");
 	const shorthandSheet = new StyleSheet("shorthand");

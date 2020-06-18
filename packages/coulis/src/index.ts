@@ -12,8 +12,8 @@ import {
 	stringifyStyle,
 } from "./helpers/stylesheet";
 import { DeclarationBlock, Property, Value } from "./types";
-import { merge } from "./helpers/merge";
-import { isObject } from "./helpers/object";
+import { isObject, merge } from "./helpers/object";
+import { CacheAdapter, createCache } from "./helpers/cache";
 
 const toDeclaration = (property: Property, value: Value) => {
 	// @section: from JS camelCase to CSS kebeb-case
@@ -42,10 +42,7 @@ const toClassName = (hashInput: string, prefix = "c") => {
 	return `${prefix}${hash(hashInput)}`;
 };
 
-const createProcessor = () => {
-	// for memoization purposes:
-	const cache: Record<string, string | null> = {};
-
+const createProcessor = (cache: CacheAdapter) => {
 	return (
 		key: string,
 		property: string,
@@ -53,29 +50,29 @@ const createProcessor = () => {
 		ruleSetFormatter: (className: string, declaration: string) => string,
 		styleSheet: StyleSheetAdapter
 	) => {
-		const cacheValue = cache[key];
+		const className = toClassName(key);
 
-		if (cacheValue) {
-			return cacheValue;
+		if (cache.has(className)) {
+			return className;
 		}
 
 		if (value === undefined) {
 			return null;
 		}
 
-		const className = toClassName(key);
 		const normalizedDeclaration = toDeclaration(property, value);
 		const ruleSet = ruleSetFormatter(className, normalizedDeclaration);
 
 		// @todo: do not commit if rule already exists inside dom (hydratation + rerendering purposes :))
 		styleSheet.commit(ruleSet);
-		cache[key] = className;
+		cache.set(className);
 
 		return className;
 	};
 };
 
-const processStyle = createProcessor();
+const cache = createCache();
+const processStyle = createProcessor(cache);
 const styleSheets = createStyleSheets();
 
 export const createCss = (groupRule: string) => {

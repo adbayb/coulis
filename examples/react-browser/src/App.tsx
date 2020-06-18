@@ -88,6 +88,13 @@ function App() {
 				>
 					Some heartbeat effect
 				</div>
+				<div
+					className={css({
+						animation: `${animationName} 500ms ease alternate infinite`,
+					})}
+				>
+					Some heartbeat effect
+				</div>
 			</header>
 		</div>
 	);

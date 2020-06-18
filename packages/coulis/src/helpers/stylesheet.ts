@@ -8,68 +8,66 @@ export interface StyleSheetAdapter {
 
 export type StyleSheetKey = "global" | "shorthand" | "longhand" | "conditional";
 
-class VirtualStyleSheet implements StyleSheetAdapter {
-	static inMemoryCache: Record<string, string[]> = {};
-	target: typeof VirtualStyleSheet.inMemoryCache["global"];
+const createVirtualStyleSheet = (key: StyleSheetKey): StyleSheetAdapter => {
+	const target: typeof createVirtualStyleSheet.slots[number] = [];
 
-	constructor(key: StyleSheetKey) {
-		this.target = [];
-		VirtualStyleSheet.inMemoryCache[key] = this.target;
+	createVirtualStyleSheet.slots[key] = target;
+
+	return {
+		commit(rule: string) {
+			target.push(rule);
+		},
+		getDeclarationBlock() {
+			return target.join("");
+		},
+	};
+};
+
+createVirtualStyleSheet.slots = {} as Record<string, string[]>;
+
+const createWebStyleSheet = (key: StyleSheetKey): StyleSheetAdapter => {
+	let element = document.querySelector(
+		`[data-coulis=${key}]`
+	) as HTMLStyleElement | null;
+
+	// @todo: rehydration in case of element !== null
+	if (element === null) {
+		element = document.createElement("style");
+		element.dataset.coulis = key;
+		document.head.appendChild(element);
 	}
 
-	commit(rule: string) {
-		this.target.push(rule);
-	}
+	const target = element;
 
-	getDeclarationBlock() {
-		return this.target.join("");
-	}
-}
-
-class WebStyleSheet implements StyleSheetAdapter {
-	target: HTMLStyleElement;
-
-	constructor(key: StyleSheetKey) {
-		let element = document.querySelector(
-			`[data-coulis=${key}]`
-		) as HTMLStyleElement | null;
-
-		// @todo: rehydration in case of element !== null
-		if (element === null) {
-			element = document.createElement("style");
-			element.dataset.coulis = key;
-			document.head.appendChild(element);
-		}
-
-		this.target = element;
-	}
-
-	commit(rule: string) {
-		if (IS_PROD_ENV) {
-			this.target.sheet!.insertRule(rule);
-		} else {
-			// stl.innerHTML = `${stl.innerHTML}${rule}`;
-			// stl.appendChild(document.createTextNode(rule));
-			// @note: faster than other insertion alternatives https://jsperf.com/insertadjacenthtml-perf/22 :
-			this.target.insertAdjacentHTML("beforeend", rule);
-		}
-	}
-
-	getDeclarationBlock() {
-		// @todo: to check, retrieve declaration block other ways
-		return this.target.innerText;
-	}
-}
+	return {
+		commit(rule: string) {
+			if (IS_PROD_ENV) {
+				target.sheet!.insertRule(rule);
+			} else {
+				// stl.innerHTML = `${stl.innerHTML}${rule}`;
+				// stl.appendChild(document.createTextNode(rule));
+				// @note: faster than other insertion alternatives https://jsperf.com/insertadjacenthtml-perf/22 :
+				target.insertAdjacentHTML("beforeend", rule);
+			}
+		},
+		getDeclarationBlock() {
+			// @todo: to check, retrieve declaration block other ways
+			return target.innerText;
+		},
+	};
+};
 
 export const createStyleSheets = (): Record<
 	StyleSheetKey,
 	StyleSheetAdapter
 > => {
-	const StyleSheet = IS_BROWSER_ENV ? WebStyleSheet : VirtualStyleSheet;
-	const globalSheet = new StyleSheet("global");
-	const longhandSheet = new StyleSheet("longhand");
-	const shorthandSheet = new StyleSheet("shorthand");
-	const conditionalSheet = new StyleSheet("conditional");
+	const createStyleSheet = IS_BROWSER_ENV
+		? createWebStyleSheet
+		: createVirtualStyleSheet;
+	const globalSheet = createStyleSheet("global");
+	const longhandSheet = createStyleSheet("longhand");
+	const shorthandSheet = createStyleSheet("shorthand");
+	const conditionalSheet = createStyleSheet("conditional");
 
 	return {
 		global: globalSheet,

@@ -1,0 +1,111 @@
+import { SHORTHAND_PROPERTIES } from "./constants";
+import { isObject, merge } from "./helpers";
+import {
+	StyleSheetKey,
+	createStyleSheets,
+	stringifyStyle,
+} from "./domains/stylesheet";
+import { createCache } from "./domains/cache";
+import { createProcessor, toClassName } from "./domains/processor";
+import { DeclarationBlock } from "./types";
+
+const styleSheets = createStyleSheets();
+const cache = createCache(styleSheets);
+const processStyle = createProcessor(cache);
+
+export const createCss = (groupRule: string) => {
+	const formatRuleSetWithScope = (ruleSet: string) => {
+		return !groupRule ? ruleSet : `${groupRule}{${ruleSet}}`;
+	};
+
+	return (...cssBlocks: DeclarationBlock[]) => {
+		const cssBlock =
+			cssBlocks.length <= 1 ? cssBlocks[0] : merge({}, ...cssBlocks);
+		let classNames = "";
+
+		for (const property in cssBlock) {
+			const value = cssBlock[property];
+			const styleSheet = groupRule
+				? styleSheets.conditional
+				: SHORTHAND_PROPERTIES[property]
+				? styleSheets.shorthand
+				: styleSheets.longhand;
+
+			if (isObject(value)) {
+				for (const selectorProperty in value) {
+					const selectorValue =
+						value[selectorProperty as keyof typeof value];
+					const isDefaultProperty = selectorProperty === "default";
+					const className = processStyle(
+						isDefaultProperty
+							? `${groupRule}${property}${selectorValue}`
+							: `${groupRule}${property}${selectorValue}${selectorProperty}`,
+						property,
+						selectorValue,
+						(className, declaration) =>
+							formatRuleSetWithScope(
+								`.${className}${
+									isDefaultProperty ? "" : selectorProperty
+								}{${declaration}}`
+							),
+						styleSheet
+					);
+
+					if (className !== null) {
+						classNames = `${classNames} ${className}`;
+					}
+				}
+			} else {
+				const className = processStyle(
+					`${groupRule}${property}${value}`,
+					property,
+					value,
+					(className, declaration) =>
+						formatRuleSetWithScope(`.${className}{${declaration}}`),
+					styleSheet
+				);
+
+				if (className !== null) {
+					classNames = `${classNames} ${className}`;
+				}
+			}
+		}
+
+		console.log(cache.entries());
+
+		return classNames.trim();
+	};
+};
+
+export const css = createCss("");
+
+export const keyframes = (value: string) => {
+	const className = `${toClassName(value, "a")}`;
+	const declarationBlock = `@keyframes ${className}{${value}}`;
+
+	styleSheets.global.commit(declarationBlock);
+
+	return className;
+};
+
+export const extractCss = () => {
+	let style = "";
+
+	Object.keys(styleSheets).map((key) => {
+		const declarationBlock = styleSheets[
+			key as StyleSheetKey
+		].getDeclarationBlock();
+
+		style = `${style}${stringifyStyle(
+			key as StyleSheetKey,
+			declarationBlock
+		)}`;
+	});
+
+	// @todo: stringified <style></style><style></style><style></style>
+	return style;
+};
+
+export const raw = (value: string) => {
+	styleSheets.global.commit(value);
+};

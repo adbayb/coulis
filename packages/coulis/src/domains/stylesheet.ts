@@ -1,12 +1,13 @@
 import { IS_BROWSER_ENV, IS_PROD_ENV } from "../constants";
 
-// @todo: globalStyleElement
 export interface StyleSheetAdapter {
 	commit: (rule: string) => void;
 	getDeclarationBlock: () => string;
 }
 
 export type StyleSheetKey = "global" | "shorthand" | "longhand" | "conditional";
+
+export type StyleSheets = Record<StyleSheetKey, StyleSheetAdapter>;
 
 const createVirtualStyleSheet = (key: StyleSheetKey): StyleSheetAdapter => {
 	const target: typeof createVirtualStyleSheet.slots[number] = [];
@@ -30,7 +31,6 @@ const createWebStyleSheet = (key: StyleSheetKey): StyleSheetAdapter => {
 		`[data-coulis=${key}]`
 	) as HTMLStyleElement | null;
 
-	// @todo: rehydration in case of element !== null
 	if (element === null) {
 		element = document.createElement("style");
 		element.dataset.coulis = key;

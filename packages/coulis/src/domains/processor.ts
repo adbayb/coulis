@@ -58,7 +58,7 @@ export const createProcessor = (cache: CacheAdapter) => {
 		const normalizedDeclaration = toDeclaration(property, value);
 		const ruleSet = ruleSetFormatter(className, normalizedDeclaration);
 
-		styleSheet.commit(ruleSet, cacheKey);
+		styleSheet.set(ruleSet);
 		cache.set(cacheKey);
 
 		return className;

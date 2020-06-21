@@ -82,9 +82,15 @@ export const css = createCss("");
 export const keyframes = (value: string) => {
 	const key = hash(value);
 	const className = `${toClassName(key)}`;
+
+	if (cache.has(key)) {
+		return className;
+	}
+
 	const declarationBlock = `@keyframes ${className}{${minify(value)}}`;
 
-	styleSheets.global.commit(declarationBlock, key);
+	styleSheets.global.set(declarationBlock);
+	cache.set(key);
 
 	return className;
 };
@@ -93,7 +99,7 @@ export const extractCss = () => {
 	let style = "";
 
 	Object.keys(styleSheets).map((key) => {
-		const css = styleSheets[key as StyleSheetKey].getCss();
+		const css = styleSheets[key as StyleSheetKey].get();
 
 		style = `${style}${stringifyStyle(key as StyleSheetKey, css)}`;
 	});
@@ -102,5 +108,12 @@ export const extractCss = () => {
 };
 
 export const raw = (value: string) => {
-	styleSheets.global.commit(minify(value), hash(value));
+	const key = hash(value);
+
+	if (cache.has(key)) {
+		return;
+	}
+
+	styleSheets.global.set(minify(value));
+	cache.set(key);
 };

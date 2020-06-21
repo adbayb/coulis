@@ -1,48 +1,55 @@
 import { IS_BROWSER_ENV, IS_PROD_ENV } from "../constants";
-import { minify } from "../helpers";
 
-export interface StyleSheetAdapter {
-	set: (rule: string) => void;
-	get: () => string;
-}
-
+// @todo: rename StyleSheetKey to StyleSheetType
+// @todo: StyleSheets should be an array and not record + use mapping to set order { global: 0, shorthand: 1, ...}
+// following points TBC:
+// @todo: remove data-coulis-type inside dom since order is deterministic (global is always the first...)
+// @todo: rename data-coulis-keys to data-coulis
 export type StyleSheetKey = "global" | "shorthand" | "longhand" | "conditional";
+export interface StyleSheetAdapter {
+	commit: (rule: string) => void;
+	get: () => string;
+	element: HTMLStyleElement | null;
+	type: StyleSheetKey;
+}
 
 export type StyleSheets = Record<StyleSheetKey, StyleSheetAdapter>;
 
-const createVirtualStyleSheet = (key: StyleSheetKey): StyleSheetAdapter => {
+const createVirtualStyleSheet = (type: StyleSheetKey): StyleSheetAdapter => {
 	const target: typeof createVirtualStyleSheet.slots[number] = [];
 
-	createVirtualStyleSheet.slots[key] = target;
+	createVirtualStyleSheet.slots[type] = target;
 	createVirtualStyleSheet.prototype.valueOf = () => 2;
 
 	return {
-		set(rule: string) {
+		commit(rule: string) {
 			target.push(rule);
 		},
 		get() {
 			return target.join("");
 		},
+		element: null,
+		type,
 	};
 };
 
 createVirtualStyleSheet.slots = {} as Record<string, string[]>;
 
-const createWebStyleSheet = (key: StyleSheetKey): StyleSheetAdapter => {
+const createWebStyleSheet = (type: StyleSheetKey): StyleSheetAdapter => {
 	let element = document.querySelector(
-		`[data-coulis=${key}]`
+		`[data-coulis-type=${type}]`
 	) as HTMLStyleElement | null;
 
 	if (element === null) {
 		element = document.createElement("style");
-		element.dataset.coulis = key;
+		element.dataset.coulisType = type;
 		document.head.appendChild(element);
 	}
 
 	const target = element;
 
 	return {
-		set(rule: string) {
+		commit(rule: string) {
 			if (IS_PROD_ENV) {
 				target.sheet!.insertRule(rule);
 			} else {
@@ -56,6 +63,8 @@ const createWebStyleSheet = (key: StyleSheetKey): StyleSheetAdapter => {
 			// @todo: to check, retrieve declaration block other ways
 			return target.innerText;
 		},
+		element,
+		type,
 	};
 };
 
@@ -77,8 +86,4 @@ export const createStyleSheets = (): Record<
 		shorthand: shorthandSheet,
 		conditional: conditionalSheet,
 	};
-};
-
-export const stringifyStyle = (key: StyleSheetKey, value: string) => {
-	return `<style data-coulis="${key}">${minify(value)}</style>`;
 };

@@ -1,10 +1,6 @@
 import { SHORTHAND_PROPERTIES } from "./constants";
 import { hash, isObject, merge, minify } from "./helpers";
-import {
-	StyleSheetKey,
-	createStyleSheets,
-	stringifyStyle,
-} from "./domains/stylesheet";
+import { StyleSheetKey, createStyleSheets } from "./domains/stylesheet";
 import { createCache } from "./domains/cache";
 import { createProcessor, toClassName } from "./domains/processor";
 import { DeclarationBlock } from "./types";
@@ -71,8 +67,6 @@ export const createCss = (groupRule: string) => {
 			}
 		}
 
-		console.log(cache.entries());
-
 		return classNames.trim();
 	};
 };
@@ -89,22 +83,33 @@ export const keyframes = (value: string) => {
 
 	const declarationBlock = `@keyframes ${className}{${minify(value)}}`;
 
-	styleSheets.global.set(declarationBlock);
-	cache.set(key);
+	styleSheets.global.commit(declarationBlock);
+	cache.set(key, "global");
 
 	return className;
 };
 
-export const extractCss = () => {
-	let style = "";
+export const extractStyles = () => {
+	const styleSheetTypes = Object.keys(styleSheets) as StyleSheetKey[];
+	const cacheEntries = cache.entries();
+	const cacheKeys = Object.keys(cacheEntries);
 
-	Object.keys(styleSheets).map((key) => {
-		const css = styleSheets[key as StyleSheetKey].get();
+	return styleSheetTypes.map((type) => {
+		const styleSheet = styleSheets[type];
+		const cssValue = minify(styleSheet.get());
+		const keys = cacheKeys.filter((key) => cacheEntries[key] === type);
 
-		style = `${style}${stringifyStyle(key as StyleSheetKey, css)}`;
+		return {
+			keys,
+			content: cssValue,
+			type,
+			toString() {
+				return `<style data-coulis-type="${type}" data-coulis-keys="${keys.join(
+					","
+				)}">${cssValue}</style>`;
+			},
+		};
 	});
-
-	return style;
 };
 
 export const raw = (value: string) => {
@@ -114,6 +119,6 @@ export const raw = (value: string) => {
 		return;
 	}
 
-	styleSheets.global.set(minify(value));
-	cache.set(key);
+	styleSheets.global.commit(minify(value));
+	cache.set(key, "global");
 };

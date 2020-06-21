@@ -3,4 +3,4 @@
 // @todo: always & to reference parent in selector ? Quid :hover, :focus
 // @todo: server side extraction
 // @todo: hydrate createProcessor cache client side from data-coulis tag ?
-export { createCss, css, extractCss, keyframes, raw } from "./coulis";
+export { createCss, css, extractStyles, keyframes, raw } from "./coulis";

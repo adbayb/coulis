@@ -1,30 +1,42 @@
 import { IS_BROWSER_ENV } from "../constants";
-import { StyleSheets } from "./stylesheet";
+import { StyleSheetKey, StyleSheets } from "./stylesheet";
 
-type CacheEntry = Record<string, boolean>;
+type CacheEntry = Record<string, StyleSheetKey>;
 
 export interface CacheAdapter {
-	set(key: string): void;
+	set(key: string, target: StyleSheetKey): void;
 	has(key: string): boolean;
 	entries(): CacheEntry;
 }
 
 const hydrate = (styleSheets: StyleSheets): CacheEntry => {
-	console.log(styleSheets);
-	// Array.from($0.sheet.rules).map(rule => rule.selectorText)
+	const sheets = Object.values(styleSheets);
+	const hydratedCache: CacheEntry = {};
 
-	return {};
+	sheets.forEach(({ element, type }) => {
+		if (!element) {
+			return;
+		}
+
+		const keys = element.dataset.coulisKey?.split(",") || [];
+
+		keys.forEach((key) => {
+			hydratedCache[key] = type;
+		});
+	});
+
+	return hydratedCache;
 };
 
 export const createCache = (styleSheets: StyleSheets): CacheAdapter => {
 	const cache: CacheEntry = IS_BROWSER_ENV ? hydrate(styleSheets) : {};
 
 	return {
-		set(key) {
-			cache[key] = true;
+		set(key, target: StyleSheetKey) {
+			cache[key] = target;
 		},
 		has(key) {
-			return cache[key];
+			return Boolean(cache[key]);
 		},
 		entries() {
 			return cache;

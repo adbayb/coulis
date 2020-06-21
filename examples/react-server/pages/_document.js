@@ -1,22 +1,40 @@
 import React from "react";
 import Document, { Head, Html, Main, NextScript } from "next/document";
-import { extractCss } from "coulis";
+import { extractStyles } from "coulis";
 
 class MyDocument extends Document {
 	static async getInitialProps(ctx) {
 		const initialProps = await Document.getInitialProps(ctx);
-		const styleTags = extractCss();
+		const styles = extractStyles();
 
-		// console.log("PASSE", initialProps, styleTags);
+		return {
+			...initialProps,
+			styles: (
+				<>
+					{initialProps.styles}
+					{styles.map((style) => {
+						const { content, keys, type } = style;
 
-		return { ...initialProps, styleTags };
+						return (
+							<style
+								key={type}
+								data-coulis-type={type}
+								data-coulis-keys={keys.join()}
+								dangerouslySetInnerHTML={{ __html: content }}
+							/>
+						);
+					})}
+				</>
+			),
+		};
 	}
 
 	render() {
 		return (
 			<Html>
-				<Head>{this.props.styleTags}</Head>
+				<Head />
 				<body>
+					{JSON.stringify(this.props.styleTags)}
 					<Main />
 					<NextScript />
 				</body>

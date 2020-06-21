@@ -31,11 +31,6 @@ export const toClassName = (key: string) => {
 	return `c${key}`;
 };
 
-// @todo: createRawProcessor
-// createAtomicProcessor
-// @todo: data-coulis-cache
-// @todo data-coulis => data-coulis-type
-
 export const createProcessor = (cache: CacheAdapter) => {
 	return (
 		key: string,
@@ -58,8 +53,8 @@ export const createProcessor = (cache: CacheAdapter) => {
 		const normalizedDeclaration = toDeclaration(property, value);
 		const ruleSet = ruleSetFormatter(className, normalizedDeclaration);
 
-		styleSheet.set(ruleSet);
-		cache.set(cacheKey);
+		styleSheet.commit(ruleSet);
+		cache.set(cacheKey, styleSheet.type);
 
 		return className;
 	};

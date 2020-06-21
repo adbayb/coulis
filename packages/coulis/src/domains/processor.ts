@@ -1,26 +1,8 @@
 import { Property, Value } from "../types";
 import { UNITLESS_PROPERTIES } from "../constants";
+import { hash } from "../helpers";
 import { CacheAdapter } from "./cache";
 import { StyleSheetAdapter } from "./stylesheet";
-
-const hash = (str: string) => {
-	// hash content based with FNV-1a algorithm:
-	const FNVOffsetBasis = 2166136261;
-	const FNVPrime = 16777619;
-	let hash = FNVOffsetBasis;
-
-	for (let i = 0; i < str.length; i++) {
-		hash ^= str.charCodeAt(i);
-		hash *= FNVPrime;
-	}
-
-	// @note: we convert hashed value to 32-bit unsigned integer
-	// via logical unsigned shift operator >>>
-	const uHash = hash >>> 0;
-
-	// @note: we convert to hexadecimal
-	return Number(uHash).toString(16);
-};
 
 export const toDeclaration = (property: Property, value: Value) => {
 	// @section: from JS camelCase to CSS kebeb-case
@@ -45,9 +27,14 @@ export const toDeclaration = (property: Property, value: Value) => {
 // background-color = property (or property name)
 // blue = value (or property value)
 
-export const toClassName = (hashInput: string, prefix = "c") => {
-	return `${prefix}${hash(hashInput)}`;
+export const toClassName = (key: string) => {
+	return `c${key}`;
 };
+
+// @todo: createRawProcessor
+// createAtomicProcessor
+// @todo: data-coulis-cache
+// @todo data-coulis => data-coulis-type
 
 export const createProcessor = (cache: CacheAdapter) => {
 	return (
@@ -57,9 +44,10 @@ export const createProcessor = (cache: CacheAdapter) => {
 		ruleSetFormatter: (className: string, declaration: string) => string,
 		styleSheet: StyleSheetAdapter
 	) => {
-		const className = toClassName(key);
+		const cacheKey = hash(key);
+		const className = toClassName(cacheKey);
 
-		if (cache.has(className)) {
+		if (cache.has(cacheKey)) {
 			return className;
 		}
 
@@ -70,8 +58,8 @@ export const createProcessor = (cache: CacheAdapter) => {
 		const normalizedDeclaration = toDeclaration(property, value);
 		const ruleSet = ruleSetFormatter(className, normalizedDeclaration);
 
-		styleSheet.commit(ruleSet);
-		cache.set(className);
+		styleSheet.commit(ruleSet, cacheKey);
+		cache.set(cacheKey);
 
 		return className;
 	};

@@ -4,8 +4,8 @@ import { StyleSheets } from "./stylesheet";
 type CacheEntry = Record<string, boolean>;
 
 export interface CacheAdapter {
-	set(className: string): void;
-	has(className: string): boolean;
+	set(key: string): void;
+	has(key: string): boolean;
 	entries(): CacheEntry;
 }
 
@@ -20,11 +20,11 @@ export const createCache = (styleSheets: StyleSheets): CacheAdapter => {
 	const cache: CacheEntry = IS_BROWSER_ENV ? hydrate(styleSheets) : {};
 
 	return {
-		set(className) {
-			cache[className] = true;
+		set(key) {
+			cache[key] = true;
 		},
-		has(className) {
-			return cache[className];
+		has(key) {
+			return cache[key];
 		},
 		entries() {
 			return cache;

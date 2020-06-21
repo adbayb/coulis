@@ -1,11 +1,10 @@
 {
 	"private": true,
 	"scripts": {
-		"sandbox": "npm start --prefix examples/react-browser",
-		"pretest-server": "npm run build --prefix packages/coulis",
-		"test-server": "npm start --prefix examples/test-server",
+		"sandbox:browser": "npm start --prefix examples/react-browser",
+		"sandbox:server": "npm run dev --prefix examples/react-server",
 		"benchmark": "npm run coulis:table --prefix benchmarks && npm run emotion:table --prefix benchmarks && npm run styled-components:table --prefix benchmarks",
-		"dev": "concurrently \"npm run watch --prefix packages/coulis\" \"npm run sandbox\" --names \"lib,sandbox\"",
+		"dev": "concurrently \"npm run watch --prefix packages/coulis\" \"npm run sandbox:browser\" \"npm run sandbox:server\" --names \"lib,browser,server\"",
 		"check:format": "prettier . --ignore-path .gitignore --ignore-path .prettierignore",
 		"check:lint": "eslint . --ignore-path .gitignore",
 		"check:types": "tsc --noEmit",

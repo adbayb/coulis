@@ -1,5 +1,5 @@
 import { SHORTHAND_PROPERTIES } from "./constants";
-import { isObject, merge, minify } from "./helpers";
+import { hash, isObject, merge, minify } from "./helpers";
 import {
 	StyleSheetKey,
 	createStyleSheets,
@@ -80,10 +80,11 @@ export const createCss = (groupRule: string) => {
 export const css = createCss("");
 
 export const keyframes = (value: string) => {
-	const className = `${toClassName(value, "a")}`;
+	const key = hash(value);
+	const className = `${toClassName(key)}`;
 	const declarationBlock = `@keyframes ${className}{${minify(value)}}`;
 
-	styleSheets.global.commit(declarationBlock);
+	styleSheets.global.commit(declarationBlock, key);
 
 	return className;
 };
@@ -92,19 +93,14 @@ export const extractCss = () => {
 	let style = "";
 
 	Object.keys(styleSheets).map((key) => {
-		const declarationBlock = styleSheets[
-			key as StyleSheetKey
-		].getDeclarationBlock();
+		const css = styleSheets[key as StyleSheetKey].getCss();
 
-		style = `${style}${stringifyStyle(
-			key as StyleSheetKey,
-			declarationBlock
-		)}`;
+		style = `${style}${stringifyStyle(key as StyleSheetKey, css)}`;
 	});
 
 	return style;
 };
 
 export const raw = (value: string) => {
-	styleSheets.global.commit(minify(value));
+	styleSheets.global.commit(minify(value), hash(value));
 };

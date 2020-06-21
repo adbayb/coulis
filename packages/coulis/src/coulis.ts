@@ -29,8 +29,7 @@ export const createCss = (groupRule: string) => {
 
 			if (isObject(value)) {
 				for (const selectorProperty in value) {
-					const selectorValue =
-						value[selectorProperty as keyof typeof value];
+					const selectorValue = value[selectorProperty as keyof typeof value];
 					const isDefaultProperty = selectorProperty === "default";
 					const className = processStyle(
 						isDefaultProperty

@@ -1,8 +1,8 @@
 import React from "react";
 import { css } from "coulis";
-import { NUMBER_OF_DATA } from "../constants";
+import { NUMBER_OF_DATA } from "../../constants";
 
-export default function BenchmarkCase() {
+export const Component = () => {
 	return (
 		<table
 			className={css({
@@ -45,4 +45,4 @@ export default function BenchmarkCase() {
 			</tbody>
 		</table>
 	);
-}
+};

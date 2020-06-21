@@ -4,16 +4,15 @@
 	"description": "",
 	"main": "index.js",
 	"scripts": {
-		"coulis:simple": "react-benchmark ./cases/coulis-simple.js",
-		"emotion:simple": "react-benchmark ./cases/emotion-simple.js",
-		"coulis:table": "react-benchmark ./cases/coulis.js",
-		"emotion:table": "react-benchmark ./cases/emotion.js",
-		"styled-components:table": "react-benchmark ./cases/styled-components.js"
+		"benchmark:browser": "react-benchmark ./cases/coulis/browser.js && react-benchmark ./cases/emotion/browser.js",
+		"benchmark:server": "react-benchmark ./cases/coulis/server.js && react-benchmark ./cases/emotion/server.js",
+		"benchmark:styled-components": "react-benchmark ./cases/styled-components.js"
 	},
 	"keywords": [],
 	"author": "Ayoub Adib <adbayb@gmail.com>",
 	"license": "MIT",
 	"dependencies": {
+		"benchmark": "2.1.4",
 		"coulis": "file:../packages/coulis",
 		"emotion": "10.0.27",
 		"react-benchmark": "2.1.1",

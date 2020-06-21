@@ -3,7 +3,8 @@
 	"scripts": {
 		"sandbox:browser": "npm start --prefix examples/react-browser",
 		"sandbox:server": "npm run dev --prefix examples/react-server",
-		"benchmark": "npm run coulis:table --prefix benchmarks && npm run emotion:table --prefix benchmarks && npm run styled-components:table --prefix benchmarks",
+		"benchmark:browser": "npm run benchmark:browser --prefix benchmarks",
+		"benchmark:server": "npm run benchmark:server --prefix benchmarks",
 		"dev": "concurrently \"npm run watch --prefix packages/coulis\" \"npm run sandbox:browser\" \"npm run sandbox:server\" --names \"lib,browser,server\"",
 		"check:format": "prettier . --ignore-path .gitignore --ignore-path .prettierignore",
 		"check:lint": "eslint . --ignore-path .gitignore",

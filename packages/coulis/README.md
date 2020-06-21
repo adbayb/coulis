@@ -62,7 +62,7 @@ ReactDOM.render(<App />, document.getElementById("root"));
 -   [x] Conditional at rule API
 -   [x] Client side support
 -   [x] keyframes API
--   [x] Global css API (naming proposal: raw => to also take advantage of global class names definition)
--   [ ] Server side support
+-   [x] Global css API (api naming to be reviewed)
+-   [x] Server side support
 -   [ ] Review API typings
 -   [ ] Documentation (principles, homepage, ...)

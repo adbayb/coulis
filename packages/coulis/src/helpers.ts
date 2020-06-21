@@ -27,3 +27,7 @@ export const merge = <ItemShape extends Record<string, unknown>>(
 
 	return merge(target, ...sources);
 };
+
+export const minify = (value: string) => {
+	return value.replace(/\s{2,}|\s+(?={)|\r?\n/gm, "");
+};

@@ -7,6 +7,10 @@ raw(`
 	html, body {
 		background-color: lightcoral;
 	}
+
+	div {
+		color: red;
+	}
 `);
 
 const animationName = keyframes(`

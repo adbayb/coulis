@@ -1,4 +1,5 @@
 import { IS_BROWSER_ENV, IS_PROD_ENV } from "../constants";
+import { minify } from "../helpers";
 
 export interface StyleSheetAdapter {
 	commit: (rule: string) => void;
@@ -78,5 +79,5 @@ export const createStyleSheets = (): Record<
 };
 
 export const stringifyStyle = (key: StyleSheetKey, value: string) => {
-	return `<style data-coulis="${key}">${value}</style>`;
+	return `<style data-coulis="${key}">${minify(value)}</style>`;
 };

@@ -1,5 +1,5 @@
 import { SHORTHAND_PROPERTIES } from "./constants";
-import { isObject, merge } from "./helpers";
+import { isObject, merge, minify } from "./helpers";
 import {
 	StyleSheetKey,
 	createStyleSheets,
@@ -81,7 +81,7 @@ export const css = createCss("");
 
 export const keyframes = (value: string) => {
 	const className = `${toClassName(value, "a")}`;
-	const declarationBlock = `@keyframes ${className}{${value}}`;
+	const declarationBlock = `@keyframes ${className}{${minify(value)}}`;
 
 	styleSheets.global.commit(declarationBlock);
 
@@ -102,10 +102,9 @@ export const extractCss = () => {
 		)}`;
 	});
 
-	// @todo: stringified <style></style><style></style><style></style>
 	return style;
 };
 
 export const raw = (value: string) => {
-	styleSheets.global.commit(value);
+	styleSheets.global.commit(minify(value));
 };

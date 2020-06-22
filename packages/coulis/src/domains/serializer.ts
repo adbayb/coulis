@@ -31,7 +31,7 @@ export const toClassName = (key: string) => {
 	return `c${key}`;
 };
 
-export const createProcessor = (cache: CacheAdapter) => {
+export const createSerializer = (cache: CacheAdapter) => {
 	return (
 		key: string,
 		property: string,

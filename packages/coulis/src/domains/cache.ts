@@ -18,7 +18,7 @@ const hydrate = (styleSheets: StyleSheets): CacheEntry => {
 			return;
 		}
 
-		const keys = element.dataset.coulisKey?.split(",") || [];
+		const keys = element.dataset.coulisKeys?.split(",") || [];
 
 		keys.forEach((key) => {
 			hydratedCache[key] = type;

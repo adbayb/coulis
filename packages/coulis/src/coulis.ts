@@ -2,12 +2,12 @@ import { SHORTHAND_PROPERTIES } from "./constants";
 import { hash, isObject, merge, minify } from "./helpers";
 import { StyleSheetKey, createStyleSheets } from "./domains/stylesheet";
 import { createCache } from "./domains/cache";
-import { createProcessor, toClassName } from "./domains/processor";
+import { createSerializer, toClassName } from "./domains/serializer";
 import { DeclarationBlock } from "./types";
 
 const styleSheets = createStyleSheets();
 const cache = createCache(styleSheets);
-const processStyle = createProcessor(cache);
+const serialize = createSerializer(cache);
 
 export const createCss = (groupRule: string) => {
 	const formatRuleSetWithScope = (ruleSet: string) => {
@@ -31,7 +31,7 @@ export const createCss = (groupRule: string) => {
 				for (const selectorProperty in value) {
 					const selectorValue = value[selectorProperty as keyof typeof value];
 					const isDefaultProperty = selectorProperty === "default";
-					const className = processStyle(
+					const className = serialize(
 						isDefaultProperty
 							? `${groupRule}${property}${selectorValue}`
 							: `${groupRule}${property}${selectorValue}${selectorProperty}`,
@@ -51,7 +51,7 @@ export const createCss = (groupRule: string) => {
 					}
 				}
 			} else {
-				const className = processStyle(
+				const className = serialize(
 					`${groupRule}${property}${value}`,
 					property,
 					value,

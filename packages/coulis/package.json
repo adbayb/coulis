@@ -12,7 +12,7 @@
 	"scripts": {
 		"prepublishOnly": "npm run build",
 		"clean": "rm -rf dist",
-		"watch": "rollup -c --watch",
+		"watch": "rollup -c --watch --sourcemap",
 		"prebuild": "npm run clean",
 		"build": "NODE_ENV=production rollup -c"
 	},

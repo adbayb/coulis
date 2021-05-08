@@ -6,8 +6,8 @@
 
 ## Usage
 
-- `npm i coulis --save` or `yarn add coulis`
-- Play with the API
+-   `npm i coulis --save` or `yarn add coulis`
+-   Play with the API
 
 <details>
 <summary><b>React</b></summary>
@@ -58,11 +58,11 @@ ReactDOM.render(<App />, document.getElementById("root"));
 
 ## TODO
 
-- [x] Atomic API
-- [x] Conditional at rule API
-- [x] Client side support
-- [x] keyframes API
-- [x] Global css API (api naming to be reviewed)
-- [x] Server side support
-- [ ] Review API typings
-- [ ] Documentation (principles, homepage, ...)
+-   [x] Atomic API
+-   [x] Conditional at rule API
+-   [x] Client side support
+-   [x] keyframes API
+-   [x] Global css API (api naming to be reviewed)
+-   [x] Server side support
+-   [ ] Review API typings
+-   [ ] Documentation (principles, homepage, ...)

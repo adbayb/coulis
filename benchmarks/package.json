@@ -13,12 +13,12 @@
 	"license": "MIT",
 	"dependencies": {
 		"benchmark": "2.1.4",
-		"coulis": "file:../packages/coulis",
-		"emotion": "10.0.27",
-		"react-benchmark": "2.1.1",
-		"styled-components": "5.1.0"
+		"coulis": "0.2.0",
+		"emotion": "11.0.0",
+		"react-benchmark": "4.0.0",
+		"styled-components": "5.3.0"
 	},
 	"devDependencies": {
-		"@babel/preset-react": "7.9.4"
+		"@babel/preset-react": "7.13.13"
 	}
 }

@@ -19,7 +19,6 @@ const createVirtualStyleSheet = (type: StyleSheetKey): StyleSheetAdapter => {
 	const target: typeof createVirtualStyleSheet.slots[number] = [];
 
 	createVirtualStyleSheet.slots[type] = target;
-	createVirtualStyleSheet.prototype.valueOf = () => 2;
 
 	return {
 		commit(rule: string) {

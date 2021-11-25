@@ -1,6 +1,11 @@
-// import type CSS from "csstype";
+import { PropertiesFallback, SimplePseudos } from "csstype";
 
-export type Property = string;
-export type Value = string | number | undefined;
-export type StatefulValue = Record<"default" | string, Value>; // @todo: accepts only pseudo class and pseudo elements (::after:hover)
-export type DeclarationBlock = Record<string, Value | StatefulValue>;
+// eslint-disable-next-line @typescript-eslint/ban-types
+type Property = PropertiesFallback<number | (string & {})>;
+
+export type DeclarationBlock = {
+	[Key in keyof Property]:
+		| Property[Key]
+		// @note: string to allow data attribute selector (eg. [href="https://www.example.com"])
+		| Partial<Record<"default" | SimplePseudos | string, Property[Key]>>;
+};

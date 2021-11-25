@@ -60,8 +60,8 @@ function App() {
 							},
 							{
 								color: {
-									":hover": "purple",
 									default: "red",
+									":hover": "purple",
 									"[target=_blank]": undefined,
 								},
 							},

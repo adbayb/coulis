@@ -17,7 +17,12 @@ export const createCss = (groupRule: string) => {
 	// eslint-disable-next-line sonarjs/cognitive-complexity
 	return (...cssBlocks: DeclarationBlock[]) => {
 		const cssBlock =
-			cssBlocks.length <= 1 ? cssBlocks[0] : merge({}, ...cssBlocks);
+			cssBlocks.length <= 1
+				? cssBlocks[0]
+				: (merge(
+						{} as DeclarationBlock,
+						...cssBlocks
+				  ) as unknown as Record<string, unknown>); // @note: force typescript to reduce the typing evaluation cost due to heavy generic on css-type package
 		let classNames = "";
 
 		for (const property in cssBlock) {

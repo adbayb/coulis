@@ -1,10 +1,10 @@
-import { Property, Value } from "../types";
 import { UNITLESS_PROPERTIES } from "../constants";
 import { hash } from "../helpers";
 import { CacheAdapter } from "./cache";
 import { StyleSheetAdapter } from "./stylesheet";
 
-export const toDeclaration = (property: Property, value: Value) => {
+// @todo: Use generic to type property from Property and value from Value
+export const toDeclaration = (property: string, value: unknown) => {
 	// @section: from JS camelCase to CSS kebeb-case
 	const normalizedProperty = property.replace(
 		/([A-Z])/g,
@@ -35,7 +35,7 @@ export const createSerializer = (cache: CacheAdapter) => {
 	return (
 		key: string,
 		property: string,
-		value: Value,
+		value: unknown,
 		ruleSetFormatter: (className: string, declaration: string) => string,
 		styleSheet: StyleSheetAdapter
 	) => {

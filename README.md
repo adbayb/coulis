@@ -2,8 +2,7 @@
     <h1>🍩 Coulis</h1>
     <strong>Yet another atomic CSS-in-JS library</strong>
 </div>
-<p></p>
+<br>
+<br>
 
-## Packages
-
-:package: [**coulis**](./packages/coulis) Core library
+[**README**](./packages/coulis)

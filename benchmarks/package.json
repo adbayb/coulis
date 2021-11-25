@@ -1,8 +1,8 @@
 {
 	"name": "benchmarks",
-	"version": "1.0.0",
-	"description": "",
-	"main": "index.js",
+	"private": "true",
+	"version": "0.1.0",
+	"description": "Benchmark suite for coulis",
 	"scripts": {
 		"benchmark:browser": "react-benchmark ./cases/coulis/browser.js && react-benchmark ./cases/emotion/browser.js",
 		"benchmark:server": "react-benchmark ./cases/coulis/server.js && react-benchmark ./cases/emotion/server.js",
@@ -16,9 +16,9 @@
 		"coulis": "0.2.0",
 		"emotion": "11.0.0",
 		"react-benchmark": "4.0.0",
-		"styled-components": "5.3.0"
+		"styled-components": "5.3.3"
 	},
 	"devDependencies": {
-		"@babel/preset-react": "7.13.13"
+		"@babel/preset-react": "7.16.0"
 	}
 }

@@ -51,7 +51,7 @@ const createWebStyleSheet = (type: StyleSheetKey): StyleSheetAdapter => {
 	return {
 		commit(rule: string) {
 			if (IS_PROD_ENV) {
-				target.sheet!.insertRule(rule);
+				target.sheet?.insertRule(rule);
 			} else {
 				// stl.innerHTML = `${stl.innerHTML}${rule}`;
 				// stl.appendChild(document.createTextNode(rule));

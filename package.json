@@ -6,11 +6,11 @@
 		"packages/*"
 	],
 	"scripts": {
-		"sandbox:browser": "npm start --prefix examples/react-browser",
-		"sandbox:server": "npm run dev --prefix examples/react-server",
-		"benchmark:browser": "npm run benchmark:browser --prefix benchmarks",
-		"benchmark:server": "npm run benchmark:server --prefix benchmarks",
-		"dev": "concurrently \"npm run watch --prefix packages/coulis\" \"npm run sandbox:browser\" \"npm run sandbox:server\" --names \"lib,browser,server\"",
+		"sandbox:browser": "yarn workspace @example/react-browser start",
+		"sandbox:server": "yarn workspace @example/react-server start",
+		"benchmark:browser": "yarn workspace benchmarks benchmark:browser",
+		"benchmark:server": "yarn workspace benchmarks benchmark:server",
+		"start": "yarn workspace coulis build && concurrently \"yarn workspace coulis watch\" \"yarn sandbox:browser\" \"yarn sandbox:server\" --names \"lib,browser,server\"",
 		"format": "prettier . --ignore-path .gitignore --ignore-path .prettierignore --write",
 		"lint": "eslint . --ignore-path .gitignore --fix"
 	},
@@ -18,10 +18,15 @@
 		"example": "examples"
 	},
 	"devDependencies": {
-		"@adbayb/eslint-config": "0.6.0",
-		"@adbayb/prettier-config": "0.6.0",
-		"@adbayb/ts-config": "0.6.0",
-		"concurrently": "6.1.0"
+		"@adbayb/eslint-config": "0.9.0",
+		"@adbayb/prettier-config": "0.9.0",
+		"@adbayb/ts-config": "0.9.0",
+		"concurrently": "6.4.0",
+		"eslint": "8.3.0",
+		"husky": "4.3.8",
+		"lint-staged": "12.1.2",
+		"prettier": "2.4.1",
+		"typescript": "4.5.2"
 	},
 	"author": {
 		"name": "Ayoub Adib",
@@ -44,10 +49,13 @@
 	},
 	"lint-staged": {
 		"**/*.{js,jsx,ts,tsx}": [
-			"npm run lint"
+			"yarn lint"
 		],
 		"**/*.{json,md,mdx,html,css}": [
-			"npm run format"
+			"yarn format"
 		]
+	},
+	"resolutions": {
+		"@typescript-eslint/eslint-plugin": "5.4.0"
 	}
 }

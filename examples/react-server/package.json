@@ -1,20 +1,20 @@
 {
-	"name": "react-server",
+	"name": "@example/react-server",
 	"version": "0.1.0",
 	"private": true,
 	"scripts": {
-		"dev": "next dev -p 8080",
+		"start": "next dev -p 8080",
 		"build": "next build",
-		"start": "next start"
+		"serve": "next start"
 	},
 	"dependencies": {
 		"coulis": "0.2.0",
-		"next": "10.2.0",
+		"next": "12.0.4",
 		"react": "17.0.2",
 		"react-dom": "17.0.2"
 	},
 	"devDependencies": {
-		"@types/node": "15.0.2",
-		"@types/react": "17.0.5"
+		"@types/node": "16.11.10",
+		"@types/react": "17.0.37"
 	}
 }

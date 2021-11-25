@@ -14,6 +14,7 @@ export const createCss = (groupRule: string) => {
 		return !groupRule ? ruleSet : `${groupRule}{${ruleSet}}`;
 	};
 
+	// eslint-disable-next-line sonarjs/cognitive-complexity
 	return (...cssBlocks: DeclarationBlock[]) => {
 		const cssBlock =
 			cssBlocks.length <= 1 ? cssBlocks[0] : merge({}, ...cssBlocks);

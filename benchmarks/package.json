@@ -1,7 +1,7 @@
 {
 	"name": "benchmarks",
 	"private": "true",
-	"version": "0.1.0",
+	"version": "0.3.0",
 	"description": "Benchmark suite for coulis",
 	"scripts": {
 		"benchmark:browser": "react-benchmark ./cases/coulis/browser.js && react-benchmark ./cases/emotion/browser.js",
@@ -13,7 +13,7 @@
 	"license": "MIT",
 	"dependencies": {
 		"benchmark": "2.1.4",
-		"coulis": "0.2.0",
+		"coulis": "0.3.0",
 		"emotion": "11.0.0",
 		"react-benchmark": "4.0.0",
 		"styled-components": "5.3.3"

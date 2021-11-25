@@ -1,6 +1,6 @@
 {
 	"name": "@example/react-server",
-	"version": "0.1.0",
+	"version": "0.3.0",
 	"private": true,
 	"scripts": {
 		"start": "next dev -p 8080",
@@ -8,7 +8,7 @@
 		"serve": "next start"
 	},
 	"dependencies": {
-		"coulis": "0.2.0",
+		"coulis": "0.3.0",
 		"next": "12.0.4",
 		"react": "17.0.2",
 		"react-dom": "17.0.2"

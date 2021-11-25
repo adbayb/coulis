@@ -1,6 +1,6 @@
 {
 	"name": "@example/react-browser",
-	"version": "0.1.0",
+	"version": "0.3.0",
 	"private": true,
 	"dependencies": {
 		"@testing-library/jest-dom": "5.15.1",
@@ -10,7 +10,7 @@
 		"@types/node": "16.11.10",
 		"@types/react": "17.0.37",
 		"@types/react-dom": "17.0.11",
-		"coulis": "0.2.0",
+		"coulis": "0.3.0",
 		"react": "17.0.2",
 		"react-dom": "17.0.2",
 		"react-scripts": "4.0.3",

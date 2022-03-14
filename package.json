@@ -7,20 +7,17 @@
 		"packages/*"
 	],
 	"scripts": {
-		"sandbox:browser": "yarn workspace @example/react-browser start",
-		"sandbox:server": "yarn workspace @example/react-server start",
+		"example:browser": "yarn workspace @example/react-browser start",
+		"example:server": "yarn workspace @example/react-server start",
 		"benchmark:browser": "yarn workspace benchmarks benchmark:browser",
 		"benchmark:server": "yarn workspace benchmarks benchmark:server",
-		"start": "yarn workspace coulis build && concurrently \"yarn workspace coulis watch\" \"yarn sandbox:browser\" \"yarn sandbox:server\" --names \"lib,browser,server\"",
+		"start": "yarn workspace coulis build && concurrently \"yarn workspace coulis watch\" \"yarn example:browser\" \"yarn example:server\" --names \"lib,browser,server\"",
 		"verify": "yarn lint & tsc --noEmit",
 		"fix": "yarn lint --fix",
 		"lint": "eslint . --ignore-path .gitignore",
 		"format": "prettier . --ignore-path .gitignore --ignore-path .prettierignore --write",
 		"changed": "lerna changed --all",
 		"release": "lerna publish"
-	},
-	"directories": {
-		"example": "examples"
 	},
 	"devDependencies": {
 		"@adbayb/eslint-config": "0.10.0",
@@ -60,8 +57,5 @@
 		"**/*.{json,md,mdx,html,css}": [
 			"yarn format"
 		]
-	},
-	"resolutions": {
-		"@typescript-eslint/eslint-plugin": "5.4.0"
 	}
 }

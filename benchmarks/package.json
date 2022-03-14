@@ -19,6 +19,6 @@
 		"styled-components": "5.3.3"
 	},
 	"devDependencies": {
-		"@babel/preset-react": "7.16.0"
+		"@babel/preset-react": "7.16.7"
 	}
 }

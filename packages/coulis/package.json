@@ -39,7 +39,7 @@
 	},
 	"devDependencies": {
 		"@types/node": "17.0.21",
-		"quickbundle": "0.7.0",
+		"quickbundle": "0.8.0",
 		"typescript": "4.6.2"
 	}
 }

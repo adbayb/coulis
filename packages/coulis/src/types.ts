@@ -1,11 +1,31 @@
-import { PropertiesFallback, SimplePseudos } from "csstype";
+import {
+	AdvancedPseudos,
+	HtmlAttributes,
+	PropertiesFallback,
+	SimplePseudos,
+} from "csstype";
 
+// @note: UngreedyString is a special string type allowing literal enums getting widened to the super type string when specified
+// It allows to enable string type with literal enums without loosing autocomplete DX
 // eslint-disable-next-line @typescript-eslint/ban-types
-type Property = PropertiesFallback<number | (string & {})>;
+type UngreedyString = string & {};
+
+type Property = PropertiesFallback<number | UngreedyString>;
+
+type AttributeSelectors = HtmlAttributes;
+
+type PseudoSelectors = SimplePseudos | AdvancedPseudos;
 
 export type DeclarationBlock = {
 	[Key in keyof Property]:
 		| Property[Key]
-		// @note: string to allow data attribute selector (eg. [href="https://www.example.com"])
-		| Partial<Record<"default" | SimplePseudos | string, Property[Key]>>;
+		| Partial<
+				Record<
+					| "default"
+					| PseudoSelectors
+					| AttributeSelectors
+					| UngreedyString,
+					Property[Key]
+				>
+		  >;
 };

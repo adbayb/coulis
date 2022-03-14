@@ -1,12 +1,12 @@
 import { SHORTHAND_PROPERTIES } from "./constants";
 import { hash, isObject, merge, minify } from "./helpers";
-import { StyleSheetKey, createStyleSheet } from "./entities/stylesheet";
+import { StyleSheetType, createStyleSheet } from "./entities/stylesheet";
 import { createCache } from "./entities/cache";
 import { createSerializer, toClassName } from "./entities/serializer";
 import { DeclarationBlock } from "./types";
 
-const styleSheets = createStyleSheet();
-const cache = createCache(styleSheets);
+const styleSheet = createStyleSheet();
+const cache = createCache(styleSheet);
 const serialize = createSerializer(cache);
 
 export const createCss = (groupRule: string) => {
@@ -27,11 +27,11 @@ export const createCss = (groupRule: string) => {
 
 		for (const property in cssBlock) {
 			const value = cssBlock[property];
-			const styleSheet = groupRule
-				? styleSheets.conditional
+			const style = groupRule
+				? styleSheet.conditional
 				: SHORTHAND_PROPERTIES[property]
-				? styleSheets.shorthand
-				: styleSheets.longhand;
+				? styleSheet.shorthand
+				: styleSheet.longhand;
 
 			if (isObject(value)) {
 				for (const selectorProperty in value) {
@@ -50,7 +50,7 @@ export const createCss = (groupRule: string) => {
 									isDefaultProperty ? "" : selectorProperty
 								}{${declaration}}`
 							),
-						styleSheet
+						style
 					);
 
 					if (className !== null) {
@@ -64,7 +64,7 @@ export const createCss = (groupRule: string) => {
 					value,
 					(className, declaration) =>
 						formatRuleSetWithScope(`.${className}{${declaration}}`),
-					styleSheet
+					style
 				);
 
 				if (className !== null) {
@@ -89,20 +89,20 @@ export const keyframes = (value: string) => {
 
 	const declarationBlock = `@keyframes ${className}{${minify(value)}}`;
 
-	styleSheets.global.commit(declarationBlock);
+	styleSheet.global.commit(declarationBlock);
 	cache.set(key, "global");
 
 	return className;
 };
 
 export const extractStyles = () => {
-	const styleSheetTypes = Object.keys(styleSheets) as StyleSheetKey[];
+	const styleSheetTypes = Object.keys(styleSheet) as StyleSheetType[];
 	const cacheEntries = cache.entries();
 	const cacheKeys = Object.keys(cacheEntries);
 
 	return styleSheetTypes.map((type) => {
-		const styleSheet = styleSheets[type];
-		const cssValue = minify(styleSheet.get());
+		const style = styleSheet[type];
+		const cssValue = minify(style.get());
 		const keys = cacheKeys.filter((key) => cacheEntries[key] === type);
 
 		return {
@@ -125,6 +125,6 @@ export const raw = (value: string) => {
 		return;
 	}
 
-	styleSheets.global.commit(minify(value));
+	styleSheet.global.commit(minify(value));
 	cache.set(key, "global");
 };

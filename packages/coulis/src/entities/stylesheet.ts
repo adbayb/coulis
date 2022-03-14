@@ -1,21 +1,21 @@
 import { IS_BROWSER_ENV, IS_PROD_ENV } from "../constants";
 
-// @todo: rename StyleSheetKey to StyleSheetType
-// @todo: StyleSheet should be an array and not record + use mapping to set order { global: 0, shorthand: 1, ...}
-// following points TBC:
-// @todo: remove data-coulis-type inside dom since order is deterministic (global is always the first...)
-// @todo: rename data-coulis-keys to data-coulis
-export type StyleSheetKey = "global" | "shorthand" | "longhand" | "conditional";
+export type StyleSheetType =
+	| "global"
+	| "shorthand"
+	| "longhand"
+	| "conditional";
+
 export interface StyleSheetAdapter {
 	commit: (rule: string) => void;
 	get: () => string;
 	element: HTMLStyleElement | null;
-	type: StyleSheetKey;
+	type: StyleSheetType;
 }
 
-export type StyleSheet = Record<StyleSheetKey, StyleSheetAdapter>;
+export type StyleSheet = Record<StyleSheetType, StyleSheetAdapter>;
 
-const createVirtualStyleSheet = (type: StyleSheetKey): StyleSheetAdapter => {
+const createVirtualStyleSheet = (type: StyleSheetType): StyleSheetAdapter => {
 	const target: typeof createVirtualStyleSheet.slots[number] = [];
 
 	createVirtualStyleSheet.slots[type] = target;
@@ -34,10 +34,10 @@ const createVirtualStyleSheet = (type: StyleSheetKey): StyleSheetAdapter => {
 
 createVirtualStyleSheet.slots = {} as Record<string, string[]>;
 
-const createWebStyleSheet = (type: StyleSheetKey): StyleSheetAdapter => {
-	let element = document.querySelector(
+const createWebStyleSheet = (type: StyleSheetType): StyleSheetAdapter => {
+	let element = document.querySelector<HTMLStyleElement>(
 		`[data-coulis-type=${type}]`
-	) as HTMLStyleElement | null;
+	);
 
 	if (element === null) {
 		element = document.createElement("style");
@@ -67,17 +67,18 @@ const createWebStyleSheet = (type: StyleSheetKey): StyleSheetAdapter => {
 	};
 };
 
-export const createStyleSheet = (): Record<
-	StyleSheetKey,
-	StyleSheetAdapter
-> => {
-	const createStyleSheet = IS_BROWSER_ENV
+export const createStyleSheet = (): StyleSheet => {
+	const create = IS_BROWSER_ENV
 		? createWebStyleSheet
 		: createVirtualStyleSheet;
-	const globalSheet = createStyleSheet("global");
-	const longhandSheet = createStyleSheet("longhand");
-	const shorthandSheet = createStyleSheet("shorthand");
-	const conditionalSheet = createStyleSheet("conditional");
+	// @note: The order is important for following lines.
+	// Global has a lesser specificity than (<) shorthand properties:
+	// global < shorthand < longhand properties
+	const globalSheet = create("global");
+	const shorthandSheet = create("shorthand");
+	const longhandSheet = create("longhand");
+	// @todo: remove conditional sheet. The property name should be checked instead and dispatched either in long/short or global sheet
+	const conditionalSheet = create("conditional");
 
 	return {
 		global: globalSheet,

@@ -1,5 +1,5 @@
-import { UNITLESS_PROPERTIES } from "../constants";
 import { hash } from "../helpers";
+import { UNITLESS_PROPERTIES } from "../constants";
 import { CacheAdapter } from "./cache";
 import { StyleSheetAdapter } from "./stylesheet";
 

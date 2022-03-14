@@ -1,7 +1,7 @@
 import { IS_BROWSER_ENV, IS_PROD_ENV } from "../constants";
 
 // @todo: rename StyleSheetKey to StyleSheetType
-// @todo: StyleSheets should be an array and not record + use mapping to set order { global: 0, shorthand: 1, ...}
+// @todo: StyleSheet should be an array and not record + use mapping to set order { global: 0, shorthand: 1, ...}
 // following points TBC:
 // @todo: remove data-coulis-type inside dom since order is deterministic (global is always the first...)
 // @todo: rename data-coulis-keys to data-coulis
@@ -13,7 +13,7 @@ export interface StyleSheetAdapter {
 	type: StyleSheetKey;
 }
 
-export type StyleSheets = Record<StyleSheetKey, StyleSheetAdapter>;
+export type StyleSheet = Record<StyleSheetKey, StyleSheetAdapter>;
 
 const createVirtualStyleSheet = (type: StyleSheetKey): StyleSheetAdapter => {
 	const target: typeof createVirtualStyleSheet.slots[number] = [];
@@ -67,7 +67,7 @@ const createWebStyleSheet = (type: StyleSheetKey): StyleSheetAdapter => {
 	};
 };
 
-export const createStyleSheets = (): Record<
+export const createStyleSheet = (): Record<
 	StyleSheetKey,
 	StyleSheetAdapter
 > => {

@@ -1,5 +1,5 @@
 import { IS_BROWSER_ENV } from "../constants";
-import { StyleSheetKey, StyleSheets } from "./stylesheet";
+import { StyleSheet, StyleSheetKey } from "./stylesheet";
 
 type CacheEntry = Record<string, StyleSheetKey>;
 
@@ -9,8 +9,8 @@ export interface CacheAdapter {
 	entries(): CacheEntry;
 }
 
-const hydrate = (styleSheets: StyleSheets): CacheEntry => {
-	const sheets = Object.values(styleSheets);
+const hydrate = (styleSheet: StyleSheet): CacheEntry => {
+	const sheets = Object.values(styleSheet);
 	const hydratedCache: CacheEntry = {};
 
 	sheets.forEach(({ element, type }) => {
@@ -28,8 +28,8 @@ const hydrate = (styleSheets: StyleSheets): CacheEntry => {
 	return hydratedCache;
 };
 
-export const createCache = (styleSheets: StyleSheets): CacheAdapter => {
-	const cache: CacheEntry = IS_BROWSER_ENV ? hydrate(styleSheets) : {};
+export const createCache = (styleSheet: StyleSheet): CacheAdapter => {
+	const cache: CacheEntry = IS_BROWSER_ENV ? hydrate(styleSheet) : {};
 
 	return {
 		set(key, target: StyleSheetKey) {

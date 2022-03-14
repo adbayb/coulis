@@ -1,11 +1,11 @@
 import { SHORTHAND_PROPERTIES } from "./constants";
 import { hash, isObject, merge, minify } from "./helpers";
-import { StyleSheetKey, createStyleSheets } from "./domains/stylesheet";
-import { createCache } from "./domains/cache";
-import { createSerializer, toClassName } from "./domains/serializer";
+import { StyleSheetKey, createStyleSheet } from "./entities/stylesheet";
+import { createCache } from "./entities/cache";
+import { createSerializer, toClassName } from "./entities/serializer";
 import { DeclarationBlock } from "./types";
 
-const styleSheets = createStyleSheets();
+const styleSheets = createStyleSheet();
 const cache = createCache(styleSheets);
 const serialize = createSerializer(cache);
 

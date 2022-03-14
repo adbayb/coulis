@@ -15,7 +15,7 @@
 		"benchmark": "2.1.4",
 		"coulis": "0.3.0",
 		"emotion": "11.0.0",
-		"react-benchmark": "4.0.0",
+		"react-benchmark": "5.0.0",
 		"styled-components": "5.3.3"
 	},
 	"devDependencies": {

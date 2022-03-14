@@ -1,4 +1,5 @@
 {
+	"name": "coulis-monorepo",
 	"private": true,
 	"workspaces": [
 		"benchmarks",
@@ -11,8 +12,10 @@
 		"benchmark:browser": "yarn workspace benchmarks benchmark:browser",
 		"benchmark:server": "yarn workspace benchmarks benchmark:server",
 		"start": "yarn workspace coulis build && concurrently \"yarn workspace coulis watch\" \"yarn sandbox:browser\" \"yarn sandbox:server\" --names \"lib,browser,server\"",
+		"verify": "yarn lint & tsc --noEmit",
+		"fix": "yarn lint --fix",
+		"lint": "eslint . --ignore-path .gitignore",
 		"format": "prettier . --ignore-path .gitignore --ignore-path .prettierignore --write",
-		"lint": "eslint . --ignore-path .gitignore --fix",
 		"changed": "lerna changed --all",
 		"release": "lerna publish"
 	},
@@ -20,16 +23,16 @@
 		"example": "examples"
 	},
 	"devDependencies": {
-		"@adbayb/eslint-config": "0.9.0",
-		"@adbayb/prettier-config": "0.9.0",
-		"@adbayb/ts-config": "0.9.0",
-		"concurrently": "6.4.0",
-		"eslint": "8.3.0",
+		"@adbayb/eslint-config": "0.10.0",
+		"@adbayb/prettier-config": "0.10.0",
+		"@adbayb/ts-config": "0.10.0",
+		"concurrently": "7.0.0",
+		"eslint": "8.11.0",
 		"husky": "4.3.8",
-		"lerna": "^4.0.0",
-		"lint-staged": "12.1.2",
-		"prettier": "2.4.1",
-		"typescript": "4.5.2"
+		"lerna": "4.0.0",
+		"lint-staged": "12.3.5",
+		"prettier": "2.5.1",
+		"typescript": "4.6.2"
 	},
 	"author": {
 		"name": "Ayoub Adib",
@@ -60,6 +63,5 @@
 	},
 	"resolutions": {
 		"@typescript-eslint/eslint-plugin": "5.4.0"
-	},
-	"name": "coulis"
+	}
 }

@@ -45,38 +45,20 @@ function App() {
 				</p>
 				<a
 					className={[
-						css(
-							{
-								color: {
-									default: "yellow",
-									"[target=_blank]": "green",
-								},
+						css({
+							backgroundColor: {
+								default: "lightcoral",
+								"[data-plop=true]": "red",
 							},
-							{
-								backgroundColor: {
-									default: "purple",
-									"[data-plop=true]": "red",
-								},
+							color: {
+								default: "yellow",
+								":hover": "purple",
+								"[target=_blank]": undefined,
 							},
-							{
-								color: {
-									":hover": "purple",
-									default: "red",
-									"[target=_blank]": undefined,
-								},
-							},
-							{
-								color: "yellow",
-							}
-						),
-						cssTablet(
-							{
-								color: "red",
-							},
-							{
-								color: "blue",
-							}
-						),
+						}),
+						cssTablet({
+							color: "blue",
+						}),
 					].join(" ")}
 					href="https://reactjs.org"
 					target="_blank"

@@ -1,9 +1,9 @@
 import { SHORTHAND_PROPERTIES } from "./constants";
-import { hash, isObject, merge, minify } from "./helpers";
+import { hash, isObject, minify } from "./helpers";
 import { StyleSheetType, createStyleSheet } from "./entities/stylesheet";
 import { createCache } from "./entities/cache";
 import { createSerializer, toClassName } from "./entities/serializer";
-import { DeclarationBlock } from "./types";
+import { StyleObject } from "./types";
 
 const styleSheet = createStyleSheet();
 const cache = createCache(styleSheet);
@@ -15,18 +15,13 @@ export const createCss = (groupRule: string) => {
 	};
 
 	// eslint-disable-next-line sonarjs/cognitive-complexity
-	return (...cssBlocks: DeclarationBlock[]) => {
-		const cssBlock =
-			cssBlocks.length <= 1
-				? cssBlocks[0]
-				: (merge(
-						{} as DeclarationBlock,
-						...cssBlocks
-				  ) as unknown as Record<string, unknown>); // @note: force typescript to reduce the typing evaluation cost due to heavy generic on css-type package
+	return (styleObject: StyleObject) => {
+		// @note: force typescript to reduce the typing evaluation cost due to heavy generic on css-type package
+		const input = styleObject as Record<string, unknown>;
 		let classNames = "";
 
-		for (const property in cssBlock) {
-			const value = cssBlock[property];
+		for (const property in input) {
+			const value = input[property];
 			const style = groupRule
 				? styleSheet.conditional
 				: SHORTHAND_PROPERTIES[property]

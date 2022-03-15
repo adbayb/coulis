@@ -16,7 +16,7 @@ type AttributeSelectors = HtmlAttributes;
 
 type PseudoSelectors = SimplePseudos | AdvancedPseudos;
 
-export type DeclarationBlock = {
+export type StyleObject = {
 	[Key in keyof Property]:
 		| Property[Key]
 		| Partial<

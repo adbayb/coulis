@@ -1,4 +1,3 @@
-import React from "react";
 import { createCss, css, keyframes, raw } from "coulis";
 
 const cssTablet = createCss("@media (min-width: 400px)");

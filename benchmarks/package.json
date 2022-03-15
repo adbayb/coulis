@@ -4,7 +4,7 @@
 	"version": "0.3.0",
 	"description": "Benchmark suite for coulis",
 	"scripts": {
-		"benchmark:browser": "react-benchmark ./cases/coulis/browser.js && react-benchmark ./cases/emotion/browser.js",
+		"benchmark:browser": "react-benchmark ./cases/coulis/browser.js && react-benchmark ./cases/emotion/browser.js && react-benchmark ./cases/styled-components.js",
 		"benchmark:server": "react-benchmark ./cases/coulis/server.js && react-benchmark ./cases/emotion/server.js",
 		"benchmark:styled-components": "react-benchmark ./cases/styled-components.js"
 	},
@@ -12,9 +12,10 @@
 	"author": "Ayoub Adib <adbayb@gmail.com>",
 	"license": "MIT",
 	"dependencies": {
+		"@emotion/css": "11.7.1",
+		"@emotion/server": "11.4.0",
 		"benchmark": "2.1.4",
 		"coulis": "0.3.0",
-		"emotion": "11.0.0",
 		"react-benchmark": "5.0.0",
 		"styled-components": "5.3.3"
 	},

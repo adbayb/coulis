@@ -23,7 +23,6 @@ Coulis leverages these two approaches to create a great developer experience whi
 <p>
 
 ```typescript
-import React from "react";
 import ReactDOM from "react-dom";
 import { css } from "coulis";
 

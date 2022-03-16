@@ -16,7 +16,7 @@
 		"fix": "yarn lint --fix",
 		"lint": "eslint . --ignore-path .gitignore",
 		"format": "prettier . --ignore-path .gitignore --ignore-path .prettierignore --write",
-		"test": "jest",
+		"test": "vitest",
 		"changed": "lerna changed --all",
 		"release": "lerna publish"
 	},
@@ -25,14 +25,13 @@
 		"@adbayb/prettier-config": "0.10.0",
 		"@adbayb/ts-config": "0.10.0",
 		"concurrently": "7.0.0",
-		"esbuild-jest": "0.5.0",
 		"eslint": "8.11.0",
 		"husky": "4.3.8",
-		"jest": "27.5.1",
 		"lerna": "4.0.0",
 		"lint-staged": "12.3.5",
 		"prettier": "2.5.1",
-		"typescript": "4.6.2"
+		"typescript": "4.6.2",
+		"vitest": "0.6.3"
 	},
 	"author": {
 		"name": "Ayoub Adib",

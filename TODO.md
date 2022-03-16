@@ -24,3 +24,5 @@ globals({
 	},
 });
 ```
+
+-   [ ] Update `createAtoms` to check if the argument starts with `@media|@supports` (throw a runtime warning otherwise) + use TS template string to force type starting with `@media|@supports `${string}``

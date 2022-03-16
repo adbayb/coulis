@@ -1,3 +1,4 @@
+import { expect, test } from "vitest";
 import { atoms, createAtoms, extractStyles, globals, keyframes } from "../src";
 
 test("should extract styles", () => {

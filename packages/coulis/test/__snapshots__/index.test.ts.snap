@@ -1,19 +1,19 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Vitest Snapshot v1
 
 exports[`should extract styles 1`] = `
-Array [
-  Object {
+[
+  {
     "content": "html, body{background-color: lightcoral;}div{color: red;}@keyframes c68c11a40{from{transform: scale(1);}to{transform: scale(1.015);}}",
-    "keys": Array [
+    "keys": [
       "d3ea47cc",
       "68c11a40",
     ],
     "toString": [Function],
     "type": "global",
   },
-  Object {
+  {
     "content": ".c3c5816c4{color:lightblue}.cbb3db274{background-color:lightcoral}.c571db958:hover{background-color:lightcyan}.ce9403afc[alt]{background-color:lightgray}",
-    "keys": Array [
+    "keys": [
       "3c5816c4",
       "bb3db274",
       "571db958",
@@ -22,17 +22,17 @@ Array [
     "toString": [Function],
     "type": "longhand",
   },
-  Object {
+  {
     "content": ".cde6daf3c{padding:10px}",
-    "keys": Array [
+    "keys": [
       "de6daf3c",
     ],
     "toString": [Function],
     "type": "shorthand",
   },
-  Object {
+  {
     "content": "@media (min-width: 400px){.cfdaa40cc{color:lightblue}}@media (min-width: 400px){.c83a26eac{background-color:lightcoral}}@media (min-width: 400px){.c8da3c910:hover{background-color:lightcyan}}@media (min-width: 400px){.c1225fd44[alt]{background-color:lightgray}}@media (min-width: 400px){.c9cc8640{padding:10px}}",
-    "keys": Array [
+    "keys": [
       "fdaa40cc",
       "83a26eac",
       "8da3c910",

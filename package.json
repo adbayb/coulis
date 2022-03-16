@@ -12,10 +12,11 @@
 		"benchmark:browser": "yarn workspace benchmarks benchmark:browser",
 		"benchmark:server": "yarn workspace benchmarks benchmark:server",
 		"start": "yarn workspace coulis build && concurrently \"yarn workspace coulis watch\" \"yarn example:browser\" \"yarn example:server\" --names \"lib,browser,server\"",
-		"verify": "yarn lint & tsc --noEmit",
+		"verify": "yarn lint & yarn test & tsc --noEmit",
 		"fix": "yarn lint --fix",
 		"lint": "eslint . --ignore-path .gitignore",
 		"format": "prettier . --ignore-path .gitignore --ignore-path .prettierignore --write",
+		"test": "jest",
 		"changed": "lerna changed --all",
 		"release": "lerna publish"
 	},
@@ -24,8 +25,10 @@
 		"@adbayb/prettier-config": "0.10.0",
 		"@adbayb/ts-config": "0.10.0",
 		"concurrently": "7.0.0",
+		"esbuild-jest": "0.5.0",
 		"eslint": "8.11.0",
 		"husky": "4.3.8",
+		"jest": "27.5.1",
 		"lerna": "4.0.0",
 		"lint-staged": "12.3.5",
 		"prettier": "2.5.1",
@@ -57,5 +60,10 @@
 		"**/*.{json,md,mdx,html,css}": [
 			"yarn format"
 		]
+	},
+	"jest": {
+		"transform": {
+			"^.+\\.tsx?$": "esbuild-jest"
+		}
 	}
 }

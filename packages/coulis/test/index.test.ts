@@ -1,9 +1,9 @@
-import { createCss, css, extractStyles, keyframes, raw } from "../src";
+import { atoms, createAtoms, extractStyles, globals, keyframes } from "../src";
 
 test("should extract styles", () => {
-	const cssMedia = createCss("@media (min-width: 400px)");
+	const mediumAtoms = createAtoms("@media (min-width: 400px)");
 
-	raw(`html, body {
+	globals(`html, body {
 		background-color: lightcoral;
 	}
 
@@ -21,7 +21,7 @@ to {
 }
 `);
 
-	const classNames = css({
+	const classNames = atoms({
 		color: "lightblue",
 		backgroundColor: {
 			default: "lightcoral",
@@ -31,7 +31,7 @@ to {
 		padding: 10,
 	});
 
-	const mediaClassNames = cssMedia({
+	const mediaClassNames = mediumAtoms({
 		color: "lightblue",
 		backgroundColor: {
 			default: "lightcoral",

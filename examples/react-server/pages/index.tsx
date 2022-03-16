@@ -1,8 +1,8 @@
-import { createCss, css, keyframes, raw } from "coulis";
+import { atoms, createAtoms, globals, keyframes } from "coulis";
 
-const cssTablet = createCss("@media (min-width: 400px)");
+const tabletAtoms = createAtoms("@media (min-width: 400px)");
 
-raw(`
+globals(`
 	html, body {
 		background-color: lightcoral;
 	}
@@ -26,14 +26,14 @@ function App() {
 	return (
 		<div>
 			<header
-				className={css({
+				className={atoms({
 					padding: 10,
 					backgroundColor: "lightblue",
 					borderRadius: 4,
 				})}
 			>
 				<p
-					className={css({
+					className={atoms({
 						color: {
 							default: "blue",
 							":hover": "red",
@@ -44,7 +44,7 @@ function App() {
 				</p>
 				<a
 					className={[
-						css({
+						atoms({
 							backgroundColor: {
 								default: "lightcoral",
 								"[data-plop=true]": "red",
@@ -55,7 +55,7 @@ function App() {
 								"[target=_blank]": undefined,
 							},
 						}),
-						cssTablet({
+						tabletAtoms({
 							color: "blue",
 						}),
 					].join(" ")}
@@ -67,14 +67,14 @@ function App() {
 					Learn React
 				</a>
 				<div
-					className={css({
+					className={atoms({
 						animation: `${animationName} 500ms ease alternate infinite`,
 					})}
 				>
 					Some heartbeat effect
 				</div>
 				<div
-					className={css({
+					className={atoms({
 						animation: `${animationName} 500ms ease alternate infinite`,
 					})}
 				>

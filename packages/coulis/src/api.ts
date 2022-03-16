@@ -9,7 +9,7 @@ const styleSheet = createStyleSheet();
 const cache = createCache(styleSheet);
 const serialize = createSerializer(cache);
 
-export const createCss = (groupRule: string) => {
+export const createAtoms = (groupRule: string) => {
 	const formatRuleSetWithScope = (ruleSet: string) => {
 		return !groupRule ? ruleSet : `${groupRule}{${ruleSet}}`;
 	};
@@ -72,7 +72,7 @@ export const createCss = (groupRule: string) => {
 	};
 };
 
-export const css = createCss("");
+export const atoms = createAtoms("");
 
 export const keyframes = (value: string) => {
 	const key = hash(value);
@@ -113,7 +113,7 @@ export const extractStyles = () => {
 	});
 };
 
-export const raw = (value: string) => {
+export const globals = (value: string) => {
 	const key = hash(value);
 
 	if (cache.has(key)) {

@@ -1,5 +1,3 @@
--   [ ] Rename `css` and `createCss` to `styles` and `createStyles` API
-
 -   [ ] Update `keyframes` API to be autocomplete friendly (by replacing template string with object driven API):
 
 ```ts
@@ -13,7 +11,7 @@ keyframes({
 });
 ```
 
--   [ ] Rename `raw` API to `globals` and make it consistent with `keyframes` API:
+-   [ ] Make `globals` API consistent with `keyframes` one:
 
 ```ts
 globals({

@@ -1,11 +1,11 @@
 import React from "react";
-import { css } from "coulis";
+import { atoms } from "coulis";
 import { NUMBER_OF_DATA } from "../../constants";
 
 export const Component = () => {
 	return (
 		<table
-			className={css({
+			className={atoms({
 				border: "1px solid black",
 			})}
 		>
@@ -20,7 +20,7 @@ export const Component = () => {
 					return (
 						<tr key={index}>
 							<td
-								className={css({
+								className={atoms({
 									backgroundColor: {
 										default: "lightcoral",
 										":hover": "lightyellow",
@@ -30,7 +30,7 @@ export const Component = () => {
 								The table body
 							</td>
 							<td
-								className={css({
+								className={atoms({
 									backgroundColor: {
 										default: "lightblue",
 										":hover": "lightyellow",

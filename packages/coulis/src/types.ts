@@ -1,9 +1,4 @@
-import {
-	AdvancedPseudos,
-	HtmlAttributes,
-	PropertiesFallback,
-	SimplePseudos,
-} from "csstype";
+import { HtmlAttributes, PropertiesFallback, Pseudos } from "csstype";
 
 // @note: UngreedyString is a special string type allowing literal enums getting widened to the super type string when specified
 // It allows to enable string type with literal enums without loosing autocomplete DX
@@ -12,20 +7,25 @@ type UngreedyString = string & {};
 
 type Property = PropertiesFallback<number | UngreedyString>;
 
-type AttributeSelectors = HtmlAttributes;
+export type AtomicStyleObject = StyleObject<true>;
 
-type PseudoSelectors = SimplePseudos | AdvancedPseudos;
+export type StyleObject<HasAtomicValue = false> = {
+	[Key in keyof Property]: HasAtomicValue extends false
+		? Property[Key]
+		:
+				| Property[Key]
+				| Partial<
+						Record<
+							| "default"
+							| Pseudos
+							| HtmlAttributes
+							| UngreedyString,
+							Property[Key]
+						>
+				  >;
+};
 
-export type StyleObject = {
-	[Key in keyof Property]:
-		| Property[Key]
-		| Partial<
-				Record<
-					| "default"
-					| PseudoSelectors
-					| AttributeSelectors
-					| UngreedyString,
-					Property[Key]
-				>
-		  >;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type StyleObjectBySelector<Selector extends keyof any> = {
+	[Key in Selector | UngreedyString]?: StyleObject;
 };

@@ -2,8 +2,12 @@ import { SHORTHAND_PROPERTIES } from "./constants";
 import { hash, isObject, minify } from "./helpers";
 import { StyleSheetType, createStyleSheet } from "./entities/stylesheet";
 import { createCache } from "./entities/cache";
-import { createSerializer, toClassName } from "./entities/serializer";
-import { StyleObject } from "./types";
+import {
+	createSerializer,
+	toClassName,
+	toDeclaration,
+} from "./entities/serializer";
+import { AtomicStyleObject, StyleObjectBySelector } from "./types";
 
 const styleSheet = createStyleSheet();
 const cache = createCache(styleSheet);
@@ -15,7 +19,7 @@ export const createAtoms = (groupRule: string) => {
 	};
 
 	// eslint-disable-next-line sonarjs/cognitive-complexity
-	return (styleObject: StyleObject) => {
+	return (styleObject: AtomicStyleObject) => {
 		// @note: force typescript to reduce the typing evaluation cost due to heavy generic on css-type package
 		const input = styleObject as Record<string, unknown>;
 		let classNames = "";
@@ -74,22 +78,6 @@ export const createAtoms = (groupRule: string) => {
 
 export const atoms = createAtoms("");
 
-export const keyframes = (value: string) => {
-	const key = hash(value);
-	const className = `${toClassName(key)}`;
-
-	if (cache.has(key)) {
-		return className;
-	}
-
-	const declarationBlock = `@keyframes ${className}{${minify(value)}}`;
-
-	styleSheet.global.commit(declarationBlock);
-	cache.set(key, "global");
-
-	return className;
-};
-
 export const extractStyles = () => {
 	const styleSheetTypes = Object.keys(styleSheet) as StyleSheetType[];
 	const cacheEntries = cache.entries();
@@ -113,13 +101,77 @@ export const extractStyles = () => {
 	});
 };
 
-export const globals = (value: string) => {
-	const key = hash(value);
+// @todo: refacto to reuse as much as possible serializer + update serializer to have key and selector arg and remove `ruleSetFormatter`
+export const globals = (
+	stylesBySelector: StyleObjectBySelector<keyof HTMLElementTagNameMap>
+) => {
+	const key = hash(JSON.stringify(stylesBySelector));
 
 	if (cache.has(key)) {
 		return;
 	}
 
-	styleSheet.global.commit(minify(value));
+	let ruleSet = "";
+
+	for (const selector in stylesBySelector) {
+		const style = stylesBySelector[selector];
+
+		if (!style) {
+			continue;
+		}
+
+		let property: keyof typeof style;
+		let declarationBlock = "";
+
+		for (property in style) {
+			const value = style[property];
+
+			declarationBlock += `${toDeclaration(property, value)};`;
+		}
+
+		ruleSet += `${selector}{${declarationBlock}}`;
+	}
+
+	styleSheet.global.commit(ruleSet);
 	cache.set(key, "global");
+};
+
+export const keyframes = (
+	stylesBySelector: StyleObjectBySelector<"from" | "to">
+) => {
+	const key = hash(JSON.stringify(stylesBySelector));
+	const animationName = toClassName(key);
+
+	if (cache.has(key)) {
+		console.log("hits", key, animationName);
+
+		return animationName;
+	}
+
+	let ruleSet = "";
+
+	for (const selector in stylesBySelector) {
+		const style = stylesBySelector[selector];
+
+		if (!style) {
+			continue;
+		}
+
+		let property: keyof typeof style;
+		let declarationBlock = "";
+
+		for (property in style) {
+			const value = style[property];
+
+			declarationBlock += `${toDeclaration(property, value)};`;
+		}
+
+		ruleSet += `${selector}{${declarationBlock}}`;
+	}
+
+	ruleSet = `@keyframes ${animationName}{${ruleSet}}`;
+	styleSheet.global.commit(ruleSet);
+	cache.set(key, "global");
+
+	return animationName;
 };

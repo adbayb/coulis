@@ -1,5 +1,5 @@
 {
-	"name": "react-browser",
+	"name": "@example/react-browser",
 	"private": true,
 	"version": "0.3.0",
 	"scripts": {

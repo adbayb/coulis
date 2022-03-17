@@ -1,26 +1,33 @@
 import { atoms, createAtoms, globals, keyframes } from "coulis";
 
+globals({
+	html: {
+		boxSizing: "border-box",
+	},
+	"html, body": {
+		padding: 0,
+		margin: 0,
+		backgroundColor: "lightcoral",
+	},
+	"*,*::before,*::after": {
+		boxSizing: "inherit",
+	},
+	".globalClass+.otherGlobalClass": {
+		border: "1px solid black",
+		borderRadius: 4,
+	},
+});
+
 const tabletAtoms = createAtoms("@media (min-width: 400px)");
 
-globals(`
-	html, body {
-		background-color: lightcoral;
-	}
-
-	div {
-		color: red;
-	}
-`);
-
-const animationName = keyframes(`
-from {
-	transform: scale(1);
-}
-
-to {
-	transform: scale(1.015);
-}
-`);
+const animationName = keyframes({
+	from: {
+		transform: "scale(1)",
+	},
+	to: {
+		transform: "scale(1.015)",
+	},
+});
 
 function App() {
 	return (
@@ -45,6 +52,7 @@ function App() {
 				<a
 					className={[
 						atoms({
+							display: "flex",
 							backgroundColor: {
 								default: "lightcoral",
 								"[data-plop=true]": "red",
@@ -81,6 +89,8 @@ function App() {
 					Some heartbeat effect
 				</div>
 			</header>
+			<span className="globalClass">GlobalClass</span>
+			<span className="otherGlobalClass">OtherGlobalClass</span>
 		</div>
 	);
 }

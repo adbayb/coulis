@@ -4,10 +4,11 @@ globals({
 	html: {
 		boxSizing: "border-box",
 	},
-	"html, body": {
+	"html,body": {
 		padding: 0,
 		margin: 0,
 		backgroundColor: "lightcoral",
+		fontFamily: "Open Sans",
 	},
 	"*,*::before,*::after": {
 		boxSizing: "inherit",
@@ -15,6 +16,10 @@ globals({
 	".globalClass+.otherGlobalClass": {
 		border: "1px solid black",
 		borderRadius: 4,
+	},
+	"@font-face": {
+		fontFamily: "'Open Sans'",
+		src: "local(Helvetica)",
 	},
 });
 

@@ -4,7 +4,7 @@ globals({
 	html: {
 		boxSizing: "border-box",
 	},
-	"html, body": {
+	"html,body": {
 		padding: 0,
 		margin: 0,
 		backgroundColor: "lightcoral",
@@ -18,9 +18,8 @@ globals({
 		borderRadius: 4,
 	},
 	"@font-face": {
-		fontFamily: '"Open Sans"',
-		color: "blue",
-		src: 'url("/fonts/OpenSans-Regular-webfont.woff2") format("woff2"), url("/fonts/OpenSans-Regular-webfont.woff") format("woff")',
+		fontFamily: "'Open Sans'",
+		src: "local(Helvetica)",
 	},
 });
 

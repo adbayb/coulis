@@ -14,9 +14,10 @@ const cache = createCache(styleSheet);
 const serialize = createSerializer(cache);
 
 /**
- * Create a scoped `atoms` to manage conditional styling rules (such as @media, @supports...)
+ * Create a contextual `atoms` tied to a [CSSGroupingRule](https://developer.mozilla.org/en-US/docs/Web/API/CSSGroupingRule)
+ * (ie. an at-rule that contains other rules nested within it (such as @media, @supports conditional rules...))
  * @param groupRule The styling rule instruction (such as `@media (min-width: 0px)`)
- * @returns The scoped `atoms` helper
+ * @returns The contextual `atoms` helper
  */
 export const createAtoms = (groupRule: string) => {
 	const formatRuleSetWithScope = (ruleSet: string) => {

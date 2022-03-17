@@ -8,6 +8,7 @@ globals({
 		padding: 0,
 		margin: 0,
 		backgroundColor: "lightcoral",
+		fontFamily: "Open Sans",
 	},
 	"*,*::before,*::after": {
 		boxSizing: "inherit",
@@ -15,6 +16,11 @@ globals({
 	".globalClass+.otherGlobalClass": {
 		border: "1px solid black",
 		borderRadius: 4,
+	},
+	"@font-face": {
+		fontFamily: '"Open Sans"',
+		color: "blue",
+		src: 'url("/fonts/OpenSans-Regular-webfont.woff2") format("woff2"), url("/fonts/OpenSans-Regular-webfont.woff") format("woff")',
 	},
 });
 

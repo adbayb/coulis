@@ -9,18 +9,23 @@ type Property = PropertiesFallback<number | UngreedyString>;
 
 export type AtomicStyleObject = StyleObject<true>;
 
+type PropertyValue<
+	Property,
+	Key extends keyof Property | UngreedyString
+> = Key extends keyof Property ? Property[Key] : UngreedyString | number;
+
 export type StyleObject<HasAtomicValue = false> = {
-	[Key in keyof Property]: HasAtomicValue extends false
-		? Property[Key]
+	[Key in keyof Property | UngreedyString]?: HasAtomicValue extends false
+		? PropertyValue<Property, Key>
 		:
-				| Property[Key]
+				| PropertyValue<Property, Key>
 				| Partial<
 						Record<
 							| "default"
 							| Pseudos
 							| HtmlAttributes
 							| UngreedyString,
-							Property[Key]
+							PropertyValue<Property, Key>
 						>
 				  >;
 };

@@ -13,6 +13,11 @@ const styleSheet = createStyleSheet();
 const cache = createCache(styleSheet);
 const serialize = createSerializer(cache);
 
+/**
+ * Create a scoped `atoms` to manage conditional styling rules (such as @media, @supports...)
+ * @param groupRule The styling rule instruction (such as `@media (min-width: 0px)`)
+ * @returns The scoped `atoms` helper
+ */
 export const createAtoms = (groupRule: string) => {
 	const formatRuleSetWithScope = (ruleSet: string) => {
 		return !groupRule ? ruleSet : `${groupRule}{${ruleSet}}`;

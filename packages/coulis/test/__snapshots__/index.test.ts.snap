@@ -3,9 +3,9 @@
 exports[`should extract styles 1`] = `
 [
   {
-    "content": "html{box-sizing:border-box;}html,body{padding:0px;margin:0px;background-color:lightcoral;font-family:Open Sans;}*,*::before,*::after{box-sizing:inherit;}.globalClass+.otherGlobalClass{border:1px solid black;border-radius:4px;}@font-face{font-family:'Open Sans';src:local(Helvetica);}@keyframes cfd697f57{from{transform:scale(1);}to{transform:scale(1.015);}}",
+    "content": "@charset UTF-8;@import url('https://fonts.googleapis.com/css?family=Open+Sans&display=swap');html{box-sizing:border-box;}html,body{padding:0px;margin:0px;background-color:lightcoral;font-family:Open Sans, AliasedHelvetica;}*,*::before,*::after{box-sizing:inherit;}.globalClass+.otherGlobalClass{border:1px solid black;border-radius:4px;}@font-face{font-family:'AliasedHelvetica';src:local(Helvetica);}@keyframes cfd697f57{from{transform:scale(1);}to{transform:scale(1.015);}}",
     "keys": [
-      "3e7a200b",
+      "52742a90",
       "fd697f57",
     ],
     "toString": [Function],

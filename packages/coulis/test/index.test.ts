@@ -5,6 +5,9 @@ test("should extract styles", () => {
 	const mediumAtoms = createAtoms("@media (min-width: 400px)");
 
 	globals({
+		"@charset": "UTF-8",
+		"@import":
+			"url('https://fonts.googleapis.com/css?family=Open+Sans&display=swap')",
 		html: {
 			boxSizing: "border-box",
 		},
@@ -12,7 +15,7 @@ test("should extract styles", () => {
 			padding: 0,
 			margin: 0,
 			backgroundColor: "lightcoral",
-			fontFamily: "Open Sans",
+			fontFamily: "Open Sans, AliasedHelvetica",
 		},
 		"*,*::before,*::after": {
 			boxSizing: "inherit",
@@ -22,7 +25,7 @@ test("should extract styles", () => {
 			borderRadius: 4,
 		},
 		"@font-face": {
-			fontFamily: "'Open Sans'",
+			fontFamily: "'AliasedHelvetica'",
 			src: "local(Helvetica)",
 		},
 	});

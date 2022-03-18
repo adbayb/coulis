@@ -7,7 +7,12 @@ import {
 	toClassName,
 	toDeclaration,
 } from "./entities/serializer";
-import { AtomicStyleObject, StyleObjectBySelector } from "./types";
+import {
+	AtTextualRule,
+	AtomicStyleObject,
+	StyleObject,
+	UngreedyString,
+} from "./types";
 
 const styleSheet = createStyleSheet();
 const cache = createCache(styleSheet);
@@ -30,7 +35,7 @@ export const createAtoms = (groupRule: string) => {
 		const input = styleObject as Record<string, unknown>;
 		let classNames = "";
 
-		for (const property in input) {
+		for (const property of Object.keys(input)) {
 			const value = input[property];
 			const style = groupRule
 				? styleSheet.conditional
@@ -39,7 +44,7 @@ export const createAtoms = (groupRule: string) => {
 				: styleSheet.longhand;
 
 			if (isObject(value)) {
-				for (const selectorProperty in value) {
+				for (const selectorProperty of Object.keys(value)) {
 					const selectorValue =
 						value[selectorProperty as keyof typeof value];
 					const isDefaultProperty = selectorProperty === "default";
@@ -107,10 +112,23 @@ export const extractStyles = () => {
 	});
 };
 
+type GlobalStyleObject =
+	/* @note: Two unioned types are used instead of one with conditional typing
+		since we're using a string index signature (via Ungreedy string) and, by design, TypeScript
+		enforces all members within an interface/type to conform to the index signature value.
+		However, here, we need to have a different value for AtTextualRule keys (string vs StyleObject).
+		To prevent index signature, we're separating the two divergent value typing needs:
+		@see: https://www.typescriptlang.org/docs/handbook/2/objects.html#index-signatures
+		@see: https://stackoverflow.com/a/63430341 */
+	| {
+			[Key in keyof HTMLElementTagNameMap | UngreedyString]?: StyleObject;
+	  }
+	| {
+			[Key in AtTextualRule]?: string;
+	  };
+
 // @todo: refacto to reuse as much as possible serializer + update serializer to have key and selector arg and remove `ruleSetFormatter`
-export const globals = (
-	stylesBySelector: StyleObjectBySelector<keyof HTMLElementTagNameMap>
-) => {
+export const globals = (stylesBySelector: GlobalStyleObject) => {
 	const key = hash(JSON.stringify(stylesBySelector));
 
 	if (cache.has(key)) {
@@ -119,32 +137,40 @@ export const globals = (
 
 	let ruleSet = "";
 
-	for (const selector in stylesBySelector) {
-		const style = stylesBySelector[selector];
+	for (const selector of Object.keys(stylesBySelector)) {
+		const style = stylesBySelector[selector as AtTextualRule];
 
 		if (!style) {
 			continue;
 		}
 
-		let property: keyof typeof style;
-		let declarationBlock = "";
+		if (typeof style === "string") {
+			ruleSet += `${selector} ${style};`;
+		} else {
+			let declarationBlock = "";
 
-		for (property in style) {
-			const value = style[property];
+			for (const property of Object.keys(style)) {
+				const value = style[property];
 
-			declarationBlock += `${toDeclaration(property, value)};`;
+				declarationBlock += `${toDeclaration(property, value)};`;
+			}
+
+			ruleSet += `${selector}{${declarationBlock}}`;
 		}
-
-		ruleSet += `${selector}{${declarationBlock}}`;
 	}
+
+	console.log(ruleSet);
 
 	styleSheet.global.commit(ruleSet);
 	cache.set(key, "global");
 };
 
-export const keyframes = (
-	stylesBySelector: StyleObjectBySelector<"from" | "to">
-) => {
+// @todo: `${number}%` | number
+type KeyframeStyleObject = {
+	[Key in ("from" | "to") | UngreedyString]?: StyleObject;
+};
+
+export const keyframes = (stylesBySelector: KeyframeStyleObject) => {
 	const key = hash(JSON.stringify(stylesBySelector));
 	const animationName = toClassName(key);
 
@@ -156,17 +182,16 @@ export const keyframes = (
 
 	let ruleSet = "";
 
-	for (const selector in stylesBySelector) {
+	for (const selector of Object.keys(stylesBySelector)) {
 		const style = stylesBySelector[selector];
 
 		if (!style) {
 			continue;
 		}
 
-		let property: keyof typeof style;
 		let declarationBlock = "";
 
-		for (property in style) {
+		for (const property of Object.keys(style)) {
 			const value = style[property];
 
 			declarationBlock += `${toDeclaration(property, value)};`;

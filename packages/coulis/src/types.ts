@@ -2,8 +2,9 @@ import { HtmlAttributes, PropertiesFallback, Pseudos } from "csstype";
 
 // @note: UngreedyString is a special string type allowing literal enums getting widened to the super type string when specified
 // It allows to enable string type with literal enums without loosing autocomplete DX
-// eslint-disable-next-line @typescript-eslint/ban-types
-type UngreedyString = string & {};
+// @see: For more details, https://github.com/Microsoft/TypeScript/issues/29729#issuecomment-567871939
+// @credits: https://github.com/sindresorhus/type-fest/blob/716b8b2e9419fb4a2fa6e3bfdf05f8be252e59e2/source/literal-union.d.ts
+export type UngreedyString = string & Record<never, never>;
 
 type Property = PropertiesFallback<number | UngreedyString>;
 
@@ -30,7 +31,19 @@ export type StyleObject<HasAtomicValue = false> = {
 				  >;
 };
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type StyleObjectBySelector<Selector extends keyof any> = {
-	[Key in Selector | UngreedyString]?: StyleObject;
-};
+export type AtGroupingRule =
+	| "@color-profile"
+	| "@counter-style"
+	| "@font-face"
+	| "@page"
+	| "@property"
+	| "@scroll-timeline"
+	| "@viewport";
+
+export type AtConditionalGroupingRule =
+	| "@document"
+	| "@layer"
+	| "@media"
+	| "@supports";
+
+export type AtTextualRule = "@charset" | "@import" | "@namespace";

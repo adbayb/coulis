@@ -33,11 +33,12 @@ const tabletAtoms = createAtoms("@media", "(min-width: 0px)");
 
 -   [ ] Update `keyframes` to accept and handle number as percentage + update type to enforce percentage via TS template string `${number}%`
 
--   [ ] Update `globals` to support non conditional at rules such as `@import|@charset...` by introducing a dedicated key to inject rules:
+-   [x] Update `globals` to support non conditional at rules such as `@import|@charset...` by introducing a dedicated key to inject rules:
 
 ```ts
 globals({
-	"@import": "url(http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,700italic,300,400,700)",
+	"@import":
+		"url(http://fonts.googleapis.com/css?family=Open+Sans:300,400,700)",
 	"@charset": "UTF-8",
 });
 ```

@@ -1,6 +1,9 @@
 import { atoms, createAtoms, globals, keyframes } from "coulis";
 
 globals({
+	"@charset": "UTF-8",
+	"@import":
+		"url('https://fonts.googleapis.com/css?family=Open+Sans&display=swap')",
 	html: {
 		boxSizing: "border-box",
 	},
@@ -8,7 +11,7 @@ globals({
 		padding: 0,
 		margin: 0,
 		backgroundColor: "lightcoral",
-		fontFamily: "Open Sans",
+		fontFamily: "Open Sans, AliasedHelvetica",
 	},
 	"*,*::before,*::after": {
 		boxSizing: "inherit",
@@ -18,7 +21,7 @@ globals({
 		borderRadius: 4,
 	},
 	"@font-face": {
-		fontFamily: "'Open Sans'",
+		fontFamily: "'AliasedHelvetica'",
 		src: "local(Helvetica)",
 	},
 });

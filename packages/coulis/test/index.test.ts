@@ -2,7 +2,7 @@ import { expect, test } from "vitest";
 import { atoms, createAtoms, extractStyles, globals, keyframes } from "../src";
 
 test("should extract styles", () => {
-	const mediumAtoms = createAtoms("@media (min-width: 400px)");
+	const mediumAtoms = createAtoms("@media", "(min-width: 576px)");
 
 	globals({
 		"@charset": '"utf-8"',
@@ -70,7 +70,7 @@ test("should extract styles", () => {
 		"c3c5816c4 cbb3db274 c571db958 ce9403afc cde6daf3c"
 	);
 	expect(mediaClassNames).toBe(
-		"cfdaa40cc c83a26eac c8da3c910 c1225fd44 c9cc8640"
+		"c721688f8 c3d523ba0 cf33f0fbe cec510c6c ca8209d58"
 	);
 	expect(extractStyles()).toMatchSnapshot();
 });

@@ -8,6 +8,7 @@ import {
 	toDeclaration,
 } from "./entities/serializer";
 import {
+	AtConditionalGroupingRule,
 	AtTextualRule,
 	AtomicStyleObject,
 	GlobalStyleObject,
@@ -18,15 +19,9 @@ const styleSheet = createStyleSheet();
 const cache = createCache(styleSheet);
 const serialize = createSerializer(cache);
 
-/**
- * Create a contextual `atoms` tied to a [CSSGroupingRule](https://developer.mozilla.org/en-US/docs/Web/API/CSSGroupingRule)
- * (ie. an at-rule that contains other rules nested within it (such as @media, @supports conditional rules...))
- * @param groupRule The styling rule instruction (such as `@media (min-width: 0px)`)
- * @returns The contextual `atoms` helper
- */
-export const createAtoms = (groupRule: string) => {
+const createAtomsFactory = (rule = "") => {
 	const formatRuleSetWithScope = (ruleSet: string) => {
-		return !groupRule ? ruleSet : `${groupRule}{${ruleSet}}`;
+		return !rule ? ruleSet : `${rule}{${ruleSet}}`;
 	};
 
 	// eslint-disable-next-line sonarjs/cognitive-complexity
@@ -37,7 +32,7 @@ export const createAtoms = (groupRule: string) => {
 
 		for (const property of Object.keys(input)) {
 			const value = input[property];
-			const style = groupRule
+			const style = rule
 				? styleSheet.conditional
 				: SHORTHAND_PROPERTIES[property]
 				? styleSheet.shorthand
@@ -50,8 +45,8 @@ export const createAtoms = (groupRule: string) => {
 					const isDefaultProperty = selectorProperty === "default";
 					const className = serialize(
 						isDefaultProperty
-							? `${groupRule}${property}${selectorValue}`
-							: `${groupRule}${property}${selectorValue}${selectorProperty}`,
+							? `${rule}${property}${selectorValue}`
+							: `${rule}${property}${selectorValue}${selectorProperty}`,
 						property,
 						selectorValue,
 						(className, declaration) =>
@@ -69,7 +64,7 @@ export const createAtoms = (groupRule: string) => {
 				}
 			} else {
 				const className = serialize(
-					`${groupRule}${property}${value}`,
+					`${rule}${property}${value}`,
 					property,
 					value,
 					(className, declaration) =>
@@ -87,7 +82,20 @@ export const createAtoms = (groupRule: string) => {
 	};
 };
 
-export const atoms = createAtoms("");
+/**
+ * Create a contextual `atoms` tied to a [CSSGroupingRule](https://developer.mozilla.org/en-US/docs/Web/API/CSSGroupingRule)
+ * (ie. an at-rule that contains other rules nested within it (such as @media, @supports conditional rules...))
+ * @param groupRule The styling rule instruction (such as `@media (min-width: 0px)`)
+ * @returns The contextual `atoms` helper
+ */
+export const createAtoms = (
+	atRule: AtConditionalGroupingRule,
+	condition: string
+) => {
+	return createAtomsFactory(`${atRule} ${condition}`);
+};
+
+export const atoms = createAtomsFactory();
 
 export const extractStyles = () => {
 	const styleSheetTypes = Object.keys(styleSheet) as StyleSheetType[];

@@ -26,7 +26,7 @@ globals({
 	},
 });
 
-const tabletAtoms = createAtoms("@media (min-width: 400px)");
+const tabletAtoms = createAtoms("@media", "(min-width: 576px)");
 
 const animationName = keyframes({
 	from: {

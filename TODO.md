@@ -25,7 +25,7 @@ globals({
 });
 ```
 
--   [ ] Update `createAtoms` to check if the argument starts with `@media|@supports|@layer|@page...` (throw a runtime warning otherwise) + use TS template string to force type starting with `@media|@supports `${string}``
+-   [x] Update `createAtoms` to be more TS friendly:
 
 ```ts
 const tabletAtoms = createAtoms("@media", "(min-width: 0px)");

@@ -112,9 +112,9 @@ export const extractStyles = () => {
 			content: cssValue,
 			type,
 			toString() {
-				return `<style data-coulis-type="${type}" data-coulis-keys="${keys.join(
+				return `<style data-type="${type}" data-keys="${keys.join(
 					","
-				)}">${cssValue}</style>`;
+				)}" data-coulis>${cssValue}</style>`;
 			},
 		};
 	});

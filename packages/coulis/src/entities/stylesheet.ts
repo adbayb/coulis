@@ -36,12 +36,13 @@ createVirtualStyleSheet.slots = {} as Record<string, string[]>;
 
 const createWebStyleSheet = (type: StyleSheetType): StyleSheetAdapter => {
 	let element = document.querySelector<HTMLStyleElement>(
-		`[data-coulis-type=${type}]`
+		`style[data-type="${type}"][data-coulis]`
 	);
 
 	if (element === null) {
 		element = document.createElement("style");
-		element.dataset.coulisType = type;
+		element.dataset.type = type;
+		element.dataset.coulis = "";
 		document.head.appendChild(element);
 	}
 

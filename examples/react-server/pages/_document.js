@@ -17,8 +17,9 @@ class MyDocument extends Document {
 						return (
 							<style
 								key={type}
-								data-coulis-type={type}
-								data-coulis-keys={keys.join()}
+								data-coulis
+								data-type={type}
+								data-keys={keys.join()}
 								// eslint-disable-next-line react/no-danger
 								dangerouslySetInnerHTML={{ __html: content }}
 							/>

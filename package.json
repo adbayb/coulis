@@ -55,15 +55,10 @@
 	"lint-staged": {
 		"**/*.{js,jsx,ts,tsx}": [
 			"yarn lint",
-			"yarn test run"
+			"yarn test"
 		],
 		"**/*.{json,md,mdx,html,css}": [
 			"yarn format"
 		]
-	},
-	"jest": {
-		"transform": {
-			"^.+\\.tsx?$": "esbuild-jest"
-		}
 	}
 }

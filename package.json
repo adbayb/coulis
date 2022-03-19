@@ -12,7 +12,7 @@
 		"benchmark:browser": "yarn workspace benchmarks benchmark:browser",
 		"benchmark:server": "yarn workspace benchmarks benchmark:server",
 		"start": "yarn workspace coulis build && concurrently \"yarn workspace coulis watch\" \"yarn example:browser\" \"yarn example:server\" --names \"lib,browser,server\"",
-		"verify": "yarn lint & yarn test & tsc --noEmit",
+		"verify": "yarn lint & yarn test",
 		"fix": "yarn lint --fix",
 		"lint": "eslint . --ignore-path .gitignore",
 		"format": "prettier . --ignore-path .gitignore --ignore-path .prettierignore --write",

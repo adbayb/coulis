@@ -1,7 +1,7 @@
 import { atoms, createAtoms, globals, keyframes } from "coulis";
 
 globals({
-	"@charset": "UTF-8",
+	"@charset": '"utf-8"',
 	"@import":
 		"url('https://fonts.googleapis.com/css?family=Open+Sans&display=swap')",
 	html: {
@@ -32,8 +32,14 @@ const animationName = keyframes({
 	from: {
 		transform: "scale(1)",
 	},
+	25: {
+		transform: "scale(1.25)",
+	},
+	"50%": {
+		transform: "scale(1.5)",
+	},
 	to: {
-		transform: "scale(1.015)",
+		transform: "scale(1)",
 	},
 });
 
@@ -82,23 +88,24 @@ function App() {
 				>
 					Learn React
 				</a>
-				<div
-					className={atoms({
-						animation: `${animationName} 500ms ease alternate infinite`,
-					})}
-				>
-					Some heartbeat effect
-				</div>
-				<div
-					className={atoms({
-						animation: `${animationName} 500ms ease alternate infinite`,
-					})}
-				>
-					Some heartbeat effect
-				</div>
 			</header>
 			<span className="globalClass">GlobalClass</span>
 			<span className="otherGlobalClass">OtherGlobalClass</span>
+			<div
+				className={atoms({
+					padding: 24,
+				})}
+			>
+				<div
+					className={atoms({
+						animation: `${animationName} 2000ms linear infinite`,
+						width: 50,
+						height: 50,
+						backgroundColor: "lightgray",
+						borderRadius: 4,
+					})}
+				/>
+			</div>
 		</div>
 	);
 }

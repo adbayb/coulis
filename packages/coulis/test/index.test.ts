@@ -5,7 +5,7 @@ test("should extract styles", () => {
 	const mediumAtoms = createAtoms("@media (min-width: 400px)");
 
 	globals({
-		"@charset": "UTF-8",
+		"@charset": '"utf-8"',
 		"@import":
 			"url('https://fonts.googleapis.com/css?family=Open+Sans&display=swap')",
 		html: {
@@ -34,8 +34,14 @@ test("should extract styles", () => {
 		from: {
 			transform: "scale(1)",
 		},
+		25: {
+			transform: "scale(1.25)",
+		},
+		"50%": {
+			transform: "scale(1.5)",
+		},
 		to: {
-			transform: "scale(1.015)",
+			transform: "scale(1)",
 		},
 	});
 
@@ -59,7 +65,7 @@ test("should extract styles", () => {
 		padding: 10,
 	});
 
-	expect(animationName).toBe("cfd697f57");
+	expect(animationName).toBe("c62e63a97");
 	expect(classNames).toBe(
 		"c3c5816c4 cbb3db274 c571db958 ce9403afc cde6daf3c"
 	);

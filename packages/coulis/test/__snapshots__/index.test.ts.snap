@@ -3,10 +3,10 @@
 exports[`should extract styles 1`] = `
 [
   {
-    "content": "@charset UTF-8;@import url('https://fonts.googleapis.com/css?family=Open+Sans&display=swap');html{box-sizing:border-box;}html,body{padding:0px;margin:0px;background-color:lightcoral;font-family:Open Sans, AliasedHelvetica;}*,*::before,*::after{box-sizing:inherit;}.globalClass+.otherGlobalClass{border:1px solid black;border-radius:4px;}@font-face{font-family:'AliasedHelvetica';src:local(Helvetica);}@keyframes cfd697f57{from{transform:scale(1);}to{transform:scale(1.015);}}",
+    "content": "@charset \\"utf-8\\";@import url('https://fonts.googleapis.com/css?family=Open+Sans&display=swap');html{box-sizing:border-box;}html,body{padding:0px;margin:0px;background-color:lightcoral;font-family:Open Sans, AliasedHelvetica;}*,*::before,*::after{box-sizing:inherit;}.globalClass+.otherGlobalClass{border:1px solid black;border-radius:4px;}@font-face{font-family:'AliasedHelvetica';src:local(Helvetica);}@keyframes c62e63a97{25%{transform:scale(1.25);}from{transform:scale(1);}50%{transform:scale(1.5);}to{transform:scale(1);}}",
     "keys": [
-      "52742a90",
-      "fd697f57",
+      "61d92872",
+      "62e63a97",
     ],
     "toString": [Function],
     "type": "global",

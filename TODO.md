@@ -31,7 +31,7 @@ globals({
 const tabletAtoms = createAtoms("@media", "(min-width: 0px)");
 ```
 
--   [ ] Update `keyframes` to accept and handle number as percentage + update type to enforce percentage via TS template string `${number}%`
+-   [x] Update `keyframes` to accept and handle number as percentage + update type to enforce percentage via TS template string `${number}%`
 
 -   [x] Update `globals` to support non conditional at rules such as `@import|@charset...` by introducing a dedicated key to inject rules:
 
@@ -43,6 +43,6 @@ globals({
 });
 ```
 
--   [ ] Update README.md before release
-
 -   [ ] Check `extractStyles` API with multiple server side case
+
+-   [ ] Update README.md before release

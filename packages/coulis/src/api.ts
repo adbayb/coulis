@@ -1,5 +1,5 @@
 import { SHORTHAND_PROPERTIES } from "./constants";
-import { hash, isObject, minify } from "./helpers";
+import { hash, isNumber, isObject, minify } from "./helpers";
 import { StyleSheetType, createStyleSheet } from "./entities/stylesheet";
 import { createCache } from "./entities/cache";
 import {
@@ -10,8 +10,8 @@ import {
 import {
 	AtTextualRule,
 	AtomicStyleObject,
-	StyleObject,
-	UngreedyString,
+	GlobalStyleObject,
+	KeyframeStyleObject,
 } from "./types";
 
 const styleSheet = createStyleSheet();
@@ -112,21 +112,6 @@ export const extractStyles = () => {
 	});
 };
 
-type GlobalStyleObject =
-	/* @note: Two unioned types are used instead of one with conditional typing
-		since we're using a string index signature (via Ungreedy string) and, by design, TypeScript
-		enforces all members within an interface/type to conform to the index signature value.
-		However, here, we need to have a different value for AtTextualRule keys (string vs StyleObject).
-		To prevent index signature, we're separating the two divergent value typing needs:
-		@see: https://www.typescriptlang.org/docs/handbook/2/objects.html#index-signatures
-		@see: https://stackoverflow.com/a/63430341 */
-	| {
-			[Key in keyof HTMLElementTagNameMap | UngreedyString]?: StyleObject;
-	  }
-	| {
-			[Key in AtTextualRule]?: string;
-	  };
-
 // @todo: refacto to reuse as much as possible serializer + update serializer to have key and selector arg and remove `ruleSetFormatter`
 export const globals = (stylesBySelector: GlobalStyleObject) => {
 	const key = hash(JSON.stringify(stylesBySelector));
@@ -140,9 +125,7 @@ export const globals = (stylesBySelector: GlobalStyleObject) => {
 	for (const selector of Object.keys(stylesBySelector)) {
 		const style = stylesBySelector[selector as AtTextualRule];
 
-		if (!style) {
-			continue;
-		}
+		if (!style) continue;
 
 		if (typeof style === "string") {
 			ruleSet += `${selector} ${style};`;
@@ -159,35 +142,25 @@ export const globals = (stylesBySelector: GlobalStyleObject) => {
 		}
 	}
 
-	console.log(ruleSet);
-
 	styleSheet.global.commit(ruleSet);
 	cache.set(key, "global");
-};
-
-// @todo: `${number}%` | number
-type KeyframeStyleObject = {
-	[Key in ("from" | "to") | UngreedyString]?: StyleObject;
 };
 
 export const keyframes = (stylesBySelector: KeyframeStyleObject) => {
 	const key = hash(JSON.stringify(stylesBySelector));
 	const animationName = toClassName(key);
 
-	if (cache.has(key)) {
-		console.log("hits", key, animationName);
-
-		return animationName;
-	}
+	if (cache.has(key)) return animationName;
 
 	let ruleSet = "";
+	const selectors = Object.keys(stylesBySelector) as Array<
+		keyof typeof stylesBySelector
+	>;
 
-	for (const selector of Object.keys(stylesBySelector)) {
+	for (const selector of selectors) {
 		const style = stylesBySelector[selector];
 
-		if (!style) {
-			continue;
-		}
+		if (!style) continue;
 
 		let declarationBlock = "";
 
@@ -197,7 +170,9 @@ export const keyframes = (stylesBySelector: KeyframeStyleObject) => {
 			declarationBlock += `${toDeclaration(property, value)};`;
 		}
 
-		ruleSet += `${selector}{${declarationBlock}}`;
+		ruleSet += `${
+			isNumber(selector) ? `${selector}%` : selector
+		}{${declarationBlock}}`;
 	}
 
 	ruleSet = `@keyframes ${animationName}{${ruleSet}}`;

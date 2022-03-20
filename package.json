@@ -54,8 +54,7 @@
 	},
 	"lint-staged": {
 		"**/*.{js,jsx,ts,tsx}": [
-			"yarn lint",
-			"yarn test"
+			"yarn lint"
 		],
 		"**/*.{json,md,mdx,html,css}": [
 			"yarn format"

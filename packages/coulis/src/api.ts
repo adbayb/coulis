@@ -3,10 +3,10 @@ import { hash, isNumber, isObject, minify } from "./helpers";
 import { StyleSheetType, createStyleSheet } from "./entities/stylesheet";
 import { createCache } from "./entities/cache";
 import {
-	createSerializer,
+	createProcessor,
 	toClassName,
 	toDeclaration,
-} from "./entities/serializer";
+} from "./entities/processor";
 import {
 	AtConditionalGroupingRule,
 	AtTextualRule,
@@ -17,7 +17,7 @@ import {
 
 const styleSheet = createStyleSheet();
 const cache = createCache(styleSheet);
-const serialize = createSerializer(cache);
+const process = createProcessor(cache);
 
 const createAtomsFactory = (rule = "") => {
 	const formatRuleSetWithScope = (ruleSet: string) => {
@@ -43,7 +43,7 @@ const createAtomsFactory = (rule = "") => {
 					const selectorValue =
 						value[selectorProperty as keyof typeof value];
 					const isDefaultProperty = selectorProperty === "default";
-					const className = serialize(
+					const className = process(
 						isDefaultProperty
 							? `${rule}${property}${selectorValue}`
 							: `${rule}${property}${selectorValue}${selectorProperty}`,
@@ -63,7 +63,7 @@ const createAtomsFactory = (rule = "") => {
 					}
 				}
 			} else {
-				const className = serialize(
+				const className = process(
 					`${rule}${property}${value}`,
 					property,
 					value,
@@ -120,7 +120,7 @@ export const extractStyles = () => {
 	});
 };
 
-// @todo: refacto to reuse as much as possible serializer + update serializer to have key and selector arg and remove `ruleSetFormatter`
+// @todo: refacto to reuse as much as possible processor + update processor to have key and selector arg and remove `ruleSetFormatter`
 export const globals = (stylesBySelector: GlobalStyleObject) => {
 	const key = hash(JSON.stringify(stylesBySelector));
 

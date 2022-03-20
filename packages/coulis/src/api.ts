@@ -75,10 +75,7 @@ export const globals = (styleObject: GlobalStyleObject) =>
 					for (const property of Object.keys(style)) {
 						const value = style[property];
 
-						declarationBlock += `${toDeclaration(
-							property,
-							value
-						)};`;
+						declarationBlock += toDeclaration(property, value);
 					}
 
 					ruleSet += `${selector}{${declarationBlock}}`;
@@ -110,7 +107,7 @@ export const keyframes = (styleObject: KeyframeStyleObject) =>
 				for (const property of Object.keys(style)) {
 					const value = style[property];
 
-					declarationBlock += `${toDeclaration(property, value)};`;
+					declarationBlock += toDeclaration(property, value);
 				}
 
 				ruleSet += `${
@@ -153,15 +150,10 @@ const createAtomsFactory = (groupingRule = "") => {
 							if (selectorValue === undefined)
 								return NO_CLASSNAME;
 
-							const declarationBlock = toDeclaration(
-								property,
-								selectorValue
-							);
-
 							return wrapRuleSet(
 								`.${className}${
 									isDefaultProperty ? "" : selectorProperty
-								}{${declarationBlock}}`
+								}{${toDeclaration(property, selectorValue)}}`
 							);
 						},
 					});
@@ -178,10 +170,8 @@ const createAtomsFactory = (groupingRule = "") => {
 					strategy({ className }) {
 						if (value === undefined) return NO_CLASSNAME;
 
-						const declarationBlock = toDeclaration(property, value);
-
 						return wrapRuleSet(
-							`.${className}{${declarationBlock}}`
+							`.${className}{${toDeclaration(property, value)}}`
 						);
 					},
 				});

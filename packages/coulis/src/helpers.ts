@@ -1,13 +1,5 @@
 import { UNITLESS_PROPERTIES } from "./constants";
 
-export const isNumber = (value: unknown): value is number => {
-	return typeof value === "number" || !Number.isNaN(Number(value));
-};
-
-export const isObject = (value: unknown): value is Record<string, unknown> => {
-	return value !== null && typeof value === "object";
-};
-
 export const hash = (str: string) => {
 	// hash content based with FNV-1a algorithm:
 	const FNVOffsetBasis = 2166136261;
@@ -25,6 +17,14 @@ export const hash = (str: string) => {
 
 	// @note: we convert to hexadecimal
 	return Number(uHash).toString(16);
+};
+
+export const isNumber = (value: unknown): value is number => {
+	return typeof value === "number" || !Number.isNaN(Number(value));
+};
+
+export const isObject = (value: unknown): value is Record<string, unknown> => {
+	return value !== null && typeof value === "object";
 };
 
 export const minify = (value: string) => {
@@ -55,5 +55,5 @@ export const toDeclaration = (property: string, value: unknown) => {
 			? value
 			: `${value}px`;
 
-	return `${normalizedProperty}:${normalizedValue}`;
+	return `${normalizedProperty}:${normalizedValue};`;
 };

@@ -2,6 +2,7 @@ type Indexable = Record<string, boolean>;
 
 export const IS_PROD_ENV = process.env.NODE_ENV === "production";
 export const IS_BROWSER_ENV = typeof window !== "undefined";
+export const NO_CLASSNAME = "";
 // @note: Taken from https://raw.githubusercontent.com/facebook/react/b98adb648a27640db8467064e537b238b8c306ce/packages/react-dom/src/shared/CSSProperty.js
 export const UNITLESS_PROPERTIES: Indexable = {
 	animationIterationCount: true,

@@ -1,12 +1,8 @@
-import { SHORTHAND_PROPERTIES } from "./constants";
-import { hash, isNumber, isObject, minify } from "./helpers";
+import { NO_CLASSNAME, SHORTHAND_PROPERTIES } from "./constants";
+import { isNumber, isObject, minify, toDeclaration } from "./helpers";
 import { StyleSheetType, createStyleSheet } from "./entities/stylesheet";
 import { createCache } from "./entities/cache";
-import {
-	createProcessor,
-	toClassName,
-	toDeclaration,
-} from "./entities/processor";
+import { process } from "./entities/processor";
 import {
 	AtConditionalGroupingRule,
 	AtTextualRule,
@@ -17,70 +13,6 @@ import {
 
 const styleSheet = createStyleSheet();
 const cache = createCache(styleSheet);
-const process = createProcessor(cache);
-
-const createAtomsFactory = (rule = "") => {
-	const formatRuleSetWithScope = (ruleSet: string) => {
-		return !rule ? ruleSet : `${rule}{${ruleSet}}`;
-	};
-
-	// eslint-disable-next-line sonarjs/cognitive-complexity
-	return (styleObject: AtomicStyleObject) => {
-		// @note: force typescript to reduce the typing evaluation cost due to heavy generic on css-type package
-		const input = styleObject as Record<string, unknown>;
-		let classNames = "";
-
-		for (const property of Object.keys(input)) {
-			const value = input[property];
-			const style = rule
-				? styleSheet.conditional
-				: SHORTHAND_PROPERTIES[property]
-				? styleSheet.shorthand
-				: styleSheet.longhand;
-
-			if (isObject(value)) {
-				for (const selectorProperty of Object.keys(value)) {
-					const selectorValue =
-						value[selectorProperty as keyof typeof value];
-					const isDefaultProperty = selectorProperty === "default";
-					const className = process(
-						isDefaultProperty
-							? `${rule}${property}${selectorValue}`
-							: `${rule}${property}${selectorValue}${selectorProperty}`,
-						property,
-						selectorValue,
-						(className, declaration) =>
-							formatRuleSetWithScope(
-								`.${className}${
-									isDefaultProperty ? "" : selectorProperty
-								}{${declaration}}`
-							),
-						style
-					);
-
-					if (className !== null) {
-						classNames = `${classNames} ${className}`;
-					}
-				}
-			} else {
-				const className = process(
-					`${rule}${property}${value}`,
-					property,
-					value,
-					(className, declaration) =>
-						formatRuleSetWithScope(`.${className}{${declaration}}`),
-					style
-				);
-
-				if (className !== null) {
-					classNames = `${classNames} ${className}`;
-				}
-			}
-		}
-
-		return classNames.trim();
-	};
-};
 
 /**
  * Create a contextual `atoms` tied to a [CSSGroupingRule](https://developer.mozilla.org/en-US/docs/Web/API/CSSGroupingRule)
@@ -95,7 +27,9 @@ export const createAtoms = (
 	return createAtomsFactory(`${atRule} ${condition}`);
 };
 
-export const atoms = createAtomsFactory();
+export const atoms = (styleObject: AtomicStyleObject) => {
+	return createAtomsFactory()(styleObject);
+};
 
 export const extractStyles = () => {
 	const styleSheetTypes = Object.keys(styleSheet) as StyleSheetType[];
@@ -120,72 +54,144 @@ export const extractStyles = () => {
 	});
 };
 
-// @todo: refacto to reuse as much as possible processor + update processor to have key and selector arg and remove `ruleSetFormatter`
-export const globals = (stylesBySelector: GlobalStyleObject) => {
-	const key = hash(JSON.stringify(stylesBySelector));
+export const globals = (styleObject: GlobalStyleObject) =>
+	process({
+		cache,
+		key: JSON.stringify(styleObject),
+		styleSheet: styleSheet.global,
+		strategy() {
+			let ruleSet = "";
 
-	if (cache.has(key)) {
-		return;
-	}
+			for (const selector of Object.keys(styleObject)) {
+				const style = styleObject[selector as AtTextualRule];
 
-	let ruleSet = "";
+				if (!style) continue;
 
-	for (const selector of Object.keys(stylesBySelector)) {
-		const style = stylesBySelector[selector as AtTextualRule];
+				if (typeof style === "string") {
+					ruleSet += `${selector} ${style};`;
+				} else {
+					let declarationBlock = "";
 
-		if (!style) continue;
+					for (const property of Object.keys(style)) {
+						const value = style[property];
 
-		if (typeof style === "string") {
-			ruleSet += `${selector} ${style};`;
-		} else {
-			let declarationBlock = "";
+						declarationBlock += `${toDeclaration(
+							property,
+							value
+						)};`;
+					}
 
-			for (const property of Object.keys(style)) {
-				const value = style[property];
-
-				declarationBlock += `${toDeclaration(property, value)};`;
+					ruleSet += `${selector}{${declarationBlock}}`;
+				}
 			}
 
-			ruleSet += `${selector}{${declarationBlock}}`;
+			return ruleSet;
+		},
+	});
+
+export const keyframes = (styleObject: KeyframeStyleObject) =>
+	process({
+		cache,
+		key: JSON.stringify(styleObject),
+		styleSheet: styleSheet.global,
+		strategy({ className }) {
+			let ruleSet = "";
+			const selectors = Object.keys(styleObject) as Array<
+				keyof typeof styleObject
+			>;
+
+			for (const selector of selectors) {
+				const style = styleObject[selector];
+
+				if (!style) continue;
+
+				let declarationBlock = "";
+
+				for (const property of Object.keys(style)) {
+					const value = style[property];
+
+					declarationBlock += `${toDeclaration(property, value)};`;
+				}
+
+				ruleSet += `${
+					isNumber(selector) ? `${selector}%` : selector
+				}{${declarationBlock}}`;
+			}
+
+			return `@keyframes ${className}{${ruleSet}}`;
+		},
+	});
+
+const createAtomsFactory = (groupingRule = "") => {
+	const wrapRuleSet = (ruleSet: string) => {
+		return !groupingRule ? ruleSet : `${groupingRule}{${ruleSet}}`;
+	};
+
+	// eslint-disable-next-line sonarjs/cognitive-complexity
+	return (styleObject: AtomicStyleObject) => {
+		let classNames = "";
+
+		for (const property of Object.keys(styleObject)) {
+			const value = styleObject[property];
+			const style = groupingRule
+				? styleSheet.conditional
+				: SHORTHAND_PROPERTIES[property]
+				? styleSheet.shorthand
+				: styleSheet.longhand;
+
+			if (isObject(value)) {
+				for (const selectorProperty of Object.keys(value)) {
+					const selectorValue = value[selectorProperty];
+					const isDefaultProperty = selectorProperty === "default";
+					const className = process({
+						cache,
+						key: `${groupingRule}${property}${selectorValue}${
+							isDefaultProperty ? "" : selectorProperty
+						}`,
+						styleSheet: style,
+						strategy({ className }) {
+							if (selectorValue === undefined)
+								return NO_CLASSNAME;
+
+							const declarationBlock = toDeclaration(
+								property,
+								selectorValue
+							);
+
+							return wrapRuleSet(
+								`.${className}${
+									isDefaultProperty ? "" : selectorProperty
+								}{${declarationBlock}}`
+							);
+						},
+					});
+
+					if (className !== NO_CLASSNAME) {
+						classNames = `${classNames} ${className}`;
+					}
+				}
+			} else {
+				const className = process({
+					cache,
+					key: `${groupingRule}${property}${value}`,
+					styleSheet: style,
+					strategy({ className }) {
+						if (value === undefined) return NO_CLASSNAME;
+
+						const declarationBlock = toDeclaration(property, value);
+
+						return wrapRuleSet(
+							`.${className}{${declarationBlock}}`
+						);
+					},
+				});
+
+				if (className !== NO_CLASSNAME) {
+					classNames = `${classNames} ${className}`;
+				}
+			}
 		}
-	}
 
-	styleSheet.global.commit(ruleSet);
-	cache.set(key, "global");
-};
-
-export const keyframes = (stylesBySelector: KeyframeStyleObject) => {
-	const key = hash(JSON.stringify(stylesBySelector));
-	const animationName = toClassName(key);
-
-	if (cache.has(key)) return animationName;
-
-	let ruleSet = "";
-	const selectors = Object.keys(stylesBySelector) as Array<
-		keyof typeof stylesBySelector
-	>;
-
-	for (const selector of selectors) {
-		const style = stylesBySelector[selector];
-
-		if (!style) continue;
-
-		let declarationBlock = "";
-
-		for (const property of Object.keys(style)) {
-			const value = style[property];
-
-			declarationBlock += `${toDeclaration(property, value)};`;
-		}
-
-		ruleSet += `${
-			isNumber(selector) ? `${selector}%` : selector
-		}{${declarationBlock}}`;
-	}
-
-	ruleSet = `@keyframes ${animationName}{${ruleSet}}`;
-	styleSheet.global.commit(ruleSet);
-	cache.set(key, "global");
-
-	return animationName;
+		return classNames.trim();
+	};
 };

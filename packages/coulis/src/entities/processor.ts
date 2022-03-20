@@ -1,64 +1,33 @@
-import { hash } from "../helpers";
-import { UNITLESS_PROPERTIES } from "../constants";
+import { NO_CLASSNAME } from "../constants";
+import { hash, toClassName } from "../helpers";
 import { Cache } from "./cache";
 import { StyleSheet } from "./stylesheet";
 
-export const toDeclaration = (property: string, value: unknown) => {
-	// @section: from JS camelCase to CSS kebeb-case
-	const normalizedProperty = property.replace(
-		/([A-Z])/g,
-		(matched) => `-${matched.toLowerCase()}`
-	);
-	// @section: format value to follow CSS specs (unitless number)
-	const normalizedValue =
-		typeof value !== "number" || UNITLESS_PROPERTIES[property]
-			? value
-			: `${value}px`;
-
-	return `${normalizedProperty}:${normalizedValue}`;
+type CreateProcessorData = {
+	cache: Cache;
+	key: string;
+	styleSheet: StyleSheet;
+	strategy: (params: { className: string }) => /* ruleSet */ string;
 };
 
-// @note: Anatomy of a css syntax:
-// .className { background-color: blue; color: red } = css rule-set
-// .className = selector
-// { background-color: blue; color: red } = declaration block (contains one or more declarations separated by semicolons)
-// background-color: blue = a declaration
-// background-color = property (or property name)
-// blue = value (or property value)
+export const process = ({
+	cache,
+	key,
+	strategy,
+	styleSheet,
+}: CreateProcessorData) => {
+	const cacheKey = hash(key);
+	const className = toClassName(cacheKey);
 
-export const toClassName = (key: string) => {
-	return `c${key}`;
+	if (cache.has(cacheKey)) return className;
+
+	const ruleSet = strategy({ className });
+
+	// @note: empty string to unset className (eg. if a value is undefined)
+	if (!ruleSet) return NO_CLASSNAME;
+
+	styleSheet.commit(ruleSet);
+	cache.set(cacheKey, styleSheet.type);
+
+	return className;
 };
-
-export const createProcessor = (cache: Cache) => {
-	return (
-		key: string,
-		property: string,
-		value: unknown,
-		ruleSetFormatter: (className: string, declaration: string) => string,
-		styleSheet: StyleSheet
-	) => {
-		const cacheKey = hash(key);
-		const className = toClassName(cacheKey);
-
-		if (cache.has(cacheKey)) {
-			return className;
-		}
-
-		if (value === undefined) {
-			return null;
-		}
-
-		const normalizedDeclaration = toDeclaration(property, value);
-		const ruleSet = ruleSetFormatter(className, normalizedDeclaration);
-
-		styleSheet.commit(ruleSet);
-		cache.set(cacheKey, styleSheet.type);
-
-		return className;
-	};
-};
-
-// export const createProcessorGlob = (cache: Cache) => {
-
-// }

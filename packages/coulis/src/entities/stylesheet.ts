@@ -6,16 +6,16 @@ export type StyleSheetType =
 	| "longhand"
 	| "conditional";
 
-export interface StyleSheetAdapter {
+export interface StyleSheet {
 	commit: (rule: string) => void;
 	get: () => string;
 	element: HTMLStyleElement | null;
 	type: StyleSheetType;
 }
 
-export type StyleSheet = Record<StyleSheetType, StyleSheetAdapter>;
+export type StyleSheetCollection = Record<StyleSheetType, StyleSheet>;
 
-const createVirtualStyleSheet = (type: StyleSheetType): StyleSheetAdapter => {
+const createVirtualStyleSheet = (type: StyleSheetType): StyleSheet => {
 	const target: typeof createVirtualStyleSheet.slots[number] = [];
 
 	createVirtualStyleSheet.slots[type] = target;
@@ -34,7 +34,7 @@ const createVirtualStyleSheet = (type: StyleSheetType): StyleSheetAdapter => {
 
 createVirtualStyleSheet.slots = {} as Record<string, string[]>;
 
-const createWebStyleSheet = (type: StyleSheetType): StyleSheetAdapter => {
+const createWebStyleSheet = (type: StyleSheetType): StyleSheet => {
 	let element = document.querySelector<HTMLStyleElement>(
 		`style[data-type="${type}"][data-coulis]`
 	);
@@ -68,7 +68,7 @@ const createWebStyleSheet = (type: StyleSheetType): StyleSheetAdapter => {
 	};
 };
 
-export const createStyleSheet = (): StyleSheet => {
+export const createStyleSheet = (): StyleSheetCollection => {
 	const create = IS_BROWSER_ENV
 		? createWebStyleSheet
 		: createVirtualStyleSheet;

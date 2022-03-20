@@ -1,7 +1,7 @@
 import { hash } from "../helpers";
 import { UNITLESS_PROPERTIES } from "../constants";
-import { CacheAdapter } from "./cache";
-import { StyleSheetAdapter } from "./stylesheet";
+import { Cache } from "./cache";
+import { StyleSheet } from "./stylesheet";
 
 export const toDeclaration = (property: string, value: unknown) => {
 	// @section: from JS camelCase to CSS kebeb-case
@@ -30,13 +30,13 @@ export const toClassName = (key: string) => {
 	return `c${key}`;
 };
 
-export const createProcessor = (cache: CacheAdapter) => {
+export const createProcessor = (cache: Cache) => {
 	return (
 		key: string,
 		property: string,
 		value: unknown,
 		ruleSetFormatter: (className: string, declaration: string) => string,
-		styleSheet: StyleSheetAdapter
+		styleSheet: StyleSheet
 	) => {
 		const cacheKey = hash(key);
 		const className = toClassName(cacheKey);
@@ -58,3 +58,7 @@ export const createProcessor = (cache: CacheAdapter) => {
 		return className;
 	};
 };
+
+// export const createProcessorGlob = (cache: Cache) => {
+
+// }

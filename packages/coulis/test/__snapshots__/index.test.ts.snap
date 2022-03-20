@@ -12,7 +12,7 @@ exports[`should extract styles 1`] = `
     "type": "global",
   },
   {
-    "content": ".c3c5816c4{color:lightblue}.cbb3db274{background-color:lightcoral}.c571db958:hover{background-color:lightcyan}.ce9403afc[alt]{background-color:lightgray}",
+    "content": ".c3c5816c4{color:lightblue;}.cbb3db274{background-color:lightcoral;}.c571db958:hover{background-color:lightcyan;}.ce9403afc[alt]{background-color:lightgray;}",
     "keys": [
       "3c5816c4",
       "bb3db274",
@@ -23,7 +23,7 @@ exports[`should extract styles 1`] = `
     "type": "longhand",
   },
   {
-    "content": ".cde6daf3c{padding:10px}",
+    "content": ".cde6daf3c{padding:10px;}",
     "keys": [
       "de6daf3c",
     ],
@@ -31,7 +31,7 @@ exports[`should extract styles 1`] = `
     "type": "shorthand",
   },
   {
-    "content": "@media (min-width: 576px){.c721688f8{color:lightblue}}@media (min-width: 576px){.c3d523ba0{background-color:lightcoral}}@media (min-width: 576px){.cf33f0fbe:hover{background-color:lightcyan}}@media (min-width: 576px){.cec510c6c[alt]{background-color:lightgray}}@media (min-width: 576px){.ca8209d58{padding:10px}}",
+    "content": "@media (min-width: 576px){.c721688f8{color:lightblue;}}@media (min-width: 576px){.c3d523ba0{background-color:lightcoral;}}@media (min-width: 576px){.cf33f0fbe:hover{background-color:lightcyan;}}@media (min-width: 576px){.cec510c6c[alt]{background-color:lightgray;}}@media (min-width: 576px){.ca8209d58{padding:10px;}}",
     "keys": [
       "721688f8",
       "3d523ba0",

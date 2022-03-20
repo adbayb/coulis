@@ -10,7 +10,6 @@ globals({
 	"html,body": {
 		padding: 0,
 		margin: 0,
-		backgroundColor: "lightcoral",
 		fontFamily: "Open Sans, AliasedHelvetica",
 	},
 	"*,*::before,*::after": {
@@ -32,10 +31,7 @@ const animationName = keyframes({
 	from: {
 		transform: "scale(1)",
 	},
-	25: {
-		transform: "scale(1.25)",
-	},
-	"50%": {
+	50: {
 		transform: "scale(1.5)",
 	},
 	to: {

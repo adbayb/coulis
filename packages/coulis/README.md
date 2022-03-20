@@ -16,22 +16,47 @@ Coulis leverages these two approaches to create a great developer experience whi
 ## Usage
 
 -   `npm i coulis --save` or `yarn add coulis`
--   Play with the API
+-   Play with the API:
 
-<details>
-<summary><b>React</b></summary>
-<p>
-
-```typescript
+```tsx
 import ReactDOM from "react-dom";
-import { css } from "coulis";
+import { atoms, createAtoms, globals, keyframes } from "coulis";
 
-const cssSmallScreen = createCss("@media (max-width: 400px)");
+globals({
+	"@import":
+		"url('https://fonts.googleapis.com/css?family=Open+Sans&display=swap')",
+	html: {
+		boxSizing: "border-box",
+	},
+	"html,body": {
+		padding: 0,
+		margin: 0,
+		fontFamily: "Open Sans",
+	},
+	"*,*::before,*::after": {
+		boxSizing: "inherit",
+	},
+});
+
+const tabletAtoms = createAtoms("@media", "(min-width: 576px)");
+
+const zoomIn = keyframes({
+	from: {
+		transform: "scale(1)",
+	},
+	50: {
+		transform: "scale(1.5)",
+	},
+	to: {
+		transform: "scale(1)",
+	},
+});
 
 const App = () => {
 	return (
 		<div
-			className={css({
+			className={atoms({
+				animation: `${zoomIn} 2000ms linear infinite`,
 				display: "flex",
 				width: "100%",
 				height: "100%",
@@ -41,7 +66,7 @@ const App = () => {
 		>
 			<p
 				className={[
-					css({
+					atoms({
 						color: {
 							default: "black",
 							":hover": "lightcoral",
@@ -49,7 +74,7 @@ const App = () => {
 						fontSize: 26,
 						textAlign: "center",
 					}),
-					cssSmallScreen({ fontSize: 20 }),
+					tabletAtoms({ fontSize: 20 }),
 				].join(" ")}
 			>
 				Hello 🤗
@@ -60,17 +85,3 @@ const App = () => {
 
 ReactDOM.render(<App />, document.getElementById("root"));
 ```
-
-</p>
-</details>
-
-## TODO
-
--   [x] Atomic API
--   [x] Conditional at rule API
--   [x] Client side support
--   [x] keyframes API
--   [x] Global css API (api naming to be reviewed)
--   [x] Server side support
--   [x] CSS type support
--   [ ] Documentation (principles, homepage, ...)

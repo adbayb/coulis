@@ -6,7 +6,10 @@ import {
 	toDeclaration,
 	toManyDeclaration,
 } from "./helpers";
-import { StyleSheetType, createStyleSheet } from "./entities/stylesheet";
+import {
+	StyleSheetType,
+	createStyleSheetCollection,
+} from "./entities/stylesheet";
 import { createCache } from "./entities/cache";
 import { process } from "./entities/processor";
 import {
@@ -17,8 +20,8 @@ import {
 	KeyframeStyleObject,
 } from "./types";
 
-const styleSheet = createStyleSheet();
-const cache = createCache(styleSheet);
+const styleSheetColection = createStyleSheetCollection();
+const cache = createCache(styleSheetColection);
 
 /**
  * Create a contextual `atoms` tied to a [CSSGroupingRule](https://developer.mozilla.org/en-US/docs/Web/API/CSSGroupingRule)
@@ -38,12 +41,14 @@ export const atoms = (styleObject: AtomicStyleObject) => {
 };
 
 export const extractStyles = () => {
-	const styleSheetTypes = Object.keys(styleSheet) as StyleSheetType[];
+	const styleSheetTypes = Object.keys(
+		styleSheetColection
+	) as StyleSheetType[];
 	const cacheEntries = cache.entries();
 	const cacheKeys = Object.keys(cacheEntries);
 
 	return styleSheetTypes.map((type) => {
-		const style = styleSheet[type];
+		const style = styleSheetColection[type];
 		const cssValue = minify(style.get());
 		const keys = cacheKeys.filter((key) => cacheEntries[key] === type);
 
@@ -52,7 +57,7 @@ export const extractStyles = () => {
 			content: cssValue,
 			type,
 			toString() {
-				return `<style data-type="${type}" data-keys="${keys.join(
+				return `<style data-keys="${keys.join(
 					","
 				)}" data-coulis>${cssValue}</style>`;
 			},
@@ -64,7 +69,7 @@ export const globals = (styleObject: GlobalStyleObject) =>
 	process({
 		cache,
 		key: JSON.stringify(styleObject),
-		styleSheet: styleSheet.global,
+		styleSheet: styleSheetColection.global,
 		strategy() {
 			let ruleSet = "";
 
@@ -88,7 +93,7 @@ export const keyframes = (styleObject: KeyframeStyleObject) =>
 	process({
 		cache,
 		key: JSON.stringify(styleObject),
-		styleSheet: styleSheet.global,
+		styleSheet: styleSheetColection.global,
 		strategy({ className }) {
 			let ruleSet = "";
 			const selectors = Object.keys(styleObject) as Array<
@@ -121,13 +126,13 @@ const createAtomsFactory = (groupingRule = "") => {
 		for (const property of Object.keys(styleObject)) {
 			const value = styleObject[property];
 			const isShorthandProperty = SHORTHAND_PROPERTIES[property];
-			const style = groupingRule
+			const styleSheet = groupingRule
 				? isShorthandProperty
-					? styleSheet.conditionalShorthand
-					: styleSheet.conditionalLonghand
+					? styleSheetColection.conditionalShorthand
+					: styleSheetColection.conditionalLonghand
 				: isShorthandProperty
-				? styleSheet.shorthand
-				: styleSheet.longhand;
+				? styleSheetColection.shorthand
+				: styleSheetColection.longhand;
 
 			if (isObject(value)) {
 				for (const selectorProperty of Object.keys(value)) {
@@ -138,7 +143,7 @@ const createAtomsFactory = (groupingRule = "") => {
 						key: `${groupingRule}${property}${selectorValue}${
 							isDefaultProperty ? "" : selectorProperty
 						}`,
-						styleSheet: style,
+						styleSheet,
 						strategy({ className }) {
 							if (selectorValue === undefined)
 								return NO_CLASSNAME;
@@ -159,7 +164,7 @@ const createAtomsFactory = (groupingRule = "") => {
 				const className = process({
 					cache,
 					key: `${groupingRule}${property}${value}`,
-					styleSheet: style,
+					styleSheet,
 					strategy({ className }) {
 						if (value === undefined) return NO_CLASSNAME;
 

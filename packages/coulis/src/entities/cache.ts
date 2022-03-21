@@ -14,9 +14,7 @@ const hydrate = (styleSheets: StyleSheetCollection): CacheEntry => {
 	const hydratedCache: CacheEntry = {};
 
 	sheets.forEach(({ element, type }) => {
-		if (!element) {
-			return;
-		}
+		if (!element) return;
 
 		const keys = element.dataset.coulisKeys?.split(",") || [];
 

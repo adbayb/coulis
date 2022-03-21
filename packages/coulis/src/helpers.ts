@@ -57,3 +57,17 @@ export const toDeclaration = (property: string, value: unknown) => {
 
 	return `${normalizedProperty}:${normalizedValue};`;
 };
+
+export const toManyDeclaration = <StyleObject extends Record<string, unknown>>(
+	styleObject: StyleObject
+) => {
+	let declarationBlock = "";
+
+	for (const property of Object.keys(styleObject)) {
+		const value = styleObject[property];
+
+		declarationBlock += toDeclaration(property, value);
+	}
+
+	return declarationBlock;
+};

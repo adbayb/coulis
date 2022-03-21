@@ -43,8 +43,12 @@ globals({
 });
 ```
 
+-   [ ] Add `conditional-shorthand/conditional-longhand` to manage conditional specificities
+
 -   [ ] Check `extractStyles` API with multiple server side case
 
--   [ ] Update README.md before release
+-   [ ] Improve overall performance
 
--   [ ] Documentation (principles, homepage, ...)
+-   [ ] Update README.md before release (add features and principles (especially, specificity management))
+
+-   [ ] Create homepage (low priority)

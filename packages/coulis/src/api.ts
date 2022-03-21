@@ -1,5 +1,11 @@
 import { NO_CLASSNAME, SHORTHAND_PROPERTIES } from "./constants";
-import { isNumber, isObject, minify, toDeclaration } from "./helpers";
+import {
+	isNumber,
+	isObject,
+	minify,
+	toDeclaration,
+	toManyDeclaration,
+} from "./helpers";
 import { StyleSheetType, createStyleSheet } from "./entities/stylesheet";
 import { createCache } from "./entities/cache";
 import { process } from "./entities/processor";
@@ -70,15 +76,7 @@ export const globals = (styleObject: GlobalStyleObject) =>
 				if (typeof style === "string") {
 					ruleSet += `${selector} ${style};`;
 				} else {
-					let declarationBlock = "";
-
-					for (const property of Object.keys(style)) {
-						const value = style[property];
-
-						declarationBlock += toDeclaration(property, value);
-					}
-
-					ruleSet += `${selector}{${declarationBlock}}`;
+					ruleSet += `${selector}{${toManyDeclaration(style)}}`;
 				}
 			}
 
@@ -102,17 +100,9 @@ export const keyframes = (styleObject: KeyframeStyleObject) =>
 
 				if (!style) continue;
 
-				let declarationBlock = "";
-
-				for (const property of Object.keys(style)) {
-					const value = style[property];
-
-					declarationBlock += toDeclaration(property, value);
-				}
-
 				ruleSet += `${
 					isNumber(selector) ? `${selector}%` : selector
-				}{${declarationBlock}}`;
+				}{${toManyDeclaration(style)}}`;
 			}
 
 			return `@keyframes ${className}{${ruleSet}}`;

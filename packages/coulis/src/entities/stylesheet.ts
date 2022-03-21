@@ -60,7 +60,6 @@ const createWebStyleSheet = (type: StyleSheetType): StyleSheet => {
 			}
 		},
 		get() {
-			// @todo: to check, retrieve declaration block other ways
 			return target.innerText;
 		},
 		element,
@@ -74,11 +73,10 @@ export const createStyleSheet = (): StyleSheetCollection => {
 		: createVirtualStyleSheet;
 	// @note: The order is important for following lines.
 	// Global has a lesser specificity than (<) shorthand properties:
-	// global < shorthand < longhand properties
+	// global < shorthand < longhand < conditional properties
 	const globalSheet = create("global");
 	const shorthandSheet = create("shorthand");
 	const longhandSheet = create("longhand");
-	// @todo: remove conditional sheet. The property name should be checked instead and dispatched either in long/short or global sheet
 	const conditionalSheet = create("conditional");
 
 	return {

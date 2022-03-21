@@ -3,7 +3,7 @@ import { hash, toClassName } from "../helpers";
 import { Cache } from "./cache";
 import { StyleSheet } from "./stylesheet";
 
-type CreateProcessorData = {
+type ProcessParameters = {
 	cache: Cache;
 	key: string;
 	styleSheet: StyleSheet;
@@ -15,7 +15,7 @@ export const process = ({
 	key,
 	strategy,
 	styleSheet,
-}: CreateProcessorData) => {
+}: ProcessParameters) => {
 	const cacheKey = hash(key);
 	const className = toClassName(cacheKey);
 

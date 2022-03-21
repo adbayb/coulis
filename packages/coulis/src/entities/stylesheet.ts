@@ -11,6 +11,17 @@ export interface StyleSheet {
 
 export type StyleSheetCollection = Record<StyleSheetType, StyleSheet>;
 
+export const createStyleSheetCollection = (): StyleSheetCollection => {
+	const collection = {} as StyleSheetCollection;
+	const types = Object.keys(INSERTION_ORDER_BY_TYPE) as Array<StyleSheetType>;
+
+	for (const type of types) {
+		collection[type] = createStyleSheet(type);
+	}
+
+	return collection;
+};
+
 // @note: The order is important. Global properties has a lesser specificity than (<) shorthand ones:
 // global < shorthand < longhand < conditional-shorthand < conditional-longhand properties
 const INSERTION_ORDER_BY_TYPE = Object.freeze({
@@ -60,7 +71,7 @@ const createWebStyleSheet = () => {
 		return {
 			commit(rule: string) {
 				if (IS_PROD_ENV) {
-					target.sheet?.insertRule(rule);
+					target.sheet && target.sheet.insertRule(rule);
 				} else {
 					// stl.innerHTML = `${stl.innerHTML}${rule}`;
 					// stl.appendChild(document.createTextNode(rule));
@@ -80,14 +91,3 @@ const createWebStyleSheet = () => {
 const createStyleSheet = IS_BROWSER_ENV
 	? createWebStyleSheet()
 	: createVirtualStyleSheet();
-
-export const createStyleSheetCollection = (): StyleSheetCollection => {
-	const collection = {} as StyleSheetCollection;
-	const types = Object.keys(INSERTION_ORDER_BY_TYPE) as Array<StyleSheetType>;
-
-	for (const type of types) {
-		collection[type] = createStyleSheet(type);
-	}
-
-	return collection;
-};

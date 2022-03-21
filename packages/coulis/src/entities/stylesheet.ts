@@ -33,7 +33,7 @@ const INSERTION_ORDER_BY_TYPE = Object.freeze({
 });
 
 const createVirtualStyleSheet = () => {
-	const slots = {} as Record<string, string[]>;
+	const slots = {} as Record<string, Array<string>>;
 
 	return (type: StyleSheetType): StyleSheet => {
 		const target: typeof slots[number] = [];

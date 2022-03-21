@@ -41,28 +41,36 @@ export const atoms = (styleObject: AtomicStyleObject) => {
 };
 
 export const extractStyles = () => {
+	let stringifiedStyles = "";
 	const styleSheetTypes = Object.keys(
 		styleSheetColection
-	) as StyleSheetType[];
+	) as Array<StyleSheetType>;
 	const cacheEntries = cache.entries();
 	const cacheKeys = Object.keys(cacheEntries);
+	const styles = styleSheetTypes.map((type) => {
+		const styleSheet = styleSheetColection[type];
+		const content = minify(styleSheet.get());
+		const keys = cacheKeys
+			.filter((key) => cacheEntries[key] === type)
+			.join();
+		const stringifiedStyle = `<style data-keys="${keys}" data-coulis>${content}</style>`;
 
-	return styleSheetTypes.map((type) => {
-		const style = styleSheetColection[type];
-		const cssValue = minify(style.get());
-		const keys = cacheKeys.filter((key) => cacheEntries[key] === type);
+		stringifiedStyles += stringifiedStyle;
 
 		return {
 			keys,
-			content: cssValue,
-			type,
+			content,
 			toString() {
-				return `<style data-keys="${keys.join(
-					","
-				)}" data-coulis>${cssValue}</style>`;
+				return stringifiedStyle;
 			},
 		};
 	});
+
+	styles.toString = () => {
+		return stringifiedStyles;
+	};
+
+	return styles;
 };
 
 export const globals = (styleObject: GlobalStyleObject) =>

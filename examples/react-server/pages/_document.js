@@ -11,14 +11,12 @@ class MyDocument extends Document {
 			styles: (
 				<>
 					{initialProps.styles}
-					{styles.map((style) => {
-						const { content, keys, type } = style;
-
+					{styles.map(({ content, keys }) => {
 						return (
 							<style
-								key={type}
+								key={keys}
 								data-coulis
-								data-keys={keys.join()}
+								data-keys={keys}
 								// eslint-disable-next-line react/no-danger
 								dangerouslySetInnerHTML={{ __html: content }}
 							/>

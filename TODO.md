@@ -43,7 +43,7 @@ globals({
 });
 ```
 
--   [ ] Add `conditional-shorthand/conditional-longhand` to manage conditional specificities
+-   [x] Add `conditional-shorthand/conditional-longhand` to manage conditional specificities
 
 -   [ ] Make `extractStyles` API hydration works with multiple server side case
 

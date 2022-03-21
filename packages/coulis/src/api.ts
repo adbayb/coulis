@@ -120,9 +120,12 @@ const createAtomsFactory = (groupingRule = "") => {
 
 		for (const property of Object.keys(styleObject)) {
 			const value = styleObject[property];
+			const isShorthandProperty = SHORTHAND_PROPERTIES[property];
 			const style = groupingRule
-				? styleSheet.conditional
-				: SHORTHAND_PROPERTIES[property]
+				? isShorthandProperty
+					? styleSheet.conditionalShorthand
+					: styleSheet.conditionalLonghand
+				: isShorthandProperty
 				? styleSheet.shorthand
 				: styleSheet.longhand;
 

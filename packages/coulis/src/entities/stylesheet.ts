@@ -4,7 +4,8 @@ export type StyleSheetType =
 	| "global"
 	| "shorthand"
 	| "longhand"
-	| "conditional";
+	| "conditionalShorthand"
+	| "conditionalLonghand";
 
 export interface StyleSheet {
 	commit: (rule: string) => void;
@@ -34,6 +35,7 @@ const createVirtualStyleSheet = (type: StyleSheetType): StyleSheet => {
 
 createVirtualStyleSheet.slots = {} as Record<string, string[]>;
 
+// @todo: avoid appending already inserted rules
 const createWebStyleSheet = (type: StyleSheetType): StyleSheet => {
 	let element = document.querySelector<HTMLStyleElement>(
 		`style[data-type="${type}"][data-coulis]`
@@ -71,18 +73,15 @@ export const createStyleSheet = (): StyleSheetCollection => {
 	const create = IS_BROWSER_ENV
 		? createWebStyleSheet
 		: createVirtualStyleSheet;
+
 	// @note: The order is important for following lines.
 	// Global has a lesser specificity than (<) shorthand properties:
-	// global < shorthand < longhand < conditional properties
-	const globalSheet = create("global");
-	const shorthandSheet = create("shorthand");
-	const longhandSheet = create("longhand");
-	const conditionalSheet = create("conditional");
-
+	// global < shorthand < longhand < conditional-shorthand < conditional-longhand properties
 	return {
-		global: globalSheet,
-		longhand: longhandSheet,
-		shorthand: shorthandSheet,
-		conditional: conditionalSheet,
+		global: create("global"),
+		shorthand: create("shorthand"),
+		longhand: create("longhand"),
+		conditionalShorthand: create("conditionalShorthand"),
+		conditionalLonghand: create("conditionalLonghand"),
 	};
 };

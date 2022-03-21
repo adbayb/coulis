@@ -2,7 +2,7 @@ import { expect, test } from "vitest";
 import { atoms, createAtoms, extractStyles, globals, keyframes } from "../src";
 
 test("should extract styles", () => {
-	const mediumAtoms = createAtoms("@media", "(min-width: 576px)");
+	const largerAtoms = createAtoms("@media", "(min-width: 576px)");
 
 	globals({
 		"@charset": '"utf-8"',
@@ -55,22 +55,22 @@ test("should extract styles", () => {
 		padding: 10,
 	});
 
-	const mediaClassNames = mediumAtoms({
+	const largerClassNames = largerAtoms({
 		color: "lightblue",
 		backgroundColor: {
 			default: "lightcoral",
 			":hover": "lightcyan",
 			"[alt]": "lightgray",
 		},
-		padding: 10,
+		padding: 24,
 	});
 
 	expect(animationName).toBe("c62e63a97");
 	expect(classNames).toBe(
 		"c3c5816c4 cbb3db274 c571db958 ce9403afc cde6daf3c"
 	);
-	expect(mediaClassNames).toBe(
-		"c721688f8 c3d523ba0 cf33f0fbe cec510c6c ca8209d58"
+	expect(largerClassNames).toBe(
+		"c721688f8 c3d523ba0 cf33f0fbe cec510c6c c3123b398"
 	);
 	expect(extractStyles()).toMatchSnapshot();
 });

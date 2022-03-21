@@ -25,7 +25,7 @@ globals({
 	},
 });
 
-const tabletAtoms = createAtoms("@media", "(min-width: 576px)");
+const largerAtoms = createAtoms("@media", "(min-width: 576px)");
 
 const animationName = keyframes({
 	from: {
@@ -73,8 +73,9 @@ function App() {
 								"[target=_blank]": undefined,
 							},
 						}),
-						tabletAtoms({
+						largerAtoms({
 							color: "blue",
+							padding: 24,
 						}),
 					].join(" ")}
 					href="https://reactjs.org"

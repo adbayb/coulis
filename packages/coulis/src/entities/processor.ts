@@ -1,5 +1,5 @@
 import { NO_CLASSNAME } from "../constants";
-import { hash, toClassName } from "../helpers";
+import { hash } from "../helpers";
 import { Cache } from "./cache";
 import { StyleSheet } from "./stylesheet";
 
@@ -16,10 +16,9 @@ export const process = ({
 	strategy,
 	styleSheet,
 }: ProcessParameters) => {
-	const cacheKey = hash(key);
-	const className = toClassName(cacheKey);
+	const className = hash(key);
 
-	if (cache.has(cacheKey)) return className;
+	if (cache.has(className)) return className;
 
 	const ruleSet = strategy({ className });
 
@@ -27,7 +26,7 @@ export const process = ({
 	if (!ruleSet) return NO_CLASSNAME;
 
 	styleSheet.commit(ruleSet);
-	cache.set(cacheKey, styleSheet.type);
+	cache.set(className, styleSheet.type);
 
 	return className;
 };

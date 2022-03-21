@@ -15,8 +15,16 @@ Coulis leverages these two approaches to create a great developer experience whi
 
 ## Usage
 
--   `npm i coulis --save` or `yarn add coulis`
--   Play with the API:
+1️⃣ Install
+
+```bash
+# NPM
+npm install coulis
+# Yarn
+yarn add coulis
+```
+
+2️⃣ Play with the API ✌️
 
 ```tsx
 import ReactDOM from "react-dom";

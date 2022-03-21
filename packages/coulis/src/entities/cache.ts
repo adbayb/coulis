@@ -16,7 +16,7 @@ const hydrate = (styleSheets: StyleSheetCollection): CacheEntry => {
 	sheets.forEach(({ element, type }) => {
 		if (!element) return;
 
-		const keys = element.dataset.keys;
+		const keys = element.dataset.coulis;
 
 		if (!keys) return;
 

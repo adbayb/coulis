@@ -53,7 +53,7 @@ export const extractStyles = () => {
 		const keys = cacheKeys
 			.filter((key) => cacheEntries[key] === type)
 			.join();
-		const stringifiedStyle = `<style data-keys="${keys}" data-coulis>${content}</style>`;
+		const stringifiedStyle = `<style data-coulis="${keys}">${content}</style>`;
 
 		stringifiedStyles += stringifiedStyle;
 

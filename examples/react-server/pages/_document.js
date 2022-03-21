@@ -15,8 +15,7 @@ class MyDocument extends Document {
 						return (
 							<style
 								key={keys}
-								data-coulis
-								data-keys={keys}
+								data-coulis={keys}
 								// eslint-disable-next-line react/no-danger
 								dangerouslySetInnerHTML={{ __html: content }}
 							/>

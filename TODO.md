@@ -47,6 +47,20 @@ globals({
 
 -   [x] Make `extractStyles` API hydration works with multiple server side case
 
+-   [ ] Update dependencies and migrate to `@adbayb/stack` (including PNPM migration)
+
+-   [ ] Rename `atoms` and `createAtoms` to `styles` and `createStyles`
+
+-   [ ] Update `createStyles` API to use only one argument and leverage '`${AtConditionalGroupingRule} ${string}`' type instead
+
+-   [ ] Returns `flush` API (along with the extracted styles content) to flush cache in a controlled way (to avoid memory leaks) for `extractStyles` api.
+
+-   [ ] Release point before optimizations
+
+-   [ ] Add `variables` API to define variable(s) (useful for reusable tokens)
+
+-   [ ] Provide a [cva-like](https://cva.style/docs) helper?
+
 -   [ ] Improve overall performance
 
 -   [ ] Update README.md before release (add features and principles (especially, specificity management))

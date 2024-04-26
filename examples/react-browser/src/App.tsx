@@ -1,6 +1,15 @@
 import { atoms, createAtoms, globals, keyframes } from "coulis";
+import { useEffect, useState } from "react";
 
 globals({
+	"@import":
+		"url('https://fonts.googleapis.com/css?family=Open+Sans&display=swap')",
+	// eslint-disable-next-line sort-keys-custom-order/object-keys
+	"@font-face": {
+		fontFamily: "'AliasedHelvetica'",
+		src: "local(Helvetica)",
+	},
+	// eslint-disable-next-line sort-keys-custom-order/object-keys
 	"*,*::before,*::after": {
 		boxSizing: "inherit",
 	},
@@ -8,13 +17,6 @@ globals({
 		border: "1px solid black",
 		borderRadius: 4,
 	},
-	"@charset": '"utf-8"',
-	"@font-face": {
-		fontFamily: "'AliasedHelvetica'",
-		src: "local(Helvetica)",
-	},
-	"@import":
-		"url('https://fonts.googleapis.com/css?family=Open+Sans&display=swap')",
 	html: {
 		boxSizing: "border-box",
 	},
@@ -39,7 +41,19 @@ const animationName = keyframes({
 	},
 });
 
-function App() {
+const App = () => {
+	const [counter, setCounter] = useState(0);
+
+	useEffect(() => {
+		const id = setInterval(() => {
+			setCounter((value) => ++value);
+		}, 1000);
+
+		return () => {
+			clearInterval(id);
+		};
+	});
+
 	return (
 		<div>
 			<header
@@ -53,7 +67,7 @@ function App() {
 					className={atoms({
 						color: {
 							":hover": "red",
-							default: "blue",
+							default: counter % 2 === 0 ? "blue" : "red",
 						},
 					})}
 				>
@@ -105,6 +119,6 @@ function App() {
 			</div>
 		</div>
 	);
-}
+};
 
 export default App;

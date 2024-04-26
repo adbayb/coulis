@@ -1,7 +1,7 @@
 import { atoms, createAtoms, globals, keyframes } from "coulis";
+import { useEffect, useState } from "react";
 
 globals({
-	"@charset": '"utf-8"',
 	"@import":
 		"url('https://fonts.googleapis.com/css?family=Open+Sans&display=swap')",
 	// eslint-disable-next-line sort-keys-custom-order/object-keys
@@ -41,7 +41,19 @@ const animationName = keyframes({
 	},
 });
 
-function App() {
+const App = () => {
+	const [counter, setCounter] = useState(0);
+
+	useEffect(() => {
+		const id = setInterval(() => {
+			setCounter((value) => ++value);
+		}, 1000);
+
+		return () => {
+			clearInterval(id);
+		};
+	});
+
 	return (
 		<div>
 			<header
@@ -55,7 +67,7 @@ function App() {
 					className={atoms({
 						color: {
 							":hover": "red",
-							default: "blue",
+							default: counter % 2 === 0 ? "blue" : "red",
 						},
 					})}
 				>
@@ -107,6 +119,6 @@ function App() {
 			</div>
 		</div>
 	);
-}
+};
 
 export default App;

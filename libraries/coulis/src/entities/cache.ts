@@ -1,6 +1,6 @@
 import { IS_BROWSER_ENV } from "../constants";
 
-import type { StyleSheetCollection, StyleSheetType } from "./stylesheet";
+import type { StyleSheetType, StyleSheets } from "./stylesheet";
 
 type CacheEntry = Record<string, StyleSheetType>;
 
@@ -10,7 +10,7 @@ export type Cache = {
 	set: (key: string, target: StyleSheetType) => void;
 };
 
-const hydrate = (styleSheets: StyleSheetCollection): CacheEntry => {
+const hydrate = (styleSheets: StyleSheets): CacheEntry => {
 	const sheets = Object.values(styleSheets);
 	const hydratedCache: CacheEntry = {};
 
@@ -29,7 +29,7 @@ const hydrate = (styleSheets: StyleSheetCollection): CacheEntry => {
 	return hydratedCache;
 };
 
-export const createCache = (styleSheets: StyleSheetCollection): Cache => {
+export const createCache = (styleSheets: StyleSheets): Cache => {
 	const cache: CacheEntry = IS_BROWSER_ENV ? hydrate(styleSheets) : {};
 
 	return {

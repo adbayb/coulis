@@ -1,12 +1,12 @@
-import { NO_CLASSNAME, SHORTHAND_PROPERTIES } from "./constants";
+import { SHORTHAND_PROPERTIES } from "./constants";
 import { createCache } from "./entities/cache";
-import { process } from "./entities/processor";
-import { createStyleSheetCollection } from "./entities/stylesheet";
+import { createStyleSheets } from "./entities/stylesheet";
 import type { StyleSheetType } from "./entities/stylesheet";
 import {
 	isNumber,
 	isObject,
 	minify,
+	process,
 	toDeclaration,
 	toManyDeclaration,
 } from "./helpers";
@@ -18,8 +18,8 @@ import type {
 	KeyframeStyleObject,
 } from "./types";
 
-const styleSheetCollection = createStyleSheetCollection();
-const cache = createCache(styleSheetCollection);
+const styleSheets = createStyleSheets();
+const cache = createCache(styleSheets);
 
 /**
  * Create a contextual `atoms` tied to a [CSSGroupingRule](https://developer.mozilla.org/en-US/docs/Web/API/CSSGroupingRule)
@@ -43,16 +43,12 @@ export const atoms = (styleObject: AtomicStyleObject) => {
 
 export const extractStyles = () => {
 	let stringifiedStyles = "";
-
-	const styleSheetTypes = Object.keys(
-		styleSheetCollection,
-	) as StyleSheetType[];
-
+	const styleSheetTypes = Object.keys(styleSheets) as StyleSheetType[];
 	const cacheEntries = cache.entries();
 	const cacheKeys = Object.keys(cacheEntries);
 
 	const styles = styleSheetTypes.map((type) => {
-		const styleSheet = styleSheetCollection[type];
+		const styleSheet = styleSheets[type];
 		const content = minify(styleSheet.get());
 
 		const keys = cacheKeys
@@ -83,8 +79,8 @@ export const globals = (styleObject: GlobalStyleObject) =>
 	process({
 		key: JSON.stringify(styleObject),
 		cache,
-		strategy() {
-			let ruleSet = "";
+		createRules() {
+			const rules: string[] = [];
 
 			for (const selector of Object.keys(styleObject)) {
 				const style = styleObject[selector as AtTextualRule];
@@ -92,23 +88,23 @@ export const globals = (styleObject: GlobalStyleObject) =>
 				if (!style) continue;
 
 				if (typeof style === "string") {
-					ruleSet += `${selector} ${style};`;
+					rules.push(`${selector} ${style};`);
 				} else {
-					ruleSet += `${selector}{${toManyDeclaration(style)}}`;
+					rules.push(`${selector}{${toManyDeclaration(style)}}`);
 				}
 			}
 
-			return ruleSet;
+			return rules;
 		},
-		styleSheet: styleSheetCollection.global,
+		styleSheet: styleSheets.global,
 	});
 
 export const keyframes = (styleObject: KeyframeStyleObject) =>
 	process({
 		key: JSON.stringify(styleObject),
 		cache,
-		strategy({ className }) {
-			let ruleSet = "";
+		createRules(className) {
+			let rule = "";
 
 			const selectors = Object.keys(
 				styleObject,
@@ -119,24 +115,24 @@ export const keyframes = (styleObject: KeyframeStyleObject) =>
 
 				if (!style) continue;
 
-				ruleSet += `${
+				rule += `${
 					isNumber(selector) ? `${selector}%` : selector
 				}{${toManyDeclaration(style)}}`;
 			}
 
-			return `@keyframes ${className}{${ruleSet}}`;
+			return [`@keyframes ${className}{${rule}}`];
 		},
-		styleSheet: styleSheetCollection.global,
+		styleSheet: styleSheets.global,
 	});
 
 const createAtomsFactory = (groupingRule = "") => {
-	const wrapRuleSet = (ruleSet: string) => {
-		return !groupingRule ? ruleSet : `${groupingRule}{${ruleSet}}`;
+	const wrapRule = (rule: string) => {
+		return !groupingRule ? rule : `${groupingRule}{${rule}}`;
 	};
 
 	// eslint-disable-next-line sonarjs/cognitive-complexity
 	return (styleObject: AtomicStyleObject) => {
-		let classNames = "";
+		const classNames: string[] = [];
 
 		for (const property of Object.keys(styleObject)) {
 			const value = styleObject[property];
@@ -144,59 +140,60 @@ const createAtomsFactory = (groupingRule = "") => {
 
 			const styleSheet = groupingRule
 				? isShorthandProperty
-					? styleSheetCollection.conditionalShorthand
-					: styleSheetCollection.conditionalLonghand
+					? styleSheets.conditionalShorthand
+					: styleSheets.conditionalLonghand
 				: isShorthandProperty
-					? styleSheetCollection.shorthand
-					: styleSheetCollection.longhand;
+					? styleSheets.shorthand
+					: styleSheets.longhand;
 
 			if (isObject(value)) {
 				for (const selectorProperty of Object.keys(value)) {
 					const selectorValue = value[selectorProperty];
 					const isDefaultProperty = selectorProperty === "default";
 
-					const className = process({
-						key: `${groupingRule}${property}${selectorValue}${
-							isDefaultProperty ? "" : selectorProperty
-						}`,
-						cache,
-						strategy(params) {
-							if (selectorValue === undefined)
-								return NO_CLASSNAME;
+					if (selectorValue === undefined) continue;
 
-							return wrapRuleSet(
-								`.${params.className}${
-									isDefaultProperty ? "" : selectorProperty
-								}{${toDeclaration(property, selectorValue)}}`,
-							);
-						},
-						styleSheet,
-					});
-
-					if (className !== NO_CLASSNAME) {
-						classNames = `${classNames} ${className}`;
-					}
+					classNames.push(
+						process({
+							key: `${groupingRule}${property}${selectorValue}${
+								isDefaultProperty ? "" : selectorProperty
+							}`,
+							cache,
+							createRules(className) {
+								return [
+									wrapRule(
+										`.${className}${
+											isDefaultProperty
+												? ""
+												: selectorProperty
+										}{${toDeclaration(property, selectorValue)}}`,
+									),
+								];
+							},
+							styleSheet,
+						}),
+					);
 				}
 			} else {
-				const className = process({
-					key: `${groupingRule}${property}${value}`,
-					cache,
-					strategy(params) {
-						if (value === undefined) return NO_CLASSNAME;
+				if (value === undefined) continue;
 
-						return wrapRuleSet(
-							`.${params.className}{${toDeclaration(property, value)}}`,
-						);
-					},
-					styleSheet,
-				});
-
-				if (className !== NO_CLASSNAME) {
-					classNames = `${classNames} ${className}`;
-				}
+				classNames.push(
+					process({
+						key: `${groupingRule}${property}${value}`,
+						cache,
+						createRules(className) {
+							return [
+								wrapRule(
+									`.${className}{${toDeclaration(property, value)}}`,
+								),
+							];
+						},
+						styleSheet,
+					}),
+				);
 			}
 		}
 
-		return classNames.trim();
+		return classNames.join(" ");
 	};
 };

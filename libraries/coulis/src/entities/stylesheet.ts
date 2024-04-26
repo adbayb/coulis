@@ -1,7 +1,9 @@
 import { IS_BROWSER_ENV, IS_PROD_ENV } from "../constants";
 
-// @note: The order is important. Global properties has a lesser specificity than (<) shorthand ones:
-// global < shorthand < longhand < conditional-shorthand < conditional-longhand properties
+/**
+ * The order is important. Global properties has a lesser specificity than (<) shorthand ones:
+ * global < shorthand < longhand < conditional-shorthand < conditional-longhand properties.
+ */
 const INSERTION_ORDER_BY_TYPE = Object.freeze({
 	conditionalLonghand: 4,
 	conditionalShorthand: 3,
@@ -19,11 +21,15 @@ export type StyleSheet = {
 	type: StyleSheetType;
 };
 
-export type StyleSheetCollection = Record<StyleSheetType, StyleSheet>;
+export type StyleSheets = Record<StyleSheetType, StyleSheet>;
 
-export const createStyleSheetCollection = (): StyleSheetCollection => {
+export const createStyleSheets = (): StyleSheets => {
+	const createStyleSheet = IS_BROWSER_ENV
+		? createWebStyleSheet()
+		: createVirtualStyleSheet();
+
 	// eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-	const collection = {} as StyleSheetCollection;
+	const collection = {} as StyleSheets;
 
 	const types = (
 		Object.keys(INSERTION_ORDER_BY_TYPE) as StyleSheetType[]
@@ -72,28 +78,23 @@ const createWebStyleSheet = () => {
 			document.head.appendChild(element);
 		}
 
-		const target = element;
-
 		return {
 			commit(rule: string) {
-				if (IS_PROD_ENV) {
-					target.sheet?.insertRule(rule);
+				if (IS_PROD_ENV && element.sheet) {
+					// Faster, more reliable (check rule insertion order (e.g. "@import" must be inserted first)), but not debug friendly
+					element.sheet.insertRule(
+						rule,
+						element.sheet.cssRules.length,
+					);
 				} else {
-					// stl.innerHTML = `${stl.innerHTML}${rule}`;
-					// stl.appendChild(document.createTextNode(rule));
-					// @note: faster than other insertion alternatives https://jsperf.com/insertadjacenthtml-perf/22 :
-					target.insertAdjacentHTML("beforeend", rule);
+					element.insertAdjacentHTML("beforeend", rule);
 				}
 			},
 			element,
 			get() {
-				return target.innerText;
+				return element.innerText;
 			},
 			type,
 		};
 	};
 };
-
-const createStyleSheet = IS_BROWSER_ENV
-	? createWebStyleSheet()
-	: createVirtualStyleSheet();

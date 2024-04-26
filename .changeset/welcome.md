@@ -1,5 +1,5 @@
 ---
-"coulis": patch
+"coulis": minor
 ---
 
-Migrate to `@adbayb/stack` stack (internal changes).
+Migrate to `@adbayb/stack` stack.

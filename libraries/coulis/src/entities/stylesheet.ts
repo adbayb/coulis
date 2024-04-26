@@ -1,5 +1,15 @@
 import { IS_BROWSER_ENV, IS_PROD_ENV } from "../constants";
 
+// @note: The order is important. Global properties has a lesser specificity than (<) shorthand ones:
+// global < shorthand < longhand < conditional-shorthand < conditional-longhand properties
+const INSERTION_ORDER_BY_TYPE = Object.freeze({
+	conditionalLonghand: 4,
+	conditionalShorthand: 3,
+	global: 0,
+	longhand: 2,
+	shorthand: 1,
+});
+
 export type StyleSheetType = keyof typeof INSERTION_ORDER_BY_TYPE;
 
 export type StyleSheet = {
@@ -14,7 +24,12 @@ export type StyleSheetCollection = Record<StyleSheetType, StyleSheet>;
 export const createStyleSheetCollection = (): StyleSheetCollection => {
 	// eslint-disable-next-line @typescript-eslint/consistent-type-assertions
 	const collection = {} as StyleSheetCollection;
-	const types = Object.keys(INSERTION_ORDER_BY_TYPE) as StyleSheetType[];
+
+	const types = (
+		Object.keys(INSERTION_ORDER_BY_TYPE) as StyleSheetType[]
+	).sort((a, b) => {
+		return INSERTION_ORDER_BY_TYPE[a] - INSERTION_ORDER_BY_TYPE[b];
+	});
 
 	for (const type of types) {
 		collection[type] = createStyleSheet(type);
@@ -22,16 +37,6 @@ export const createStyleSheetCollection = (): StyleSheetCollection => {
 
 	return collection;
 };
-
-// @note: The order is important. Global properties has a lesser specificity than (<) shorthand ones:
-// global < shorthand < longhand < conditional-shorthand < conditional-longhand properties
-const INSERTION_ORDER_BY_TYPE = Object.freeze({
-	conditionalLonghand: 4,
-	conditionalShorthand: 3,
-	global: 0,
-	longhand: 2,
-	shorthand: 1,
-});
 
 const createVirtualStyleSheet = () => {
 	const slots: Record<string, string[]> = {};

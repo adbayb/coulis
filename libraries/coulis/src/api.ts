@@ -18,8 +18,8 @@ import type {
 	KeyframeStyleObject,
 } from "./types";
 
-const styleSheetColection = createStyleSheetCollection();
-const cache = createCache(styleSheetColection);
+const styleSheetCollection = createStyleSheetCollection();
+const cache = createCache(styleSheetCollection);
 
 /**
  * Create a contextual `atoms` tied to a [CSSGroupingRule](https://developer.mozilla.org/en-US/docs/Web/API/CSSGroupingRule)
@@ -45,14 +45,14 @@ export const extractStyles = () => {
 	let stringifiedStyles = "";
 
 	const styleSheetTypes = Object.keys(
-		styleSheetColection,
+		styleSheetCollection,
 	) as StyleSheetType[];
 
 	const cacheEntries = cache.entries();
 	const cacheKeys = Object.keys(cacheEntries);
 
 	const styles = styleSheetTypes.map((type) => {
-		const styleSheet = styleSheetColection[type];
+		const styleSheet = styleSheetCollection[type];
 		const content = minify(styleSheet.get());
 
 		const keys = cacheKeys
@@ -100,7 +100,7 @@ export const globals = (styleObject: GlobalStyleObject) =>
 
 			return ruleSet;
 		},
-		styleSheet: styleSheetColection.global,
+		styleSheet: styleSheetCollection.global,
 	});
 
 export const keyframes = (styleObject: KeyframeStyleObject) =>
@@ -126,7 +126,7 @@ export const keyframes = (styleObject: KeyframeStyleObject) =>
 
 			return `@keyframes ${className}{${ruleSet}}`;
 		},
-		styleSheet: styleSheetColection.global,
+		styleSheet: styleSheetCollection.global,
 	});
 
 const createAtomsFactory = (groupingRule = "") => {
@@ -144,11 +144,11 @@ const createAtomsFactory = (groupingRule = "") => {
 
 			const styleSheet = groupingRule
 				? isShorthandProperty
-					? styleSheetColection.conditionalShorthand
-					: styleSheetColection.conditionalLonghand
+					? styleSheetCollection.conditionalShorthand
+					: styleSheetCollection.conditionalLonghand
 				: isShorthandProperty
-					? styleSheetColection.shorthand
-					: styleSheetColection.longhand;
+					? styleSheetCollection.shorthand
+					: styleSheetCollection.longhand;
 
 			if (isObject(value)) {
 				for (const selectorProperty of Object.keys(value)) {

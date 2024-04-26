@@ -1,20 +1,20 @@
 {
-	"name": "@example/react-server",
+	"name": "@coulis/example-react-server",
 	"version": "0.3.0",
 	"private": true,
 	"scripts": {
 		"start": "next dev -p 8080",
-		"build": "next build",
+		"build": "next build --no-lint",
 		"serve": "next start"
 	},
 	"dependencies": {
-		"coulis": "0.3.0",
-		"next": "12.1.0",
-		"react": "17.0.2",
-		"react-dom": "17.0.2"
+		"coulis": "workspace:^",
+		"next": "^14.2.3",
+		"react": "^18.3.1",
+		"react-dom": "^18.3.1"
 	},
 	"devDependencies": {
-		"@types/node": "17.0.21",
-		"@types/react": "17.0.40"
+		"@types/node": "20.12.7",
+		"@types/react": "18.3.0"
 	}
 }

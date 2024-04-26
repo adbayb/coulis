@@ -1,17 +1,6 @@
 import { atoms, createAtoms, globals, keyframes } from "coulis";
 
 globals({
-	"@charset": '"utf-8"',
-	"@import":
-		"url('https://fonts.googleapis.com/css?family=Open+Sans&display=swap')",
-	html: {
-		boxSizing: "border-box",
-	},
-	"html,body": {
-		padding: 0,
-		margin: 0,
-		fontFamily: "Open Sans, AliasedHelvetica",
-	},
 	"*,*::before,*::after": {
 		boxSizing: "inherit",
 	},
@@ -19,20 +8,31 @@ globals({
 		border: "1px solid black",
 		borderRadius: 4,
 	},
+	"@charset": '"utf-8"',
 	"@font-face": {
 		fontFamily: "'AliasedHelvetica'",
 		src: "local(Helvetica)",
+	},
+	"@import":
+		"url('https://fonts.googleapis.com/css?family=Open+Sans&display=swap')",
+	html: {
+		boxSizing: "border-box",
+	},
+	"html,body": {
+		fontFamily: "Open Sans, AliasedHelvetica",
+		margin: 0,
+		padding: 0,
 	},
 });
 
 const largerAtoms = createAtoms("@media", "(min-width: 576px)");
 
 const animationName = keyframes({
-	from: {
-		transform: "scale(1)",
-	},
 	50: {
 		transform: "scale(1.5)",
+	},
+	from: {
+		transform: "scale(1)",
 	},
 	to: {
 		transform: "scale(1)",
@@ -44,16 +44,16 @@ function App() {
 		<div>
 			<header
 				className={atoms({
-					padding: 10,
 					backgroundColor: "lightblue",
 					borderRadius: 4,
+					padding: 10,
 				})}
 			>
 				<p
 					className={atoms({
 						color: {
-							default: "blue",
 							":hover": "red",
+							default: "blue",
 						},
 					})}
 				>
@@ -62,26 +62,26 @@ function App() {
 				<a
 					className={[
 						atoms({
-							display: "flex",
 							backgroundColor: {
-								default: "lightcoral",
 								"[data-plop=true]": "red",
+								default: "lightcoral",
 							},
 							color: {
-								default: "yellow",
 								":hover": "purple",
 								"[target=_blank]": undefined,
+								default: "yellow",
 							},
+							display: "flex",
 						}),
 						largerAtoms({
 							color: "blue",
 							padding: 24,
 						}),
 					].join(" ")}
-					href="https://reactjs.org"
-					target="_blank"
-					rel="noopener noreferrer"
 					data-plop={false}
+					href="https://reactjs.org"
+					rel="noopener noreferrer"
+					target="_blank"
 				>
 					Learn React
 				</a>
@@ -96,10 +96,10 @@ function App() {
 				<div
 					className={atoms({
 						animation: `${animationName} 2000ms linear infinite`,
-						width: 50,
-						height: 50,
 						backgroundColor: "lightgray",
 						borderRadius: 4,
+						height: 50,
+						width: 50,
 					})}
 				/>
 			</div>

@@ -1,5 +1,5 @@
-import Document, { Head, Html, Main, NextScript } from "next/document";
 import { extractStyles } from "coulis";
+import Document, { Head, Html, Main, NextScript } from "next/document";
 
 class MyDocument extends Document {
 	static async getInitialProps(ctx) {
@@ -14,10 +14,10 @@ class MyDocument extends Document {
 					{styles.map(({ content, keys }) => {
 						return (
 							<style
-								key={keys}
 								data-coulis={keys}
-								// eslint-disable-next-line react/no-danger
+								// eslint-disable-next-line react/no-danger, react/jsx-sort-props
 								dangerouslySetInnerHTML={{ __html: content }}
+								key={keys}
 							/>
 						);
 					})}

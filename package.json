@@ -1,63 +1,34 @@
 {
-	"name": "coulis-monorepo",
-	"private": true,
-	"workspaces": [
-		"benchmarks",
-		"examples/*",
-		"packages/*"
-	],
-	"scripts": {
-		"example:browser": "yarn workspace @example/react-browser start",
-		"example:server": "yarn workspace @example/react-server start",
-		"benchmark:browser": "yarn workspace benchmarks benchmark:browser",
-		"benchmark:server": "yarn workspace benchmarks benchmark:server",
-		"start": "yarn workspace coulis build && concurrently \"yarn workspace coulis watch\" \"yarn example:browser\" \"yarn example:server\" --names \"lib,browser,server\"",
-		"verify": "yarn lint & yarn test",
-		"fix": "yarn lint --fix",
-		"lint": "eslint . --ignore-path .gitignore",
-		"format": "prettier . --ignore-path .gitignore --ignore-path .prettierignore --write",
-		"test": "vitest",
-		"changed": "lerna changed --all",
-		"release": "lerna publish"
-	},
+    "name": "@coulis/monorepo",
+    "private": true,
+    "version": "0.0.0",
+    "type": "module",
+    "scripts": {
+        "prepare": "stack install",
+        "clean": "stack clean",
+        "check": "stack check",
+        "fix": "stack fix",
+        "start": "stack start",
+        "build": "stack build",
+        "watch": "stack watch",
+        "test": "stack test",
+        "benchmark": "pnpm --filter @coulis/benchmark benchmark",
+        "release:log": "stack release --log",
+        "release:version": "stack release --tag",
+        "release:publish": "stack release --publish"
+    },
+    "prettier": "@adbayb/prettier-config",
+    "packageManager": "pnpm@9.0.6",
+    "engines": {
+        "node": ">=18.0.0",
+        "pnpm": ">=8.0.0",
+        "npm": "please-use-pnpm",
+        "yarn": "please-use-pnpm"
+    },
 	"devDependencies": {
-		"@adbayb/eslint-config": "0.10.0",
-		"@adbayb/prettier-config": "0.10.0",
-		"@adbayb/ts-config": "0.10.0",
-		"concurrently": "7.0.0",
-		"eslint": "8.11.0",
-		"husky": "4.3.8",
-		"lerna": "4.0.0",
-		"lint-staged": "12.3.6",
-		"prettier": "2.6.0",
-		"typescript": "4.6.2",
-		"vitest": "0.7.0"
-	},
-	"author": {
-		"name": "Ayoub Adib",
-		"email": "adbayb@gmail.com",
-		"url": "https://twitter.com/adbayb"
-	},
-	"repository": {
-		"type": "git",
-		"url": "git@github.com:adbayb/coulis.git"
-	},
-	"license": "MIT",
-	"prettier": "@adbayb/prettier-config",
-	"eslintConfig": {
-		"extends": "@adbayb"
-	},
-	"husky": {
-		"hooks": {
-			"pre-commit": "lint-staged"
-		}
-	},
-	"lint-staged": {
-		"**/*.{js,jsx,ts,tsx}": [
-			"yarn lint"
-		],
-		"**/*.{json,md,mdx,html,css}": [
-			"yarn format"
-		]
+		"@adbayb/eslint-config": "1.12.0",
+		"@adbayb/prettier-config": "1.5.0",
+		"@adbayb/stack": "1.16.1",
+		"@adbayb/ts-config": "1.0.0"
 	}
 }

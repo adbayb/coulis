@@ -9,6 +9,7 @@
 	"files": [
 		"dist"
 	],
+	"sideEffects": false,
 	"scripts": {
 		"prepublishOnly": "npm run build",
 		"clean": "rm -rf dist",

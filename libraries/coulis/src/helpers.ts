@@ -50,9 +50,9 @@ export const toDeclaration = (property: string, value: number | string) => {
 
 	// @section: format value to follow CSS specs (unitless number)
 	const normalizedValue =
-		typeof value === "number" && UNITLESS_PROPERTIES[property]
-			? `${value}px`
-			: value;
+		typeof value === "string" || UNITLESS_PROPERTIES[property]
+			? value
+			: `${value}px`;
 
 	return `${normalizedProperty}:${normalizedValue};`;
 };

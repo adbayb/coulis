@@ -1,6 +1,15 @@
 import { atoms, createAtoms, globals, keyframes } from "coulis";
 
 globals({
+	"@charset": '"utf-8"',
+	"@import":
+		"url('https://fonts.googleapis.com/css?family=Open+Sans&display=swap')",
+	// eslint-disable-next-line sort-keys-custom-order/object-keys
+	"@font-face": {
+		fontFamily: "'AliasedHelvetica'",
+		src: "local(Helvetica)",
+	},
+	// eslint-disable-next-line sort-keys-custom-order/object-keys
 	"*,*::before,*::after": {
 		boxSizing: "inherit",
 	},
@@ -8,13 +17,6 @@ globals({
 		border: "1px solid black",
 		borderRadius: 4,
 	},
-	"@charset": '"utf-8"',
-	"@font-face": {
-		fontFamily: "'AliasedHelvetica'",
-		src: "local(Helvetica)",
-	},
-	"@import":
-		"url('https://fonts.googleapis.com/css?family=Open+Sans&display=swap')",
 	html: {
 		boxSizing: "border-box",
 	},

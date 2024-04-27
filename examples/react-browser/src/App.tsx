@@ -1,4 +1,5 @@
 import {
+	compose,
 	createAnimationName,
 	createStyles,
 	globalStyles,
@@ -79,7 +80,7 @@ const App = () => {
 					Edit <code>src/App.tsx</code> and save to reload.
 				</p>
 				<a
-					className={[
+					className={compose(
 						styles({
 							backgroundColor: {
 								"[data-plop=true]": "red",
@@ -96,7 +97,7 @@ const App = () => {
 							color: "blue",
 							padding: 24,
 						}),
-					].join(" ")}
+					)}
 					data-plop={false}
 					href="https://reactjs.org"
 					rel="noopener noreferrer"

@@ -7,11 +7,11 @@
 
 ## Motivation
 
-With the emergence of design system / component library, the style reusability is key. Atomic CSS is a CSS approach which considers each classname as a single CSS rule: more the same rule is used across different components, more the atomic rule is reused and more the CSS filesize is reduced in contrast to other non atomic approach. You can find a great talk about this approach [here](https://www.youtube.com/watch?v=tFFn39lLO-U).
+With the emergence of design systems, style reusability is key. Atomic CSS is a CSS approach that considers each class name as a single CSS rule: the more the same rule is used across different components, the more the atomic rule is reused and the more the CSS filesize is reduced in contrast to other non-atomic approaches. You can find a great talk about this approach [here](https://www.youtube.com/watch?v=tFFn39lLO-U).
 
-In parallel, CSS-in-JS libraries enable (but not only) huge developer experience improvements by integrating transparently in the JavaScript ecosystem and letting a developer share/consume CSS-in-JS dependencies without extra specific CSS bundle step.
+In parallel, CSS-in-JS libraries enable (but not only) huge developer experience improvements by integrating transparently into the JavaScript ecosystem and letting a developer share/consume CSS-in-JS dependencies without extra specific CSS bundle steps.
 
-Coulis leverages these two approaches to create a great developer experience while maximazing the reusability of your styles.
+Coulis leverages these two approaches to create a great developer experience while maximizing the reusability of your styles.
 
 ## Usage
 
@@ -27,10 +27,16 @@ yarn add coulis
 2️⃣ Play with the API ✌️
 
 ```tsx
-import ReactDOM from "react-dom";
-import { atoms, createAtoms, globals, keyframes } from "coulis";
+import { StrictMode } from "react";
+import { createRoot } from "react-dom/client";
+import {
+	styles,
+	createStyles,
+	globalStyles,
+	createAnimationName,
+} from "coulis";
 
-globals({
+globalStyles({
 	"@import":
 		"url('https://fonts.googleapis.com/css?family=Open+Sans&display=swap')",
 	html: {
@@ -46,9 +52,9 @@ globals({
 	},
 });
 
-const tabletAtoms = createAtoms("@media", "(min-width: 576px)");
+const tabletStyles = createStyles("@media", "(min-width: 576px)");
 
-const zoomIn = keyframes({
+const zoomIn = createAnimationName({
 	from: {
 		transform: "scale(1)",
 	},
@@ -63,7 +69,7 @@ const zoomIn = keyframes({
 const App = () => {
 	return (
 		<div
-			className={atoms({
+			className={styles({
 				animation: `${zoomIn} 2000ms linear infinite`,
 				display: "flex",
 				width: "100%",
@@ -73,8 +79,8 @@ const App = () => {
 			})}
 		>
 			<p
-				className={[
-					atoms({
+				className={compose(
+					styles({
 						color: {
 							default: "black",
 							":hover": "lightcoral",
@@ -82,8 +88,8 @@ const App = () => {
 						fontSize: 26,
 						textAlign: "center",
 					}),
-					tabletAtoms({ fontSize: 20 }),
-				].join(" ")}
+					tabletStyles({ fontSize: 20 }),
+				)}
 			>
 				Hello 🤗
 			</p>
@@ -91,5 +97,15 @@ const App = () => {
 	);
 };
 
-ReactDOM.render(<App />, document.getElementById("root"));
+const container = document.getElementById("root");
+
+if (container) {
+	const root = createRoot(container);
+
+	root.render(
+		<StrictMode>
+			<App />
+		</StrictMode>,
+	);
+}
 ```

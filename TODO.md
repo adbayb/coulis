@@ -53,8 +53,6 @@ globals({
 
 -   [x] Prevent memory leaks server side
 
--   [ ] Release point before optimizations
-
 -   [ ] Add `variables` API to define variable(s) (useful for reusable tokens)
 
 -   [ ] Provide a [cva-like](https://cva.style/docs) helper?

@@ -1,33 +1,48 @@
-// Vitest Snapshot v1
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`should extract styles given object format 1`] = `
+exports[`coulis > should extract styles given object format 1`] = `
 [
   {
-    "content": "@charset \\"utf-8\\";@import url('https://fonts.googleapis.com/css?family=Open+Sans&display=swap');html{box-sizing:border-box;}html,body{padding:0px;margin:0px;background-color:lightcoral;font-family:Open Sans, AliasedHelvetica;}*,*::before,*::after{box-sizing:inherit;}.globalClass+.otherGlobalClass{border:1px solid black;border-radius:4px;}@font-face{font-family:'AliasedHelvetica';src:local(Helvetica);}@keyframes c62e63a97{25%{transform:scale(1.25);}from{transform:scale(1);}50%{transform:scale(1.5);}to{transform:scale(1);}}",
-    "keys": "c61d92872,c62e63a97",
+    "attributes": {
+      "data-coulis-cache": "c77e20e50,c8e4ce7ac",
+      "data-coulis-scope": "global",
+    },
+    "content": "@keyframes c77e20e50{25%{transform:scale(1.25);}50%{transform:scale(1.5);}from{transform:scale(1);}to{transform:scale(1);}}*,*::before,*::after{box-sizing:inherit;}.globalClass+.otherGlobalClass{border:1px solid black;border-radius:4px;}@charset "utf-8";@font-face{font-family:'AliasedHelvetica';src:local(Helvetica);}@import url('https://fonts.googleapis.com/css?family=Open+Sans&display=swap');html{box-sizing:border-box;}html,body{background-color:lightcoral;font-family:Open Sans, AliasedHelvetica;}",
     "toString": [Function],
   },
   {
+    "attributes": {
+      "data-coulis-cache": "cde6daf3c",
+      "data-coulis-scope": "shorthand",
+    },
     "content": ".cde6daf3c{padding:10px;}",
-    "keys": "cde6daf3c",
     "toString": [Function],
   },
   {
-    "content": ".c3c5816c4{color:lightblue;}.cbb3db274{background-color:lightcoral;}.c571db958:hover{background-color:lightcyan;}.ce9403afc[alt]{background-color:lightgray;}",
-    "keys": "c3c5816c4,cbb3db274,c571db958,ce9403afc",
+    "attributes": {
+      "data-coulis-cache": "c571db958,ce9403afc,cbb3db274,c3c5816c4",
+      "data-coulis-scope": "longhand",
+    },
+    "content": ".c571db958:hover{background-color:lightcyan;}.ce9403afc[alt]{background-color:lightgray;}.cbb3db274{background-color:lightcoral;}.c3c5816c4{color:lightblue;}",
     "toString": [Function],
   },
   {
+    "attributes": {
+      "data-coulis-cache": "c3123b398",
+      "data-coulis-scope": "conditionalShorthand",
+    },
     "content": "@media (min-width: 576px){.c3123b398{padding:24px;}}",
-    "keys": "c3123b398",
     "toString": [Function],
   },
   {
-    "content": "@media (min-width: 576px){.c721688f8{color:lightblue;}}@media (min-width: 576px){.c3d523ba0{background-color:lightcoral;}}@media (min-width: 576px){.cf33f0fbe:hover{background-color:lightcyan;}}@media (min-width: 576px){.cec510c6c[alt]{background-color:lightgray;}}",
-    "keys": "c721688f8,c3d523ba0,cf33f0fbe,cec510c6c",
+    "attributes": {
+      "data-coulis-cache": "cf33f0fbe,cec510c6c,c3d523ba0,c721688f8",
+      "data-coulis-scope": "conditionalLonghand",
+    },
+    "content": "@media (min-width: 576px){.cf33f0fbe:hover{background-color:lightcyan;}}@media (min-width: 576px){.cec510c6c[alt]{background-color:lightgray;}}@media (min-width: 576px){.c3d523ba0{background-color:lightcoral;}}@media (min-width: 576px){.c721688f8{color:lightblue;}}",
     "toString": [Function],
   },
 ]
 `;
 
-exports[`should extract styles given string format 1`] = `"<style data-coulis=\\"c61d92872,c62e63a97\\">@charset \\"utf-8\\";@import url('https://fonts.googleapis.com/css?family=Open+Sans&display=swap');html{box-sizing:border-box;}html,body{padding:0px;margin:0px;background-color:lightcoral;font-family:Open Sans, AliasedHelvetica;}*,*::before,*::after{box-sizing:inherit;}.globalClass+.otherGlobalClass{border:1px solid black;border-radius:4px;}@font-face{font-family:'AliasedHelvetica';src:local(Helvetica);}@keyframes c62e63a97{25%{transform:scale(1.25);}from{transform:scale(1);}50%{transform:scale(1.5);}to{transform:scale(1);}}</style><style data-coulis=\\"cde6daf3c\\">.cde6daf3c{padding:10px;}</style><style data-coulis=\\"c3c5816c4,cbb3db274,c571db958,ce9403afc\\">.c3c5816c4{color:lightblue;}.cbb3db274{background-color:lightcoral;}.c571db958:hover{background-color:lightcyan;}.ce9403afc[alt]{background-color:lightgray;}</style><style data-coulis=\\"c3123b398\\">@media (min-width: 576px){.c3123b398{padding:24px;}}</style><style data-coulis=\\"c721688f8,c3d523ba0,cf33f0fbe,cec510c6c\\">@media (min-width: 576px){.c721688f8{color:lightblue;}}@media (min-width: 576px){.c3d523ba0{background-color:lightcoral;}}@media (min-width: 576px){.cf33f0fbe:hover{background-color:lightcyan;}}@media (min-width: 576px){.cec510c6c[alt]{background-color:lightgray;}}</style>"`;
+exports[`coulis > should extract styles given string format 1`] = `"<style data-coulis-cache="c77e20e50,c8e4ce7ac" data-coulis-scope="global">@keyframes c77e20e50{25%{transform:scale(1.25);}50%{transform:scale(1.5);}from{transform:scale(1);}to{transform:scale(1);}}*,*::before,*::after{box-sizing:inherit;}.globalClass+.otherGlobalClass{border:1px solid black;border-radius:4px;}@charset "utf-8";@font-face{font-family:'AliasedHelvetica';src:local(Helvetica);}@import url('https://fonts.googleapis.com/css?family=Open+Sans&display=swap');html{box-sizing:border-box;}html,body{background-color:lightcoral;font-family:Open Sans, AliasedHelvetica;}</style><style data-coulis-cache="" data-coulis-scope="shorthand"></style><style data-coulis-cache="" data-coulis-scope="longhand"></style><style data-coulis-cache="" data-coulis-scope="conditionalShorthand"></style><style data-coulis-cache="" data-coulis-scope="conditionalLonghand"></style>"`;

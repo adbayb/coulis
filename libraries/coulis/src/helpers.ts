@@ -1,6 +1,5 @@
 import { UNITLESS_PROPERTIES } from "./constants";
-import type { Cache } from "./entities/cache";
-import type { StyleSheet } from "./entities/stylesheet";
+import type { Scope } from "./entities/scope";
 import type { StyleObject } from "./types";
 
 export const hash = (str: string) => {
@@ -29,10 +28,6 @@ export const isNumber = (value: unknown): value is number => {
 
 export const isObject = (value: unknown): value is Record<string, unknown> => {
 	return value !== null && typeof value === "object";
-};
-
-export const minify = (value: string) => {
-	return value.replace(/\s{2,}|\s+(?={)|\r?\n/gm, "");
 };
 
 export const toDeclaration = (property: string, value: number | string) => {
@@ -81,14 +76,12 @@ export const toManyDeclaration = <Style extends StyleObject>(
 
 export const process = ({
 	key,
-	cache,
 	createRules,
-	styleSheet,
+	scope: { cache, styleSheet },
 }: {
 	key: string;
-	cache: Cache;
 	createRules: (className: string) => string[];
-	styleSheet: StyleSheet;
+	scope: Scope;
 }) => {
 	const className = hash(key);
 
@@ -100,7 +93,7 @@ export const process = ({
 		styleSheet.commit(rule);
 	}
 
-	cache.set(className, styleSheet.type);
+	cache.add(className);
 
 	return className;
 };

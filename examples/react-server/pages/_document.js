@@ -11,13 +11,13 @@ class MyDocument extends Document {
 			styles: (
 				<>
 					{initialProps.styles}
-					{styles.map(({ content, keys }) => {
+					{styles.map(({ attributes, content }) => {
 						return (
 							<style
-								data-coulis={keys}
+								{...attributes}
 								// eslint-disable-next-line react/no-danger, react/jsx-sort-props
 								dangerouslySetInnerHTML={{ __html: content }}
-								key={keys}
+								key={attributes.dataCoulisScope}
 							/>
 						);
 					})}

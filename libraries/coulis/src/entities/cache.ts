@@ -1,46 +1,31 @@
-import { IS_BROWSER_ENV } from "../constants";
+import type { StyleSheet } from "./stylesheet";
 
-import type { StyleSheetType, StyleSheets } from "./stylesheet";
+type CacheKey = string;
 
-type CacheEntry = Record<string, StyleSheetType>;
+type CacheRecord = Set<CacheKey>;
 
 export type Cache = {
-	entries: () => CacheEntry;
-	has: (key: string) => boolean;
-	set: (key: string, target: StyleSheetType) => void;
+	add: (key: CacheKey) => void;
+	flush: () => void;
+	has: (key: CacheKey) => boolean;
+	toString: () => string;
 };
 
-const hydrate = (styleSheets: StyleSheets): CacheEntry => {
-	const sheets = Object.values(styleSheets);
-	const hydratedCache: CacheEntry = {};
-
-	sheets.forEach(({ element, type }) => {
-		if (!element) return;
-
-		const keys = element.dataset.coulis;
-
-		if (!keys) return;
-
-		keys.split(",").forEach((key) => {
-			hydratedCache[key] = type;
-		});
-	});
-
-	return hydratedCache;
-};
-
-export const createCache = (styleSheets: StyleSheets): Cache => {
-	const cache: CacheEntry = IS_BROWSER_ENV ? hydrate(styleSheets) : {};
+export const createCache = (styleSheet: StyleSheet): Cache => {
+	let cache: CacheRecord = new Set(styleSheet.hydrate());
 
 	return {
-		entries() {
-			return cache;
+		add(key) {
+			cache.add(key);
+		},
+		flush() {
+			cache = new Set();
 		},
 		has(key) {
-			return Boolean(cache[key]);
+			return cache.has(key);
 		},
-		set(key, target: StyleSheetType) {
-			cache[key] = target;
+		toString() {
+			return Array.from(cache).join();
 		},
 	};
 };

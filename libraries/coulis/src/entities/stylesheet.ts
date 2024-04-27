@@ -1,100 +1,95 @@
 import { IS_BROWSER_ENV, IS_PROD_ENV } from "../constants";
-
-/**
- * The order is important. Global properties has a lesser specificity than (<) shorthand ones:
- * global < shorthand < longhand < conditional-shorthand < conditional-longhand properties.
- */
-const INSERTION_ORDER_BY_TYPE = Object.freeze({
-	conditionalLonghand: 4,
-	conditionalShorthand: 3,
-	global: 0,
-	longhand: 2,
-	shorthand: 1,
-});
-
-export type StyleSheetType = keyof typeof INSERTION_ORDER_BY_TYPE;
+import type { ScopeKey } from "../types";
 
 export type StyleSheet = {
 	commit: (rule: string) => void;
 	element: HTMLStyleElement | null;
-	get: () => string;
-	type: StyleSheetType;
+	flush: () => void;
+	getAttributes: (
+		cachedKeys?: string,
+	) => Record<"data-coulis-cache" | "data-coulis-scope", string | undefined>;
+	getContent: () => string;
+	hydrate: () => string[];
 };
 
-export type StyleSheets = Record<StyleSheetType, StyleSheet>;
+type CreateStyleSheet = (scope: ScopeKey) => StyleSheet;
 
-export const createStyleSheets = (): StyleSheets => {
-	const createStyleSheet = IS_BROWSER_ENV
-		? createWebStyleSheet()
-		: createVirtualStyleSheet();
+const createVirtualStyleSheet: CreateStyleSheet = (scope) => {
+	let data: string[] = [];
 
-	// eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-	const collection = {} as StyleSheets;
+	return {
+		commit(rule: string) {
+			data.push(rule);
+		},
+		element: null,
+		flush() {
+			data = [];
+		},
+		getAttributes(cachedKeys) {
+			return {
+				"data-coulis-cache": cachedKeys,
+				"data-coulis-scope": scope,
+			};
+		},
+		getContent() {
+			return minify(data.join(""));
+		},
+		hydrate() {
+			return [];
+		},
+	};
+};
 
-	const types = (
-		Object.keys(INSERTION_ORDER_BY_TYPE) as StyleSheetType[]
-	).sort((a, b) => {
-		return INSERTION_ORDER_BY_TYPE[a] - INSERTION_ORDER_BY_TYPE[b];
-	});
+const createWebStyleSheet: CreateStyleSheet = (scope) => {
+	let element = document.querySelector<HTMLStyleElement>(
+		`style[data-coulis-scope="${scope}"]`,
+	);
 
-	for (const type of types) {
-		collection[type] = createStyleSheet(type);
+	if (!element) {
+		element = document.createElement("style");
+		element.dataset.coulisCache = "";
+		element.dataset.coulisScope = scope;
+		document.head.appendChild(element);
 	}
 
-	return collection;
-};
+	const getCacheDataFromElement = () => element.dataset.coulisCache;
 
-const createVirtualStyleSheet = () => {
-	const slots: Record<string, string[]> = {};
+	return {
+		commit(rule: string) {
+			if (IS_PROD_ENV && element.sheet) {
+				// Faster, more reliable (check rule insertion order (e.g. "@import" must be inserted first)), but not debug friendly
+				element.sheet.insertRule(rule, element.sheet.cssRules.length);
+			} else {
+				element.insertAdjacentHTML("beforeend", rule);
+			}
+		},
+		element,
+		flush() {
+			element.remove();
+		},
+		getAttributes() {
+			return {
+				"data-coulis-cache": getCacheDataFromElement(),
+				"data-coulis-scope": element.dataset.scope,
+			};
+		},
+		getContent() {
+			return element.innerText;
+		},
+		hydrate() {
+			const source = getCacheDataFromElement();
 
-	return (type: StyleSheetType): StyleSheet => {
-		const target: (typeof slots)[number] = [];
+			if (!source) return [];
 
-		slots[type] = target;
-
-		return {
-			commit(rule: string) {
-				target.push(rule);
-			},
-			element: null,
-			get() {
-				return target.join("");
-			},
-			type,
-		};
+			return source.split(",");
+		},
 	};
 };
 
-const createWebStyleSheet = () => {
-	const elements =
-		document.querySelectorAll<HTMLStyleElement>(`style[data-coulis]`);
+export const createStyleSheet: CreateStyleSheet = IS_BROWSER_ENV
+	? createWebStyleSheet
+	: createVirtualStyleSheet;
 
-	return (type: StyleSheetType): StyleSheet => {
-		let element = elements[INSERTION_ORDER_BY_TYPE[type]];
-
-		if (!element) {
-			element = document.createElement("style");
-			element.dataset.coulis = "";
-			document.head.appendChild(element);
-		}
-
-		return {
-			commit(rule: string) {
-				if (IS_PROD_ENV && element.sheet) {
-					// Faster, more reliable (check rule insertion order (e.g. "@import" must be inserted first)), but not debug friendly
-					element.sheet.insertRule(
-						rule,
-						element.sheet.cssRules.length,
-					);
-				} else {
-					element.insertAdjacentHTML("beforeend", rule);
-				}
-			},
-			element,
-			get() {
-				return element.innerText;
-			},
-			type,
-		};
-	};
+const minify = (value: string) => {
+	return value.replace(/\s{2,}|\s+(?={)|\r?\n/gm, "");
 };

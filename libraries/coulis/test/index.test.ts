@@ -32,12 +32,12 @@ describe("coulis", () => {
 	});
 
 	test("should generate classNames", () => {
-		expect(animationName).toBe("c62e63a97");
+		expect(animationName).toBe("c77e20e50");
 		expect(classNames).toBe(
-			"c3c5816c4 cbb3db274 c571db958 ce9403afc cde6daf3c",
+			"c571db958 ce9403afc cbb3db274 c3c5816c4 cde6daf3c",
 		);
 		expect(largerClassNames).toBe(
-			"c721688f8 c3d523ba0 cf33f0fbe cec510c6c c3123b398",
+			"cf33f0fbe cec510c6c c3d523ba0 c721688f8 c3123b398",
 		);
 	});
 

@@ -1,11 +1,8 @@
 import { SHORTHAND_PROPERTIES } from "./constants";
-import { createCache } from "./entities/cache";
-import { createStyleSheets } from "./entities/stylesheet";
-import type { StyleSheetType } from "./entities/stylesheet";
+import { createScopes } from "./entities/scope";
 import {
 	isNumber,
 	isObject,
-	minify,
 	process,
 	toDeclaration,
 	toManyDeclaration,
@@ -18,8 +15,7 @@ import type {
 	KeyframeStyleObject,
 } from "./types";
 
-const styleSheets = createStyleSheets();
-const cache = createCache(styleSheets);
+const scopes = createScopes();
 
 /**
  * Create a contextual `atoms` tied to a [CSSGroupingRule](https://developer.mozilla.org/en-US/docs/Web/API/CSSGroupingRule)
@@ -41,31 +37,51 @@ export const atoms = (styleObject: AtomicStyleObject) => {
 	return createAtomsFactory()(styleObject);
 };
 
-export const extractStyles = () => {
+type ExtractStylesOptions = {
+	/**
+	 * Automatically flush the cache after the method call.
+	 * @default true - To prevent memory leaks. It can be disable if the cache should be shared across requests.
+	 */
+	flush: boolean;
+};
+
+/**
+ * Extract the styles to inject it ahead of time (for server-side rendering/static site generation).
+ * @param options - Options to modufy extraction behaviors.
+ * @returns Object containing the content, attributes and a default `toString` operator.
+ * @example
+ * 	const styles = extractStyles({ flush: true });
+ *  return `<head>${styles}</head>`;
+ */
+export const extractStyles = (
+	options: ExtractStylesOptions = { flush: true },
+) => {
 	let stringifiedStyles = "";
-	const styleSheetTypes = Object.keys(styleSheets) as StyleSheetType[];
-	const cacheEntries = cache.entries();
-	const cacheKeys = Object.keys(cacheEntries);
+	const scopeKeys = Object.keys(scopes) as (keyof typeof scopes)[];
 
-	const styles = styleSheetTypes.map((type) => {
-		const styleSheet = styleSheets[type];
-		const content = minify(styleSheet.get());
-
-		const keys = cacheKeys
-			.filter((key) => cacheEntries[key] === type)
-			.join();
-
-		const stringifiedStyle = `<style data-coulis="${keys}">${content}</style>`;
+	const styles = scopeKeys.map((scopeKey) => {
+		const { cache, styleSheet } = scopes[scopeKey];
+		const content = styleSheet.getContent();
+		const cacheKeys = cache.toString();
+		const stringifiedStyle = `<style data-coulis-cache="${cacheKeys}" data-coulis-scope="${scopeKey}">${content}</style>`;
 
 		stringifiedStyles += stringifiedStyle;
 
-		return {
+		const output = {
+			attributes: styleSheet.getAttributes(cacheKeys),
 			content,
-			keys,
 			toString() {
 				return stringifiedStyle;
 			},
 		};
+
+		if (options.flush && scopeKey !== "global") {
+			// Flush only local styles to preserve styles defined globally as they're not re-rendered:
+			cache.flush();
+			styleSheet.flush();
+		}
+
+		return output;
 	});
 
 	styles.toString = () => {
@@ -78,7 +94,6 @@ export const extractStyles = () => {
 export const globals = (styleObject: GlobalStyleObject) =>
 	process({
 		key: JSON.stringify(styleObject),
-		cache,
 		createRules() {
 			const rules: string[] = [];
 
@@ -96,13 +111,12 @@ export const globals = (styleObject: GlobalStyleObject) =>
 
 			return rules;
 		},
-		styleSheet: styleSheets.global,
+		scope: scopes.global,
 	});
 
 export const keyframes = (styleObject: KeyframeStyleObject) =>
 	process({
 		key: JSON.stringify(styleObject),
-		cache,
 		createRules(className) {
 			let rule = "";
 
@@ -122,7 +136,7 @@ export const keyframes = (styleObject: KeyframeStyleObject) =>
 
 			return [`@keyframes ${className}{${rule}}`];
 		},
-		styleSheet: styleSheets.global,
+		scope: scopes.global,
 	});
 
 const createAtomsFactory = (groupingRule = "") => {
@@ -138,13 +152,13 @@ const createAtomsFactory = (groupingRule = "") => {
 			const value = styleObject[property];
 			const isShorthandProperty = SHORTHAND_PROPERTIES[property];
 
-			const styleSheet = groupingRule
+			const scope = groupingRule
 				? isShorthandProperty
-					? styleSheets.conditionalShorthand
-					: styleSheets.conditionalLonghand
+					? scopes.conditionalShorthand
+					: scopes.conditionalLonghand
 				: isShorthandProperty
-					? styleSheets.shorthand
-					: styleSheets.longhand;
+					? scopes.shorthand
+					: scopes.longhand;
 
 			if (isObject(value)) {
 				for (const selectorProperty of Object.keys(value)) {
@@ -158,7 +172,6 @@ const createAtomsFactory = (groupingRule = "") => {
 							key: `${groupingRule}${property}${selectorValue}${
 								isDefaultProperty ? "" : selectorProperty
 							}`,
-							cache,
 							createRules(className) {
 								return [
 									wrapRule(
@@ -170,7 +183,7 @@ const createAtomsFactory = (groupingRule = "") => {
 									),
 								];
 							},
-							styleSheet,
+							scope,
 						}),
 					);
 				}
@@ -180,7 +193,6 @@ const createAtomsFactory = (groupingRule = "") => {
 				classNames.push(
 					process({
 						key: `${groupingRule}${property}${value}`,
-						cache,
 						createRules(className) {
 							return [
 								wrapRule(
@@ -188,7 +200,7 @@ const createAtomsFactory = (groupingRule = "") => {
 								),
 							];
 						},
-						styleSheet,
+						scope,
 					}),
 				);
 			}

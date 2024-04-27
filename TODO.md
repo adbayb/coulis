@@ -47,11 +47,9 @@ globals({
 
 -   [x] Make `extractStyles` API hydration works with multiple server side case
 
--   [ ] Update dependencies and migrate to `@adbayb/stack` (including PNPM migration)
+-   [x] Update dependencies and migrate to `@adbayb/stack` (including PNPM migration)
 
--   [ ] Rename `atoms` and `createAtoms` to `styles` and `createStyles`
-
--   [ ] Update `createStyles` API to use only one argument and leverage '`${AtConditionalGroupingRule} ${string}`' type instead
+-   [ ] Rename `atoms`, `createAtoms`, and `globals` to `styles`, `createStyles`, and `globalStyles`
 
 -   [ ] Returns `flush` API (along with the extracted styles content) to flush cache in a controlled way (to avoid memory leaks) for `extractStyles` api.
 

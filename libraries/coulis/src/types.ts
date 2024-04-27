@@ -1,5 +1,12 @@
 import type { HtmlAttributes, PropertiesFallback, Pseudos } from "csstype";
 
+export type ScopeKey =
+	| "conditionalLonghand"
+	| "conditionalShorthand"
+	| "global"
+	| "longhand"
+	| "shorthand";
+
 export type AtomicStyleObject = StyleObject<true>;
 
 export type GlobalStyleObject =

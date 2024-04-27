@@ -55,7 +55,7 @@ globals({
 
 -   [ ] Add `variables` API to define variable(s) (useful for reusable tokens)
 
--   [ ] Provide a [cva-like](https://cva.style/docs) helper?
+-   [ ] Add `createVariants` API (ala [cva-like](https://cva.style/docs) or [vanilla extract](https://vanilla-extract.style/documentation/packages/recipes/))
 
 -   [ ] Improve overall performance
 

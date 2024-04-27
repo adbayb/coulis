@@ -5,7 +5,7 @@
 <br>
 <br>
 
-## Motivation
+## 🤔 Motivation
 
 With the emergence of design systems, style reusability is key. Atomic CSS is a CSS approach that considers each class name as a single CSS rule: the more the same rule is used across different components, the more the atomic rule is reused and the more the CSS filesize is reduced in contrast to other non-atomic approaches. You can find a great talk about this approach [here](https://www.youtube.com/watch?v=tFFn39lLO-U).
 
@@ -13,18 +13,20 @@ In parallel, CSS-in-JS libraries enable (but not only) huge developer experience
 
 Coulis leverages these two approaches to create a great developer experience while maximizing the reusability of your styles.
 
-## Usage
+## 🚀 Quickstart
 
 1️⃣ Install
 
 ```bash
-# NPM
+# Npm
 npm install coulis
+# Pnpm
+pnpm add coulis
 # Yarn
 yarn add coulis
 ```
 
-2️⃣ Play with the API ✌️
+2️⃣ Play ✌️
 
 ```tsx
 import { StrictMode } from "react";

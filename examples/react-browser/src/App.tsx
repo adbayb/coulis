@@ -1,7 +1,12 @@
-import { atoms, createAtoms, globals, keyframes } from "coulis";
+import {
+	createAnimationName,
+	createStyles,
+	globalStyles,
+	styles,
+} from "coulis";
 import { useEffect, useState } from "react";
 
-globals({
+globalStyles({
 	"@import":
 		"url('https://fonts.googleapis.com/css?family=Open+Sans&display=swap')",
 	// eslint-disable-next-line sort-keys-custom-order/object-keys
@@ -27,9 +32,9 @@ globals({
 	},
 });
 
-const largerAtoms = createAtoms("@media", "(min-width: 576px)");
+const largerStyles = createStyles("@media", "(min-width: 576px)");
 
-const animationName = keyframes({
+const animationName = createAnimationName({
 	50: {
 		transform: "scale(1.5)",
 	},
@@ -57,14 +62,14 @@ const App = () => {
 	return (
 		<div>
 			<header
-				className={atoms({
+				className={styles({
 					backgroundColor: "lightblue",
 					borderRadius: 4,
 					padding: 10,
 				})}
 			>
 				<p
-					className={atoms({
+					className={styles({
 						color: {
 							":hover": "red",
 							default: counter % 2 === 0 ? "blue" : "red",
@@ -75,7 +80,7 @@ const App = () => {
 				</p>
 				<a
 					className={[
-						atoms({
+						styles({
 							backgroundColor: {
 								"[data-plop=true]": "red",
 								default: "lightcoral",
@@ -87,7 +92,7 @@ const App = () => {
 							},
 							display: "flex",
 						}),
-						largerAtoms({
+						largerStyles({
 							color: "blue",
 							padding: 24,
 						}),
@@ -103,12 +108,12 @@ const App = () => {
 			<span className="globalClass">GlobalClass</span>
 			<span className="otherGlobalClass">OtherGlobalClass</span>
 			<div
-				className={atoms({
+				className={styles({
 					padding: 24,
 				})}
 			>
 				<div
-					className={atoms({
+					className={styles({
 						animation: `${animationName} 2000ms linear infinite`,
 						backgroundColor: "lightgray",
 						borderRadius: 4,

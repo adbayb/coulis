@@ -3,7 +3,6 @@ import { createScopes } from "./entities/scope";
 import {
 	isNumber,
 	isObject,
-	process,
 	toDeclaration,
 	toManyDeclaration,
 } from "./helpers";
@@ -13,61 +12,68 @@ import type {
 	AtomicStyleObject,
 	GlobalStyleObject,
 	KeyframeStyleObject,
+	ScopeKey,
 } from "./types";
 
-const scopes = createScopes();
+const SCOPES = createScopes();
 
 /**
- * Create a contextual `atoms` tied to a [CSSGroupingRule](https://developer.mozilla.org/en-US/docs/Web/API/CSSGroupingRule)
+ * Create a contextual `styles` tied to a [CSSGroupingRule](https://developer.mozilla.org/en-US/docs/Web/API/CSSGroupingRule)
  * (ie. An at-rule that contains other rules nested within it (such as @media, @supports conditional rules...)).
  * @param atRule - The styling rule instruction (such as `@media (min-width: 0px)`).
  * @param condition - The rule condition.
  * @returns The contextual `atoms` helper.
  * @example
- * 	createAtoms("@media", "(min-width: 576px)")
+ * 	createStyles("@media", "(min-width: 576px)")
  */
-export const createAtoms = (
+export const createStyles = (
 	atRule: AtConditionalGroupingRule,
 	condition: string,
 ) => {
-	return createAtomsFactory(`${atRule} ${condition}`);
+	return createStylesFactory(`${atRule} ${condition}`);
 };
 
-export const atoms = (styleObject: AtomicStyleObject) => {
-	return createAtomsFactory()(styleObject);
+/**
+ * Define and generate a new style rule set applicable to an element via the returned class name.
+ * @param styleObject - A style record containing CSS declarations to apply to a given element.
+ * @returns The generated class name.
+ * @example
+ * 	const className = styles({ backgroundColor: "red" });
+ * 	document.getElementById("my-element-id").className = className;
+ */
+export const styles = (styleObject: AtomicStyleObject) => {
+	return createStylesFactory()(styleObject);
 };
 
 type ExtractStylesOptions = {
 	/**
 	 * Automatically flush the cache after the method call.
-	 * @default true - To prevent memory leaks. It can be disable if the cache should be shared across requests.
+	 * @default true - To prevent memory leaks. It can be disabled if the cache needs be shared across requests.
 	 */
 	flush: boolean;
 };
 
 /**
- * Extract the styles to inject it ahead of time (for server-side rendering/static site generation).
+ * Extract all the generated styles (including global ones) to inject it ahead of time (useful to avoid FOUC if the document is generated via server side).
  * @param options - Options to modufy extraction behaviors.
  * @returns Object containing the content, attributes and a default `toString` operator.
  * @example
- * 	const styles = extractStyles({ flush: true });
+ * 	const styles = extract({ flush: true });
  *  return `<head>${styles}</head>`;
  */
-export const extractStyles = (
-	options: ExtractStylesOptions = { flush: true },
-) => {
+export const extract = (options: ExtractStylesOptions = { flush: true }) => {
 	let stringifiedStyles = "";
-	const scopeKeys = Object.keys(scopes) as (keyof typeof scopes)[];
+	const scopeKeys = Object.keys(SCOPES) as ScopeKey[];
 
-	const styles = scopeKeys.map((scopeKey) => {
-		const { cache, styleSheet } = scopes[scopeKey];
+	const output = scopeKeys.map((scopeKey) => {
+		const { cache, styleSheet } = SCOPES[scopeKey];
 		const content = styleSheet.getContent();
 		const cacheKeys = cache.toString();
 		const stringifiedStyle = `<style data-coulis-cache="${cacheKeys}" data-coulis-scope="${scopeKey}">${content}</style>`;
 
 		stringifiedStyles += stringifiedStyle;
 
-		const output = {
+		const scopedOutput = {
 			attributes: styleSheet.getAttributes(cacheKeys),
 			content,
 			toString() {
@@ -81,18 +87,24 @@ export const extractStyles = (
 			styleSheet.flush();
 		}
 
-		return output;
+		return scopedOutput;
 	});
 
-	styles.toString = () => {
+	output.toString = () => {
 		return stringifiedStyles;
 	};
 
-	return styles;
+	return output;
 };
 
-export const globals = (styleObject: GlobalStyleObject) =>
-	process({
+/**
+ * Define and generate style rules set globally.
+ * @param styleObject - A style record containing CSS declarations to apply to a given element.
+ * @example
+ * 	globalStyles({ "html": { "background-color": "red" } });
+ */
+export const globalStyles = (styleObject: GlobalStyleObject) => {
+	SCOPES.global.commit({
 		key: JSON.stringify(styleObject),
 		createRules() {
 			const rules: string[] = [];
@@ -111,11 +123,20 @@ export const globals = (styleObject: GlobalStyleObject) =>
 
 			return rules;
 		},
-		scope: scopes.global,
 	});
+};
 
-export const keyframes = (styleObject: KeyframeStyleObject) =>
-	process({
+/**
+ * Create an animation name by defining a `keyframes` style rule set globally.
+ * @param styleObject - A style record containing CSS declarations to apply to a given element.
+ * @returns The generated animation name (see `animation-name` CSS property).
+ * @example
+ * 	const animationName = createAnimationName({ from: { opacity: 0 }, to: { opacity: 1 } });
+ * 	const className = styles({ animation: `${animationName} 2000ms linear infinite`, });
+ * 	document.getElementById("my-element-id").className = className;
+ */
+export const createAnimationName = (styleObject: KeyframeStyleObject) => {
+	return SCOPES.global.commit({
 		key: JSON.stringify(styleObject),
 		createRules(className) {
 			let rule = "";
@@ -136,10 +157,10 @@ export const keyframes = (styleObject: KeyframeStyleObject) =>
 
 			return [`@keyframes ${className}{${rule}}`];
 		},
-		scope: scopes.global,
 	});
+};
 
-const createAtomsFactory = (groupingRule = "") => {
+const createStylesFactory = (groupingRule = "") => {
 	const wrapRule = (rule: string) => {
 		return !groupingRule ? rule : `${groupingRule}{${rule}}`;
 	};
@@ -154,11 +175,13 @@ const createAtomsFactory = (groupingRule = "") => {
 
 			const scope = groupingRule
 				? isShorthandProperty
-					? scopes.conditionalShorthand
-					: scopes.conditionalLonghand
+					? SCOPES.conditionalShorthand
+					: SCOPES.conditionalLonghand
 				: isShorthandProperty
-					? scopes.shorthand
-					: scopes.longhand;
+					? SCOPES.shorthand
+					: SCOPES.longhand;
+
+			if (value === undefined) continue;
 
 			if (isObject(value)) {
 				for (const selectorProperty of Object.keys(value)) {
@@ -168,7 +191,7 @@ const createAtomsFactory = (groupingRule = "") => {
 					if (selectorValue === undefined) continue;
 
 					classNames.push(
-						process({
+						scope.commit({
 							key: `${groupingRule}${property}${selectorValue}${
 								isDefaultProperty ? "" : selectorProperty
 							}`,
@@ -183,15 +206,12 @@ const createAtomsFactory = (groupingRule = "") => {
 									),
 								];
 							},
-							scope,
 						}),
 					);
 				}
 			} else {
-				if (value === undefined) continue;
-
 				classNames.push(
-					process({
+					scope.commit({
 						key: `${groupingRule}${property}${value}`,
 						createRules(className) {
 							return [
@@ -200,7 +220,6 @@ const createAtomsFactory = (groupingRule = "") => {
 								),
 							];
 						},
-						scope,
 					}),
 				);
 			}

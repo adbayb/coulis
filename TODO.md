@@ -49,9 +49,9 @@ globals({
 
 -   [x] Update dependencies and migrate to `@adbayb/stack` (including PNPM migration)
 
--   [ ] Rename `atoms`, `createAtoms`, and `globals` to `styles`, `createStyles`, and `globalStyles`
+-   [x] Rename `atoms` and `createAtoms`` to `styles`and`createStyles`
 
--   [ ] Returns `flush` API (along with the extracted styles content) to flush cache in a controlled way (to avoid memory leaks) for `extractStyles` api.
+-   [x] Prevent memory leaks server side
 
 -   [ ] Release point before optimizations
 

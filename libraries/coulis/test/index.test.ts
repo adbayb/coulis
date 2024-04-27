@@ -1,10 +1,16 @@
 import { beforeAll, describe, expect, test } from "vitest";
 
-import { atoms, createAtoms, extractStyles, globals, keyframes } from "../src";
+import {
+	createAnimationName,
+	createStyles,
+	extract,
+	globalStyles,
+	styles,
+} from "../src";
 
 describe("coulis", () => {
 	beforeAll(() => {
-		globals({
+		globalStyles({
 			"*,*::before,*::after": {
 				boxSizing: "inherit",
 			},
@@ -42,16 +48,16 @@ describe("coulis", () => {
 	});
 
 	test("should extract styles given object format", () => {
-		expect(extractStyles()).toMatchSnapshot();
+		expect(extract()).toMatchSnapshot();
 	});
 
 	test("should extract styles given string format", () => {
 		// eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-		expect(`${extractStyles()}`).toMatchSnapshot();
+		expect(`${extract()}`).toMatchSnapshot();
 	});
 });
 
-const animationName = keyframes({
+const animationName = createAnimationName({
 	25: {
 		transform: "scale(1.25)",
 	},
@@ -66,7 +72,7 @@ const animationName = keyframes({
 	},
 });
 
-const classNames = atoms({
+const classNames = styles({
 	backgroundColor: {
 		":hover": "lightcyan",
 		"[alt]": "lightgray",
@@ -76,7 +82,7 @@ const classNames = atoms({
 	padding: 10,
 });
 
-const largerAtoms = createAtoms("@media", "(min-width: 576px)");
+const largerAtoms = createStyles("@media", "(min-width: 576px)");
 
 const largerClassNames = largerAtoms({
 	backgroundColor: {

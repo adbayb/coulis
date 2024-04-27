@@ -1,5 +1,7 @@
 import type { HtmlAttributes, PropertiesFallback, Pseudos } from "csstype";
 
+export type ClassName = string;
+
 export type ScopeKey =
 	| "conditionalLonghand"
 	| "conditionalShorthand"

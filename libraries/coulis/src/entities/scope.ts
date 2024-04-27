@@ -1,4 +1,4 @@
-import type { ScopeKey } from "../types";
+import type { ClassName, ScopeKey } from "../types";
 
 import { createCache } from "./cache";
 import type { Cache } from "./cache";
@@ -17,8 +17,6 @@ const INSERTION_ORDER_BY_SCOPE = Object.freeze({
 	shorthand: 1,
 });
 
-type ClassName = string;
-
 export type Scope = {
 	cache: Cache;
 	commit: (params: {
@@ -28,7 +26,7 @@ export type Scope = {
 	styleSheet: StyleSheet;
 };
 
-export const createScopes = () => {
+const createScopes = () => {
 	// eslint-disable-next-line @typescript-eslint/consistent-type-assertions
 	const scopes = {} as Record<ScopeKey, Scope>;
 
@@ -96,3 +94,5 @@ const hash = (str: string) => {
 	// and converting generated hash to hexadecimal
 	return `c${Number(uHash).toString(16)}`;
 };
+
+export const SCOPES = createScopes();

@@ -1,5 +1,15 @@
 # Change Log
 
+## 0.5.0
+
+### Minor Changes
+
+- [`6d2e114`](https://github.com/adbayb/coulis/commit/6d2e1147bc4dfc1af6876d6500d348b82cfb6cae) Thanks [@adbayb](https://github.com/adbayb)! - Add `createVariants` API.
+
+### Patch Changes
+
+- [`9621586`](https://github.com/adbayb/coulis/commit/9621586d014cc036821347396e0f16e39919425e) Thanks [@adbayb](https://github.com/adbayb)! - Fix ESM resolution.
+
 ## 0.4.0
 
 ### Minor Changes

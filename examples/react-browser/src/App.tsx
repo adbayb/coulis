@@ -50,9 +50,9 @@ const animationName = createAnimationName({
 
 const buttonVariants = createVariants({
 	color: {
-		accent: { backgroundColor: "lightcoral" },
+		accent: { backgroundColor: "lightsalmon" },
 		brand: { backgroundColor: "lightseagreen" },
-		neutral: { backgroundColor: "lightgrey" },
+		neutral: { backgroundColor: "lightskyblue" },
 	},
 	size: {
 		large: { padding: 18 },

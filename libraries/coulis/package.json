@@ -1,6 +1,6 @@
 {
 	"name": "coulis",
-	"version": "0.4.0",
+	"version": "0.5.0",
 	"description": "Yet another atomic CSS-in-JS library",
 	"type": "module",
 	"source": "src/index.ts",

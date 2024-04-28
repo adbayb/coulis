@@ -1,6 +1,7 @@
 import {
 	compose,
 	createAnimationName,
+	createProperty,
 	createStyles,
 	createVariants,
 	globalStyles,
@@ -47,6 +48,8 @@ const animationName = createAnimationName({
 		transform: "scale(1)",
 	},
 });
+
+const colorProperty = createProperty("blue");
 
 const buttonVariants = createVariants({
 	color: {
@@ -104,6 +107,33 @@ const App = () => {
 				>
 					Variants
 				</button>
+				<section
+					className={styles({
+						display: "flex",
+						flexDirection: "row",
+						gap: 4,
+						padding: 24,
+					})}
+				>
+					<div
+						className={styles({
+							color: colorProperty.value,
+						})}
+					>
+						Property
+					</div>
+					<div
+						className={styles({
+							color: colorProperty.value,
+						})}
+						style={{
+							[colorProperty.name]:
+								counter % 2 === 0 ? "inherit" : "lightyellow",
+						}}
+					>
+						With local overriding (via inline style)
+					</div>
+				</section>
 				<a
 					className={compose(
 						styles({

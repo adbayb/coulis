@@ -87,7 +87,7 @@ type AtGroupingRule =
  * Credits to https://github.com/sindresorhus/type-fest/blob/716b8b2e9419fb4a2fa6e3bfdf05f8be252e59e2/source/literal-union.d.ts.
  * @see For more details, https://github.com/Microsoft/TypeScript/issues/29729#issuecomment-567871939
  */
-type UngreedyString = Record<never, never> & string;
+export type UngreedyString = Record<never, never> & string;
 
 type Property = PropertiesFallback<UngreedyString | number>;
 

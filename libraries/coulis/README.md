@@ -31,6 +31,94 @@ yarn add coulis
 ```tsx
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
+import { styles, globalStyles } from "coulis";
+
+globalStyles({
+	"@import":
+		"url('https://fonts.googleapis.com/css?family=Open+Sans&display=swap')",
+	html: {
+		boxSizing: "border-box",
+	},
+	"html,body": {
+		padding: 0,
+		margin: 0,
+		fontFamily: "Open Sans",
+	},
+	"*,*::before,*::after": {
+		boxSizing: "inherit",
+	},
+});
+
+const App = () => {
+	return (
+		<main
+			className={styles({
+				display: "flex",
+				width: "100%",
+				height: "100%",
+				alignItems: "center",
+				justifyContent: "center",
+			})}
+		>
+			<p
+				className={styles({
+					color: {
+						default: "black",
+						":hover": "lightcoral",
+					},
+					fontSize: 26,
+					textAlign: "center",
+				})}
+			>
+				Hello 🤗
+			</p>
+		</main>
+	);
+};
+
+const container = document.getElementById("root");
+
+if (container) {
+	const root = createRoot(container);
+
+	root.render(
+		<StrictMode>
+			<App />
+		</StrictMode>,
+	);
+}
+```
+
+## 👨‍💻 Usage
+
+This section aims to deep dive into each public API with focused examples:
+
+### styles
+
+```tsx
+import { styles } from "coulis";
+
+export const App = () => {
+	return (
+		<p
+			className={styles({
+				color: {
+					default: "black",
+					":hover": "lightcoral",
+				},
+				fontSize: 26,
+				textAlign: "center",
+			})}
+		>
+			Hello 🤗
+		</p>
+	);
+};
+```
+
+### globalStyles
+
+```tsx
 import {
 	styles,
 	createStyles,
@@ -53,9 +141,44 @@ globalStyles({
 	"*,*::before,*::after": {
 		boxSizing: "inherit",
 	},
+	".text": {
+		color: "blue",
+		fontSize: 16,
+	},
 });
 
+export const App = () => {
+	return <span className="text">Hello 🤗</span>;
+};
+```
+
+### createStyles
+
+```tsx
+import { createStyles, compose } from "coulis";
+
 const tabletStyles = createStyles("@media", "(min-width: 576px)");
+
+export const App = () => {
+	return (
+		<p
+			className={compose(
+				tabletStyles({ fontSize: 20 }),
+				styles({
+					fontSize: 26,
+				}),
+			)}
+		>
+			Hello 🤗
+		</p>
+	);
+};
+```
+
+### createAnimationName
+
+```tsx
+import { styles, createAnimationName } from "coulis";
 
 const zoomIn = createAnimationName({
 	from: {
@@ -68,6 +191,27 @@ const zoomIn = createAnimationName({
 		transform: "scale(1)",
 	},
 });
+
+export const App = () => {
+	return (
+		<div
+			className={styles({
+				animation: `${zoomIn} 2000ms linear infinite`,
+				backgroundColor: "gray",
+				borderRadius: 4,
+				height: "50px",
+				margin: 16,
+				width: "50px",
+			})}
+		/>
+	);
+};
+```
+
+### createVariants
+
+```tsx
+import { createVariants } from "coulis";
 
 const buttonVariants = createVariants({
 	color: {
@@ -82,54 +226,56 @@ const buttonVariants = createVariants({
 	},
 });
 
-const App = () => {
+export const App = () => {
 	return (
-		<div
-			className={styles({
-				animation: `${zoomIn} 2000ms linear infinite`,
-				display: "flex",
-				width: "100%",
-				height: "100%",
-				alignItems: "center",
-				justifyContent: "center",
+		<button
+			className={buttonVariants({
+				color: "accent",
+				size: "large",
 			})}
 		>
-			<p
-				className={compose(
-					styles({
-						color: {
-							default: "black",
-							":hover": "lightcoral",
-						},
-						fontSize: 26,
-						textAlign: "center",
-					}),
-					tabletStyles({ fontSize: 20 }),
-				)}
-			>
-				Hello 🤗
-			</p>
-			<button
-				className={buttonVariants({
-					color: "accent",
-					size: "large",
-				})}
-			>
-				Click me!
-			</button>
-		</div>
+			Click me!
+		</button>
 	);
 };
+```
 
-const container = document.getElementById("root");
+### createProperty
 
-if (container) {
-	const root = createRoot(container);
+```tsx
+import { createProperty } from "coulis";
 
-	root.render(
-		<StrictMode>
-			<App />
-		</StrictMode>,
+const colorProperty = createProperty("blue");
+
+export const App = () => {
+	return (
+		<section
+			className={styles({
+				display: "flex",
+				flexDirection: "row",
+				gap: 4,
+				padding: 24,
+			})}
+		>
+			<span
+				className={styles({
+					color: colorProperty.value,
+				})}
+			>
+				Property
+			</span>
+			<span
+				className={styles({
+					color: colorProperty.value,
+				})}
+				style={{
+					[colorProperty.name]:
+						counter % 2 === 0 ? "inherit" : "lightyellow",
+				}}
+			>
+				With local overriding (via inline style)
+			</span>
+		</section>
 	);
-}
+};
 ```

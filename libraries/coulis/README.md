@@ -36,6 +36,7 @@ import {
 	createStyles,
 	globalStyles,
 	createAnimationName,
+	createVariants,
 } from "coulis";
 
 globalStyles({
@@ -68,6 +69,19 @@ const zoomIn = createAnimationName({
 	},
 });
 
+const buttonVariants = createVariants({
+	color: {
+		accent: { backgroundColor: "lightcoral" },
+		brand: { backgroundColor: "lightseagreen" },
+		neutral: { backgroundColor: "lightgrey" },
+	},
+	size: {
+		large: { padding: 18 },
+		medium: { padding: 12 },
+		small: { padding: 6 },
+	},
+});
+
 const App = () => {
 	return (
 		<div
@@ -95,6 +109,14 @@ const App = () => {
 			>
 				Hello 🤗
 			</p>
+			<button
+				className={buttonVariants({
+					color: "accent",
+					size: "large",
+				})}
+			>
+				Click me!
+			</button>
 		</div>
 	);
 };

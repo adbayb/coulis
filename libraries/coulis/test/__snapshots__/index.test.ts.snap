@@ -12,18 +12,18 @@ exports[`coulis > should extract styles given object format 1`] = `
   },
   {
     "attributes": {
-      "data-coulis-cache": "cde6daf3c",
+      "data-coulis-cache": "cde6daf3c,cd66da2a4,cdc6dac18,c36214926",
       "data-coulis-scope": "shorthand",
     },
-    "content": ".cde6daf3c{padding:10px;}",
+    "content": ".cde6daf3c{padding:10px;}.cd66da2a4{padding:18px;}.cdc6dac18{padding:12px;}.c36214926{padding:6px;}",
     "toString": [Function],
   },
   {
     "attributes": {
-      "data-coulis-cache": "c571db958,ce9403afc,cbb3db274,c3c5816c4",
+      "data-coulis-cache": "c571db958,ce9403afc,cbb3db274,c3c5816c4,c5bb3b59a,cbe211eb4",
       "data-coulis-scope": "longhand",
     },
-    "content": ".c571db958:hover{background-color:lightcyan;}.ce9403afc[alt]{background-color:lightgray;}.cbb3db274{background-color:lightcoral;}.c3c5816c4{color:lightblue;}",
+    "content": ".c571db958:hover{background-color:lightcyan;}.ce9403afc[alt]{background-color:lightgray;}.cbb3db274{background-color:lightcoral;}.c3c5816c4{color:lightblue;}.c5bb3b59a{background-color:lightseagreen;}.cbe211eb4{background-color:lightgrey;}",
     "toString": [Function],
   },
   {

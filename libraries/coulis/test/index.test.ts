@@ -3,6 +3,7 @@ import { beforeAll, describe, expect, test } from "vitest";
 import {
 	createAnimationName,
 	createStyles,
+	createVariants,
 	extract,
 	globalStyles,
 	styles,
@@ -39,6 +40,18 @@ describe("coulis", () => {
 
 	test("should generate classNames", () => {
 		expect(animationName).toBe("c77e20e50");
+		expect(buttonVariants({ color: "brand", size: "large" })).toBe(
+			"c5bb3b59a cd66da2a4",
+		);
+		expect(buttonVariants({ color: "brand", size: "medium" })).toBe(
+			"c5bb3b59a cdc6dac18",
+		);
+		expect(buttonVariants({ color: "neutral", size: "medium" })).toBe(
+			"cbe211eb4 cdc6dac18",
+		);
+		expect(buttonVariants({ color: "accent", size: "small" })).toBe(
+			"cbb3db274 c36214926",
+		);
 		expect(classNames).toBe(
 			"c571db958 ce9403afc cbb3db274 c3c5816c4 cde6daf3c",
 		);
@@ -69,6 +82,19 @@ const animationName = createAnimationName({
 	},
 	to: {
 		transform: "scale(1)",
+	},
+});
+
+const buttonVariants = createVariants({
+	color: {
+		accent: { backgroundColor: "lightcoral" },
+		brand: { backgroundColor: "lightseagreen" },
+		neutral: { backgroundColor: "lightgrey" },
+	},
+	size: {
+		large: { padding: 18 },
+		medium: { padding: 12 },
+		small: { padding: 6 },
 	},
 });
 

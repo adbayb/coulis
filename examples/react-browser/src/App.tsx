@@ -2,6 +2,7 @@ import {
 	compose,
 	createAnimationName,
 	createStyles,
+	createVariants,
 	globalStyles,
 	styles,
 } from "coulis";
@@ -47,6 +48,19 @@ const animationName = createAnimationName({
 	},
 });
 
+const buttonVariants = createVariants({
+	color: {
+		accent: { backgroundColor: "lightcoral" },
+		brand: { backgroundColor: "lightseagreen" },
+		neutral: { backgroundColor: "lightgrey" },
+	},
+	size: {
+		large: { padding: 18 },
+		medium: { padding: 12 },
+		small: { padding: 6 },
+	},
+});
+
 const App = () => {
 	const [counter, setCounter] = useState(0);
 
@@ -79,6 +93,17 @@ const App = () => {
 				>
 					Edit <code>src/App.tsx</code> and save to reload.
 				</p>
+				<button
+					className={compose(
+						styles({ marginBottom: 16 }),
+						buttonVariants({
+							color: "brand",
+							size: "large",
+						}),
+					)}
+				>
+					Variants
+				</button>
 				<a
 					className={compose(
 						styles({

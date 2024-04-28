@@ -53,9 +53,9 @@ globals({
 
 -   [x] Prevent memory leaks server side
 
--   [ ] Add `variables` API to define variable(s) (useful for reusable tokens)
+-   [x] Add `createVariants` API (ala [cva-like](https://cva.style/docs) or [vanilla extract](https://vanilla-extract.style/documentation/packages/recipes/))
 
--   [ ] Add `createVariants` API (ala [cva-like](https://cva.style/docs) or [vanilla extract](https://vanilla-extract.style/documentation/packages/recipes/))
+-   [ ] Add `variables` API to define variable(s) (useful for reusable tokens)
 
 -   [ ] Improve overall performance
 

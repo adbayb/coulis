@@ -1,5 +1,15 @@
 # Change Log
 
+## 0.7.0
+
+### Minor Changes
+
+- [`133d860`](https://github.com/adbayb/coulis/commit/133d860ceac1f6b29afa69554e9dc9c979951a0f) Thanks [@adbayb](https://github.com/adbayb)! - Remove `createCustomProperty` API in favor of `createCustomProperties`.
+
+### Patch Changes
+
+- [`0ded3ae`](https://github.com/adbayb/coulis/commit/0ded3aec64ee75c4cc7411137735db49d2c9ef77) Thanks [@adbayb](https://github.com/adbayb)! - Style reinsertion on dev environment when hot reload is enabled.
+
 ## 0.6.0
 
 ### Minor Changes

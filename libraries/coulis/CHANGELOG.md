@@ -1,5 +1,15 @@
 # Change Log
 
+## 0.6.0
+
+### Minor Changes
+
+- [`2b541dc`](https://github.com/adbayb/coulis/commit/2b541dc5d26c473d4b9ac40744f8078e09980741) Thanks [@adbayb](https://github.com/adbayb)! - Add `createProperty` API.
+
+### Patch Changes
+
+- [`45b0f04`](https://github.com/adbayb/coulis/commit/45b0f04b25c1b8d7c7d54bae6bb662a5f26a1205) Thanks [@adbayb](https://github.com/adbayb)! - Do not expose internal types consumer-side (the dist is now unminified and no source maps are provided as they're consumer concerns).
+
 ## 0.5.0
 
 ### Minor Changes

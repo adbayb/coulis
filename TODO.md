@@ -55,11 +55,11 @@ globals({
 
 -   [x] Add `createVariants` API (ala [cva-like](https://cva.style/docs) or [vanilla extract](https://vanilla-extract.style/documentation/packages/recipes/))
 
--   [ ] Add `createVariable` API to define variable globally
+-   [x] Add `createVariable` API to define variable globally
 
--   [ ] Add `createTokens` and `createTheme(tokens)` APIs to add theming features (tokens definition will follow [W3C spec](https://tr.designtokens.org/format/) and createTheme responsibility is to materialize tokens via createVariable call internally)
+-   [ ] Add `createTheme(tokens)` API to add theming features
 
--   [ ] Update `styles` API to allow passing a configuration option to define aliases (or shorthands?) and list of allowed properties (e.g. `styles({ bg: "red", paddingHorizontal }, { aliases: { bg: ["background-color"], paddingHorizontal: ["paddingLeft", "paddingRight"] }, properties: { paddingLeft: tokens.spacing } } })` (internally, Object.keys(tokens.spacing) to get available))
+-   [ ] Update `createStyles` API to allow passing a configuration option to define aliases (or shorthands?) and list of allowed properties (e.g. `createStyles({ aliases: { bg: ["background-color"], paddingHorizontal: ["paddingLeft", "paddingRight"] }, properties: { paddingLeft: theme.spacing }, condition: { base: "@media (min-width: 0)", xs: "@media (min-width: 370px)" } } })`)
 
 -   [ ] Improve overall performance
 

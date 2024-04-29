@@ -44,8 +44,8 @@ export type KeyframeStyleObject = {
 };
 
 export type StyleObject<HasAtomicValue = false> = {
-	[Key in UngreedyString | keyof Property]?: HasAtomicValue extends false
-		? PropertyValue<Key>
+	[Key in UngreedyString | keyof StyleProperty]?: HasAtomicValue extends false
+		? StylePropertyValue<Key>
 		:
 				| Partial<
 						Record<
@@ -53,10 +53,10 @@ export type StyleObject<HasAtomicValue = false> = {
 							| Pseudos
 							| UngreedyString
 							| "default",
-							PropertyValue<Key>
+							StylePropertyValue<Key>
 						>
 				  >
-				| PropertyValue<Key>;
+				| StylePropertyValue<Key>;
 };
 
 export type AtTextualRule = "@charset" | "@import" | "@layer" | "@namespace";
@@ -89,7 +89,9 @@ type AtGroupingRule =
  */
 export type UngreedyString = Record<never, never> & string;
 
-type Property = PropertiesFallback<UngreedyString | number>;
+type StyleProperty = PropertiesFallback<UngreedyString | number>;
 
-type PropertyValue<Key extends UngreedyString | keyof Property> =
-	Key extends keyof Property ? Property[Key] : UngreedyString | number;
+type StylePropertyValue<Key extends UngreedyString | keyof StyleProperty> =
+	Key extends keyof StyleProperty
+		? StyleProperty[Key]
+		: UngreedyString | number;

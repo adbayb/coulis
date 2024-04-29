@@ -1,5 +1,10 @@
 import { SCOPES } from "../entities/scope";
 
+export type Property = {
+	name: string;
+	value: string;
+};
+
 /**
  * Create a custom CSS property (globally scoped).
  * @param rawValue - The value to initialize the property with.
@@ -8,10 +13,10 @@ import { SCOPES } from "../entities/scope";
  * const property = createProperty("red");
  * // Consume the property value:
  * document.getElementById("my-element-id").style = `background-color: ${property.value};`;
- * // Update the property value:
+ * // Override locally the property value:
  * document.getElementById("my-element-id").style = `${property.name}: black;`;
  */
-export const createProperty = (rawValue: number | string) => {
+export const createProperty = (rawValue: number | string): Property => {
 	const name = `--${SCOPES.global.commit({
 		key: JSON.stringify(rawValue),
 		createRules(className) {
@@ -21,3 +26,5 @@ export const createProperty = (rawValue: number | string) => {
 
 	return { name, value: `var(${name})` };
 };
+
+// TODO add createProperties to use internally either in createProperty ([single value]) or in createTheme

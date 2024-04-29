@@ -1,7 +1,7 @@
 import { beforeAll, describe, expect, test } from "vitest";
 
 import {
-	createAnimationName,
+	createKeyframes,
 	createStyles,
 	createVariants,
 	extract,
@@ -70,7 +70,7 @@ describe("coulis", () => {
 	});
 });
 
-const animationName = createAnimationName({
+const animationName = createKeyframes({
 	25: {
 		transform: "scale(1.25)",
 	},

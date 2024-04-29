@@ -3,15 +3,15 @@ import { isNumber, toManyDeclaration } from "../helpers";
 import type { KeyframeStyleObject } from "../types";
 
 /**
- * Create an animation name by defining a `keyframes` style rule set globally.
- * @param styleObject - A style record containing CSS declarations to apply to a given element.
- * @returns The generated animation name (see `animation-name` CSS property).
+ * Create a `keyframes` rule set globally scoped that describes the animation to apply to an element.
+ * @param styleObject - A style record containing CSS keyframes-related declarations.
+ * @returns The name identifying the keyframe list (e.g. In the `animation-name` CSS property).
  * @example
- * 	const animationName = createAnimationName({ from: { opacity: 0 }, to: { opacity: 1 } });
+ * 	const animationName = createKeyframes({ from: { opacity: 0 }, to: { opacity: 1 } });
  * 	const className = styles({ animation: `${animationName} 2000ms linear infinite`, });
  * 	document.getElementById("my-element-id").className = className;
  */
-export const createAnimationName = (styleObject: KeyframeStyleObject) => {
+export const createKeyframes = (styleObject: KeyframeStyleObject) => {
 	return SCOPES.global.commit({
 		key: JSON.stringify(styleObject),
 		createRules(className) {

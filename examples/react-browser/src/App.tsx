@@ -1,7 +1,7 @@
 import {
 	compose,
-	createAnimationName,
 	createCustomProperties,
+	createKeyframes,
 	createStyles,
 	createVariants,
 	globalStyles,
@@ -37,7 +37,7 @@ globalStyles({
 
 const largerStyles = createStyles("@media", "(min-width: 576px)");
 
-const animationName = createAnimationName({
+const animationName = createKeyframes({
 	50: {
 		transform: "scale(1.5)",
 	},

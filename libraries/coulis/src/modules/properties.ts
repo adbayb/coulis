@@ -25,7 +25,7 @@ type Properties = {
 };
 
 /**
- * This method aims to create one or several custom properties globally scoped.
+ * Create one or several custom properties globally scoped.
  * A [custom property](https://www.w3.org/TR/css-variables-1/) is any property whose name starts with two dashes.
  * Its main functional purpose is theming: a theme defines a set of consistent and contextual properties (aka [design tokens](https://www.designtokens.org/glossary/)).
  * A design token is an indivisible design decision of a design system (such as colors, spacing, typography scale, ...).

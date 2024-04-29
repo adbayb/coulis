@@ -119,13 +119,7 @@ export const App = () => {
 ### globalStyles
 
 ```tsx
-import {
-	styles,
-	createStyles,
-	globalStyles,
-	createAnimationName,
-	createVariants,
-} from "coulis";
+import { globalStyles } from "coulis";
 
 globalStyles({
 	"@import":
@@ -175,12 +169,12 @@ export const App = () => {
 };
 ```
 
-### createAnimationName
+### createKeyframes
 
 ```tsx
-import { styles, createAnimationName } from "coulis";
+import { styles, createKeyframes } from "coulis";
 
-const zoomIn = createAnimationName({
+const zoomIn = createKeyframes({
 	from: {
 		transform: "scale(1)",
 	},

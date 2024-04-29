@@ -22,6 +22,7 @@
 	"scripts": {
 		"prepublishOnly": "npm run build",
 		"clean": "rm -rf dist",
+		"start": "pnpm watch",
 		"watch": "tsx ../../tools/build --watch",
 		"prebuild": "npm run clean",
 		"build": "tsx ../../tools/build",

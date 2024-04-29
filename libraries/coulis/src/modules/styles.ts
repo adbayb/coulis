@@ -75,9 +75,9 @@ const createClassName = (groupingRule = "") => {
 	return (styleObject: AtomicStyleObject): ClassName => {
 		const classNames: string[] = [];
 
-		for (const property of Object.keys(styleObject)) {
-			const value = styleObject[property];
-			const isShorthandProperty = SHORTHAND_PROPERTIES[property];
+		for (const propertyName of Object.keys(styleObject)) {
+			const value = styleObject[propertyName];
+			const isShorthandProperty = SHORTHAND_PROPERTIES[propertyName];
 
 			const scope = groupingRule
 				? isShorthandProperty
@@ -98,7 +98,7 @@ const createClassName = (groupingRule = "") => {
 
 					classNames.push(
 						scope.commit({
-							key: `${groupingRule}${property}${selectorValue}${
+							key: `${groupingRule}${propertyName}${selectorValue}${
 								isDefaultProperty ? "" : selectorProperty
 							}`,
 							createRules(className) {
@@ -108,7 +108,7 @@ const createClassName = (groupingRule = "") => {
 											isDefaultProperty
 												? ""
 												: selectorProperty
-										}{${toDeclaration(property, selectorValue)}}`,
+										}{${toDeclaration({ name: propertyName, value: selectorValue })}}`,
 									),
 								];
 							},
@@ -118,11 +118,11 @@ const createClassName = (groupingRule = "") => {
 			} else {
 				classNames.push(
 					scope.commit({
-						key: `${groupingRule}${property}${value}`,
+						key: `${groupingRule}${propertyName}${value}`,
 						createRules(className) {
 							return [
 								wrapRule(
-									`.${className}{${toDeclaration(property, value)}}`,
+									`.${className}{${toDeclaration({ name: propertyName, value })}}`,
 								),
 							];
 						},

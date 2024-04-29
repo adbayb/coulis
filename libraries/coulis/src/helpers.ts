@@ -1,4 +1,5 @@
 import { UNITLESS_PROPERTIES } from "./constants";
+import type { Property } from "./entities/property";
 import type { StyleObject } from "./types";
 
 export const isNumber = (value: unknown): value is number => {
@@ -9,7 +10,16 @@ export const isObject = (value: unknown): value is Record<string, unknown> => {
 	return value !== null && typeof value === "object";
 };
 
-export const toDeclaration = (property: string, value: number | string) => {
+export const transformPropertyValue = (
+	name: Property["name"],
+	value: Property["value"],
+) => {
+	return typeof value === "string" || UNITLESS_PROPERTIES[name]
+		? value
+		: `${value}px`;
+};
+
+export const toDeclaration = ({ name, value }: Property) => {
 	/**
 	 * CSS syntax anatomy.
 	 * @see https://developer.mozilla.org/en-US/docs/Web/CSS/Syntax
@@ -23,18 +33,15 @@ export const toDeclaration = (property: string, value: number | string) => {
 	 */
 
 	// From JS camelCase to CSS kebeb-case
-	const normalizedProperty = property.replace(
+	const transformedPropertyName = name.replace(
 		/([A-Z])/g,
 		(matched) => `-${matched.toLowerCase()}`,
 	);
 
 	// Format value to follow CSS specs (unitless number)
-	const normalizedValue =
-		typeof value === "string" || UNITLESS_PROPERTIES[property]
-			? value
-			: `${value}px`;
+	const transformedPropertyValue = transformPropertyValue(name, value);
 
-	return `${normalizedProperty}:${normalizedValue};`;
+	return `${transformedPropertyName}:${transformedPropertyValue};`;
 };
 
 export const toManyDeclaration = <Style extends StyleObject>(
@@ -42,11 +49,11 @@ export const toManyDeclaration = <Style extends StyleObject>(
 ) => {
 	let declarationBlock = "";
 
-	for (const property of Object.keys(styleObject)) {
-		const value = styleObject[property];
+	for (const propertyName of Object.keys(styleObject)) {
+		const value = styleObject[propertyName];
 
 		if (value) {
-			declarationBlock += toDeclaration(property, value);
+			declarationBlock += toDeclaration({ name: propertyName, value });
 		}
 	}
 

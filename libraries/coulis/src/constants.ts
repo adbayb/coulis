@@ -1,5 +1,7 @@
+import type { Property } from "./entities/property";
+
 /* eslint-disable sort-keys-custom-order/object-keys */
-type Indexable = Record<string, boolean>;
+type Indexable = Record<Property["name"], boolean>;
 
 export const IS_PROD_ENV = process.env.NODE_ENV === "production";
 export const IS_BROWSER_ENV = typeof window !== "undefined";

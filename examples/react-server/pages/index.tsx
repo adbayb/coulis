@@ -1,7 +1,7 @@
 import {
 	compose,
 	createAnimationName,
-	createProperty,
+	createCustomProperties,
 	createStyles,
 	createVariants,
 	globalStyles,
@@ -49,8 +49,6 @@ const animationName = createAnimationName({
 	},
 });
 
-const colorProperty = createProperty("blue");
-
 const buttonVariants = createVariants({
 	color: {
 		accent: { backgroundColor: "lightsalmon" },
@@ -61,6 +59,59 @@ const buttonVariants = createVariants({
 		large: { padding: 18 },
 		medium: { padding: 12 },
 		small: { padding: 6 },
+	},
+});
+
+const px = (value: number) => `${value}px`;
+
+const tokens = {
+	colors: {
+		black: "black",
+		blue: [
+			"rgb(241,244,248)",
+			"rgb(226,232,240)",
+			"rgb(201,212,227)",
+			"rgb(168,186,211)",
+			"rgb(119,146,185)",
+		],
+		transparent: "transparent",
+		white: "white",
+	},
+	fontSizes: [
+		px(12),
+		px(14),
+		px(16),
+		px(18),
+		px(20),
+		px(22),
+		px(24),
+		px(28),
+		px(30),
+	],
+	fontWeights: ["100", "400", "900"],
+	radii: [px(0), px(4), px(8), px(12), px(999)],
+} as const;
+
+const theme = createCustomProperties({
+	colors: {
+		neutralDark: tokens.colors.black,
+		neutralLight: tokens.colors.white,
+		neutralTransparent: tokens.colors.transparent,
+		surfacePrimary: tokens.colors.blue[4],
+		surfaceSecondary: tokens.colors.blue[2],
+	},
+	radii: {
+		full: tokens.radii[4],
+		large: tokens.radii[3],
+		medium: tokens.radii[2],
+		none: tokens.radii[0],
+		small: tokens.radii[1],
+	},
+	typographies: {
+		body: {
+			fontSize: tokens.fontSizes[2],
+			fontWeight: tokens.fontWeights[1],
+		},
 	},
 });
 
@@ -96,6 +147,21 @@ const App = () => {
 				>
 					Edit <code>src/App.tsx</code> and save to reload.
 				</p>
+				<section>
+					<h1>createCustomProperties</h1>
+					<p
+						className={styles({
+							backgroundColor: "lightcoral",
+							borderRadius: theme.radii.large,
+							color: theme.colors.neutralLight,
+							fontSize: theme.typographies.body.fontSize,
+							fontWeight: theme.typographies.body.fontWeight,
+							padding: 24,
+						})}
+					>
+						Hello 👋
+					</p>
+				</section>
 				<button
 					className={compose(
 						styles({ marginBottom: 16 }),
@@ -107,33 +173,6 @@ const App = () => {
 				>
 					Variants
 				</button>
-				<section
-					className={styles({
-						display: "flex",
-						flexDirection: "row",
-						gap: 4,
-						padding: 24,
-					})}
-				>
-					<div
-						className={styles({
-							color: colorProperty.value,
-						})}
-					>
-						Property
-					</div>
-					<div
-						className={styles({
-							color: colorProperty.value,
-						})}
-						style={{
-							[colorProperty.name]:
-								counter % 2 === 0 ? "inherit" : "lightyellow",
-						}}
-					>
-						With local overriding (via inline style)
-					</div>
-				</section>
 				<a
 					className={compose(
 						styles({

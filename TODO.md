@@ -55,9 +55,7 @@ globals({
 
 -   [x] Add `createVariants` API (ala [cva-like](https://cva.style/docs) or [vanilla extract](https://vanilla-extract.style/documentation/packages/recipes/))
 
--   [x] Add `createVariable` API to define variable globally
-
--   [ ] Add `createTheme(tokens)` API to add theming features
+-   [x] Add `createCustomProperties()` API to add theming features
 
 -   [ ] Update `createStyles` API to allow passing a configuration option to define aliases (or shorthands?) and list of allowed properties (e.g. `createStyles({ aliases: { bg: ["background-color"], paddingHorizontal: ["paddingLeft", "paddingRight"] }, properties: { paddingLeft: theme.spacing }, condition: { base: "@media (min-width: 0)", xs: "@media (min-width: 370px)" } } })`)
 

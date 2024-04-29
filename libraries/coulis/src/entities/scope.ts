@@ -64,7 +64,7 @@ const createScope = (key: ScopeKey): Scope => {
 			const rules = params.createRules(className);
 
 			for (const rule of rules) {
-				styleSheet.commit(rule);
+				styleSheet.commit(className, rule);
 			}
 
 			cache.add(className);

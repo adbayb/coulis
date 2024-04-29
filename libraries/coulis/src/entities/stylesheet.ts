@@ -2,7 +2,7 @@ import { IS_BROWSER_ENV, IS_PROD_ENV } from "../constants";
 import type { ScopeKey } from "../types";
 
 export type StyleSheet = {
-	commit: (rule: string) => void;
+	commit: (key: string, rule: string) => void;
 	element: HTMLStyleElement | null;
 	flush: () => void;
 	getAttributes: (
@@ -18,7 +18,7 @@ const createVirtualStyleSheet: CreateStyleSheet = (scope) => {
 	let data: string[] = [];
 
 	return {
-		commit(rule: string) {
+		commit(_, rule) {
 			data.push(rule);
 		},
 		element: null,
@@ -52,16 +52,23 @@ const createWebStyleSheet: CreateStyleSheet = (scope) => {
 		document.head.appendChild(element);
 	}
 
-	const getCacheDataFromElement = () => element.dataset.coulisCache;
-
 	return {
-		commit(rule: string) {
+		commit(key, rule) {
+			const cacheData = element.dataset.coulisCache;
+			const cacheSplitKeys = cacheData?.split(",");
+
+			// Manage cache via data attribute to persist it in the same manner as server-side to prevent any existing style rules re-insertion
+			// in case of hot reload update (which reset the global scope including in-memory cache)
+			if (cacheSplitKeys?.includes(key)) return;
+
 			if (IS_PROD_ENV && element.sheet) {
 				// Faster, more reliable (check rule insertion order (e.g. "@import" must be inserted first)), but not debug friendly
 				element.sheet.insertRule(rule, element.sheet.cssRules.length);
 			} else {
 				element.insertAdjacentHTML("beforeend", rule);
 			}
+
+			element.dataset.coulisCache = `${cacheData},${key}`;
 		},
 		element,
 		flush() {
@@ -69,7 +76,7 @@ const createWebStyleSheet: CreateStyleSheet = (scope) => {
 		},
 		getAttributes() {
 			return {
-				"data-coulis-cache": getCacheDataFromElement(),
+				"data-coulis-cache": element.dataset.coulisCache,
 				"data-coulis-scope": element.dataset.scope,
 			};
 		},
@@ -77,7 +84,7 @@ const createWebStyleSheet: CreateStyleSheet = (scope) => {
 			return element.innerText;
 		},
 		hydrate() {
-			const source = getCacheDataFromElement();
+			const source = element.dataset.coulisCache;
 
 			if (!source) return [];
 

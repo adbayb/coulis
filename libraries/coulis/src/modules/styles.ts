@@ -197,7 +197,10 @@ const createNewStyles = <
 		| Partial<
 				Record<
 					keyof StyleObject,
-					Record<string, string> | unknown[] | true
+					{
+						states?: Record<string, string[] | string>;
+						values: Record<string, string> | unknown[] | null;
+					}
 				>
 		  >
 		| StyleObject = StyleObject,
@@ -205,25 +208,36 @@ const createNewStyles = <
 >(contract: {
 	properties?: StyleProperties; // or conditions
 	shorthands?: Shorthands;
-	states: Record<string | "base", `@media ${string}`>;
 }) => {
 	console.log(contract);
+
+	type WithStates<StyleProperty, Value> = "states" extends keyof StyleProperty
+		? Record<keyof StyleProperty["states"], Value>
+		: Value;
 
 	type ProcessedProperties = StyleProperties extends StyleObject
 		? StyleObject
 		: {
-				[Key in keyof StyleProperties]: StyleProperties[Key] extends (infer Value)[]
-					? Value
-					: StyleProperties[Key] extends Record<
-								infer CustomPropertyValue,
-								string
-						  >
-						? CustomPropertyValue
-						: StyleProperties[Key] extends true
-							? Key extends keyof StyleObject
-								? StyleObject[Key]
+				[Key in keyof StyleProperties]: "values" extends keyof StyleProperties[Key]
+					? StyleProperties[Key]["values"] extends (infer Value)[]
+						? WithStates<StyleProperties[Key], Value>
+						: StyleProperties[Key]["values"] extends Record<
+									infer CustomPropertyValue,
+									string
+							  >
+							? WithStates<
+									StyleProperties[Key],
+									CustomPropertyValue
+								>
+							: StyleProperties[Key]["values"] extends null
+								? Key extends keyof StyleObject
+									? WithStates<
+											StyleProperties[Key],
+											StyleObject[Key]
+										>
+									: never
 								: never
-							: never;
+					: never;
 			};
 
 	type ProcessedShorthands = Shorthands extends undefined
@@ -231,7 +245,12 @@ const createNewStyles = <
 		: {
 				[K in keyof Shorthands]: Shorthands[K] extends (infer Properties)[]
 					? Properties extends keyof ProcessedProperties
-						? ProcessedProperties[Properties]
+						? ProcessedProperties[Properties] extends Record<
+								string,
+								unknown
+							>
+							? ProcessedProperties[Properties]["values"]
+							: never
 						: never
 					: never;
 			};
@@ -240,20 +259,34 @@ const createNewStyles = <
 	return {} as ProcessedProperties & ProcessedShorthands;
 };
 
+const createProperty = <Values>(values: Values) => {
+	const smallState = "@media (min-width: 360px)";
+	const hoverState = ":hover";
+
+	return {
+		states: {
+			base: "@media (min-width: 0px)",
+			hover: hoverState,
+			large: "@media (min-width: 1340px)",
+			medium: "@media (min-width: 720px)",
+			small: smallState,
+			smallWithHover: [smallState, hoverState],
+		},
+		values,
+	};
+};
+
 const test = createNewStyles({
 	properties: {
-		backgroundColor: theme.colors,
-		boxShadow: true,
-		color: theme.colors,
-		paddingLeft: [0, 1, 2],
-		paddingRight: [2, 3],
+		backgroundColor: createProperty(theme.colors),
+		boxShadow: createProperty(null),
+		color: createProperty(theme.colors),
+		paddingLeft: { values: [0, 1, 2] },
+		paddingRight: createProperty([2, 3]),
 	},
 	shorthands: {
 		paddingHorizontal: ["paddingLeft", "paddingRight"],
 		surface: ["color", "backgroundColor"],
-	},
-	states: {
-		base: "@media (min-width: 0px)",
 	},
 });
 

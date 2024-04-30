@@ -34,7 +34,9 @@ type Properties = {
  * @example
  * const properties = createCustomProperties({}); // TODO
  */
-export const createCustomProperties = <P extends Properties>(properties: P) => {
+export const createCustomProperties = <const P extends Properties>(
+	properties: P,
+) => {
 	const { collectedProperties, nodes } =
 		createCustomPropertiesWithoutSideEffects(properties);
 
@@ -54,7 +56,7 @@ export const createCustomProperties = <P extends Properties>(properties: P) => {
 	return nodes;
 };
 
-const createCustomPropertiesWithoutSideEffects = <P extends Properties>(
+const createCustomPropertiesWithoutSideEffects = <const P extends Properties>(
 	properties: P,
 	propertyNameParts: Property["name"][] = [],
 	collectedProperties: Property[] = [],

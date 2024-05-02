@@ -9,22 +9,13 @@ type CustomProperty = {
 		string /* Custom selector name */,
 		string[] | string /* List of states (including conditional at-rules) */
 	>;
-	type: "custom";
 	values?: (number | string)[] | Record<string, number | string>;
 };
 
 type NativeProperty = true;
 
-type ShorthandProperty = {
-	type: "shorthand";
-	values: string[];
-};
-
-type PropertyConfiguration = Partial<
-	Record<
-		keyof StyleObject,
-		CustomProperty | NativeProperty | ShorthandProperty
-	>
+type PropertyDefinition = Partial<
+	Record<keyof StyleObject, CustomProperty | NativeProperty>
 >;
 
 type PropertyOutput<Value> = Value | undefined;
@@ -38,9 +29,37 @@ type CustomPropertyOutput<
 		: Value
 >;
 
-type StyleProps<Config extends PropertyConfiguration> = {
-	[PropertyName in keyof Config]?: Config[PropertyName] extends ShorthandProperty
-		? Config[Config[PropertyName]["values"][number]] extends infer ReferencedProperty
+type StyleProps<
+	Properties extends PropertyDefinition,
+	Shorthands extends ShorthandsDefinition<Properties>,
+> = {
+	[PropertyName in keyof Properties]?: Properties[PropertyName] extends CustomProperty
+		? CustomPropertyOutput<
+				Properties[PropertyName],
+				| (Properties[PropertyName]["extendValues"] extends true
+						? PropertyName extends keyof StyleObject
+							? StyleObject[PropertyName]
+							: never
+						: never)
+				| (Properties[PropertyName]["values"] extends unknown[]
+						? Properties[PropertyName]["values"][number]
+						: Properties[PropertyName]["values"] extends Record<
+									string,
+									unknown
+							  >
+							? keyof Properties[PropertyName]["values"]
+							: PropertyName extends keyof StyleObject
+								? PropertyOutput<StyleObject[PropertyName]>
+								: never)
+			>
+		: Properties[PropertyName] extends NativeProperty
+			? PropertyName extends keyof StyleObject
+				? PropertyOutput<StyleObject[PropertyName]>
+				: never
+			: never;
+} & {
+	[PropertyName in keyof Shorthands]?: Shorthands[PropertyName] extends unknown[]
+		? Properties[Shorthands[PropertyName][number]] extends infer ReferencedProperty
 			? ReferencedProperty extends CustomProperty
 				? CustomPropertyOutput<
 						ReferencedProperty,
@@ -51,53 +70,39 @@ type StyleProps<Config extends PropertyConfiguration> = {
 										unknown
 								  >
 								? keyof ReferencedProperty["values"]
-								: Config[PropertyName]["values"][number] extends keyof StyleObject
+								: Shorthands[PropertyName][number] extends keyof StyleObject
 									? PropertyOutput<
-											StyleObject[Config[PropertyName]["values"][number]]
+											StyleObject[Shorthands[PropertyName][number]]
 										>
 									: never
 					>
 				: ReferencedProperty extends NativeProperty
-					? Config[PropertyName]["values"][number] extends keyof StyleObject
+					? Shorthands[PropertyName][number] extends keyof StyleObject
 						? PropertyOutput<
-								StyleObject[Config[PropertyName]["values"][number]]
+								StyleObject[Shorthands[PropertyName][number]]
 							>
 						: never
 					: never
 			: never
-		: Config[PropertyName] extends CustomProperty
-			? CustomPropertyOutput<
-					Config[PropertyName],
-					| (Config[PropertyName]["extendValues"] extends true
-							? PropertyName extends keyof StyleObject
-								? StyleObject[PropertyName]
-								: never
-							: never)
-					| (Config[PropertyName]["values"] extends unknown[]
-							? Config[PropertyName]["values"][number]
-							: Config[PropertyName]["values"] extends Record<
-										string,
-										unknown
-								  >
-								? keyof Config[PropertyName]["values"]
-								: PropertyName extends keyof StyleObject
-									? PropertyOutput<StyleObject[PropertyName]>
-									: never)
-				>
-			: Config[PropertyName] extends NativeProperty
-				? PropertyName extends keyof StyleObject
-					? PropertyOutput<StyleObject[PropertyName]>
-					: never
-				: never;
+		: never;
 };
+
+type ShorthandsDefinition<Properties extends PropertyDefinition> = Record<
+	string,
+	(keyof Properties)[]
+>;
 
 type Exactify<T, X extends T> = T & {
 	[K in keyof X]: K extends keyof T ? X[K] : never;
 };
 
-declare function createStyles<const Config extends PropertyConfiguration>(
-	config: Exactify<PropertyConfiguration, Config>,
-): (props: StyleProps<Config>) => string;
+declare function createStyles<
+	const Properties extends PropertyDefinition,
+	const Shorthands extends ShorthandsDefinition<Properties>,
+>(
+	properties: Exactify<PropertyDefinition, Properties>,
+	options: { shorthands: Shorthands },
+): (props: StyleProps<Properties, Shorthands>) => string;
 
 const createStateSelectors = () => {
 	const smallState = "@media (min-width: 360px)";
@@ -168,37 +173,33 @@ const theme = createCustomProperties({
 });
 
 // eslint-disable-next-line sonarjs/no-use-of-empty-return-value
-const styles = createStyles({
-	accentColor: true,
-	borderRadius: {
-		extendValues: true,
-		type: "custom",
-		values: theme.radii,
+const styles = createStyles(
+	{
+		accentColor: true,
+		borderRadius: {
+			extendValues: true,
+			values: theme.radii,
+		},
+		color: {
+			states: STATE_SELECTORS,
+			values: theme.colors,
+		},
+		paddingLeft: {
+			states: STATE_SELECTORS,
+			values: [1, 2],
+		},
+		paddingRight: {
+			extendValues: true,
+			values: [0, 1],
+		},
 	},
-	color: {
-		states: STATE_SELECTORS,
-		type: "custom",
-		values: theme.colors,
+	{
+		shorthands: {
+			paddingHorizontal: ["paddingLeft", "paddingRight"],
+			surface: ["color"],
+		},
 	},
-	paddingHorizontal: {
-		type: "shorthand",
-		values: ["paddingRight", "paddingLeft"],
-	},
-	paddingLeft: {
-		states: STATE_SELECTORS,
-		type: "custom",
-		values: [1, 2],
-	},
-	paddingRight: {
-		extendValues: true,
-		type: "custom",
-		values: [0, 1],
-	},
-	surface: {
-		type: "shorthand",
-		values: ["color"],
-	},
-});
+);
 
 styles({
 	accentColor: "ActiveCaption",

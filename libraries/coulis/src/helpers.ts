@@ -19,7 +19,7 @@ export const isNumber = (value: unknown): value is number => {
 };
 
 export const isObject = (value: unknown): value is Record<string, unknown> => {
-	return value !== null && typeof value === "object";
+	return typeof value === "object" && value !== null && !Array.isArray(value);
 };
 
 export const transformPropertyValue = (

@@ -133,6 +133,9 @@ const App = () => {
 				className={styles({
 					backgroundColor: "lightblue",
 					borderRadius: 4,
+					display: "flex",
+					flexDirection: "column",
+					gap: 16,
 					padding: 10,
 				})}
 			>
@@ -162,13 +165,10 @@ const App = () => {
 					</p>
 				</section>
 				<button
-					className={[
-						styles({ marginBottom: 16 }),
-						buttonVariants({
-							color: "brand",
-							size: "large",
-						}),
-					].join(" ")}
+					className={buttonVariants({
+						color: "brand",
+						size: "large",
+					})}
 				>
 					Variants
 				</button>

@@ -24,24 +24,33 @@ export const extract = (
 	const scopeKeys = Object.keys(SCOPES) as ScopeKey[];
 
 	const output = scopeKeys.map((scopeKey) => {
-		const { cache, styleSheet } = SCOPES[scopeKey];
+		const { styleSheet } = SCOPES[scopeKey];
 		const content = styleSheet.getContent();
-		const cacheKeys = cache.toString();
-		const stringifiedStyle = `<style data-coulis-cache="${cacheKeys}" data-coulis-scope="${scopeKey}">${content}</style>`;
+		const attributes = styleSheet.getAttributes();
 
-		stringifiedStyles += stringifiedStyle;
+		const toString = () => {
+			const stringifiedAttributes = (
+				Object.keys(attributes) as (keyof typeof attributes)[]
+			)
+				.map(
+					(attributeKey) =>
+						`${attributeKey}="${attributes[attributeKey]}"`,
+				)
+				.join(" ");
+
+			return `<style ${stringifiedAttributes}>${content}</style>`;
+		};
+
+		stringifiedStyles += toString();
 
 		const scopedOutput = {
-			attributes: styleSheet.getAttributes(cacheKeys),
+			attributes,
 			content,
-			toString() {
-				return stringifiedStyle;
-			},
+			toString,
 		};
 
 		if (options.flush && scopeKey !== "global") {
 			// Flush only local styles to preserve styles defined globally as they're not re-rendered:
-			cache.flush();
 			styleSheet.flush();
 		}
 

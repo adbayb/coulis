@@ -1,4 +1,5 @@
-import type { AtomicStyleObject, ClassName } from "../types";
+import type { ClassName } from "../entities/className";
+import type { AtomicStyleObject } from "../types";
 
 import { styles } from "./styles";
 import { compose } from "./tools";

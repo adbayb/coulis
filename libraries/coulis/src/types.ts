@@ -2,8 +2,6 @@ import type { HtmlAttributes, PropertiesFallback, Pseudos } from "csstype";
 
 export type RecordLike = Record<number | string | symbol, unknown>;
 
-export type ClassName = string;
-
 export type ScopeKey =
 	| "conditionalLonghand"
 	| "conditionalShorthand"

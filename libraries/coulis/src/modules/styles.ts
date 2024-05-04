@@ -1,12 +1,12 @@
 /* eslint-disable @typescript-eslint/ban-types */
 import { SHORTHAND_PROPERTIES } from "../constants";
+import type { ClassName } from "../entities/className";
 import { SCOPES } from "../entities/scope";
 import { isObject, toDeclaration, toManyDeclaration } from "../helpers";
 import type {
 	AtConditionalGroupingRule,
 	AtTextualRule,
 	AtomicStyleObject,
-	ClassName,
 	GlobalStyleObject,
 } from "../types";
 

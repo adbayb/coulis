@@ -1,13 +1,21 @@
 /* eslint-disable @typescript-eslint/ban-types */
+import { SHORTHAND_PROPERTIES } from "../constants";
+import { createClassName } from "../entities/className";
+import { isObject, toDeclaration } from "../helpers";
 import type { StyleObject } from "../types";
 
 import { createCustomProperties } from "./properties";
 
 type CustomProperty = {
-	extendValues?: boolean;
+	allowNativeValues?: boolean;
 	states?: Record<
 		string /* Custom selector name */,
-		string[] | string /* List of states (including conditional at-rules) */
+		{
+			"@container"?: string;
+			"@media"?: string;
+			"@supports"?: string;
+			selector?: `:${string}`;
+		}
 	>;
 	values?: (number | string)[] | Record<string, number | string>;
 };
@@ -36,7 +44,7 @@ type StyleProps<
 	[PropertyName in keyof Properties]?: Properties[PropertyName] extends CustomProperty
 		? CustomPropertyOutput<
 				Properties[PropertyName],
-				| (Properties[PropertyName]["extendValues"] extends true
+				| (Properties[PropertyName]["allowNativeValues"] extends true
 						? PropertyName extends keyof StyleObject
 							? StyleObject[PropertyName]
 							: never
@@ -96,25 +104,147 @@ type Exactify<T, X extends T> = T & {
 	[K in keyof X]: K extends keyof T ? X[K] : never;
 };
 
-declare function createStyles<
+const createStyles = <
 	const Properties extends PropertyDefinition,
 	const Shorthands extends ShorthandsDefinition<Properties>,
 >(
 	properties: Exactify<PropertyDefinition, Properties>,
 	options: { shorthands: Shorthands },
-): (props: StyleProps<Properties, Shorthands>) => string;
+) => {
+	// const configuredPropertyNames = Object.keys(
+	// 	properties,
+	// ) as (keyof typeof properties)[];
+
+	const configuredShorthandNames = Object.keys(
+		options.shorthands,
+	) as (keyof typeof options.shorthands)[];
+
+	// TODO: cache to speed up multiple transversal transformations (such as for states)
+
+	return (input: StyleProps<Properties, Shorthands>) => {
+		const classNames: string[] = [];
+		const propertyNames = Object.keys(input);
+
+		const process = (name: string, value: (typeof input)[string]) => {
+			const propertyConfigurationValue = properties[name];
+			const isShorthandProperty = SHORTHAND_PROPERTIES[name];
+			let output = "";
+
+			if (isObject(value)) {
+				const stateNames = Object.keys(value);
+
+				// TODO: media query must be set at the root for wider compatibility (CSS nesting is quite new):
+				// For nesting, update type to enforce allowed conditional at rules: { states: { "@media": "", selector: ":hover" } }
+				// For possible combination, check Tailwind https://tailwindcss.com/docs/hover-focus-and-other-states and vanilla extract https://github.com/vanilla-extract-css/vanilla-extract/discussions/322#discussioncomment-1350779 for inspirations
+				for (const stateName of stateNames) {
+					if (
+						!isObject(propertyConfigurationValue) ||
+						!isObject(propertyConfigurationValue.states) ||
+						!propertyConfigurationValue.states[stateName]
+					) {
+						throw new Error(
+							`Missing or misconfigured \`states\` for \`${name}\` property. Verify the \`createStyles\` factory setup.`,
+						);
+					}
+
+					const stateValue = value[stateName];
+
+					const stateConfig =
+						propertyConfigurationValue.states[stateName] ?? {};
+
+					const stateConfigNames = Object.keys(
+						stateConfig,
+					) as (keyof typeof stateConfig)[];
+
+					const declaration = toDeclaration({
+						name,
+						value: stateValue,
+					});
+
+					for (const stateConfigName of stateConfigNames) {
+						const stateConfigValue = stateConfig[stateConfigName];
+
+						const className = createClassName(
+							`${stateConfigName}${name}${String(stateValue)}`,
+						);
+
+						classNames.push(className);
+
+						if (stateConfigName === "selector") {
+							output += `.${className}${stateConfigValue}{${declaration}}`;
+						} else {
+							output += `${stateConfigName} ${stateConfigValue}{.${className}{${declaration}}}`;
+						}
+					}
+				}
+			} else {
+				const mappedValue =
+					propertyConfigurationValue.values?.[value] ?? value;
+
+				const className = createClassName(`${name}${mappedValue}`);
+
+				classNames.push(className);
+
+				output += toDeclaration({
+					name,
+					value: mappedValue as number | string, // TODO undefined value
+				});
+			}
+
+			return output;
+		};
+
+		for (const propertyName of propertyNames) {
+			const isShorthandProperty =
+				configuredShorthandNames.includes(propertyName);
+
+			if (isShorthandProperty) {
+				const shorthandConfigurationValue =
+					options.shorthands[propertyName];
+
+				if (!shorthandConfigurationValue) continue;
+
+				for (const shorthand of shorthandConfigurationValue) {
+					console.log(
+						shorthand,
+						process(shorthand as string, input[propertyName]),
+					);
+				}
+			} else {
+				console.log(
+					propertyName,
+					process(propertyName, input[propertyName]),
+				);
+			}
+		}
+
+		return classNames.join(" ");
+	};
+};
 
 const createStateSelectors = () => {
-	const smallState = "@media (min-width: 360px)";
-	const hoverState = ":hover";
+	const smallState = {
+		"@media": "(min-width: 360px)",
+	};
+
+	const hoverState = { selector: ":hover" as const };
 
 	return {
-		base: "@media (min-width: 0px)",
+		base: {
+			"@media": "(min-width: 0px)",
+		},
 		hover: hoverState,
-		large: "@media (min-width: 1340px)",
-		medium: "@media (min-width: 720px)",
+		large: {
+			"@media": "(min-width: 1024px)",
+		},
+		medium: {
+			"@media": "(min-width: 768px)",
+		},
 		small: smallState,
-		smallWithHover: [smallState, hoverState],
+		smallWithHover: {
+			...smallState,
+			...hoverState,
+		},
 	};
 };
 
@@ -177,7 +307,7 @@ const styles = createStyles(
 	{
 		accentColor: true,
 		borderRadius: {
-			extendValues: true,
+			allowNativeValues: true,
 			values: theme.radii,
 		},
 		color: {
@@ -189,7 +319,7 @@ const styles = createStyles(
 			values: [1, 2],
 		},
 		paddingRight: {
-			extendValues: true,
+			allowNativeValues: true,
 			values: [0, 1],
 		},
 	},
@@ -210,7 +340,10 @@ styles({
 		large: 1,
 		medium: 2,
 		small: 1,
+		smallWithHover: 2,
 	},
 	paddingRight: 0,
 	surface: "neutralDark",
 });
+
+export const TEST = "TODO: remove";

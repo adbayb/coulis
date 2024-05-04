@@ -1,13 +1,15 @@
 import { IS_BROWSER_ENV, IS_PROD_ENV } from "../constants";
 import type { ScopeKey } from "../types";
 
+import type { ClassName } from "./className";
+
 export type StyleSheet = {
 	commit: (key: string, rule: string) => void;
 	element: HTMLStyleElement | null;
 	flush: () => void;
 	getAttributes: (
 		cachedKeys?: string,
-	) => Record<"data-coulis-cache" | "data-coulis-scope", string | undefined>;
+	) => Record<"data-coulis-cache" | "data-coulis-scope", string>;
 	getContent: () => string;
 	hydrate: () => string[];
 };
@@ -15,24 +17,29 @@ export type StyleSheet = {
 type CreateStyleSheet = (scope: ScopeKey) => StyleSheet;
 
 const createVirtualStyleSheet: CreateStyleSheet = (scope) => {
-	let data: string[] = [];
+	const cache = new Set<ClassName>();
+	let rules: string[] = [];
 
 	return {
-		commit(_, rule) {
-			data.push(rule);
+		commit(key, rule) {
+			if (cache.has(key)) return;
+
+			rules.push(rule);
+			cache.add(key);
 		},
 		element: null,
 		flush() {
-			data = [];
+			rules = [];
+			cache.clear();
 		},
-		getAttributes(cachedKeys) {
+		getAttributes() {
 			return {
-				"data-coulis-cache": cachedKeys,
+				"data-coulis-cache": [...cache.keys()].join(","),
 				"data-coulis-scope": scope,
 			};
 		},
 		getContent() {
-			return minify(data.join(""));
+			return minify(rules.join(""));
 		},
 		hydrate() {
 			return [];
@@ -54,12 +61,12 @@ const createWebStyleSheet: CreateStyleSheet = (scope) => {
 
 	return {
 		commit(key, rule) {
-			const cacheData = element.dataset.coulisCache;
-			const cacheSplitKeys = cacheData?.split(",");
+			const cacheData = element.dataset.coulisCache ?? "";
+			const cacheKeys = cacheData.split(",");
 
 			// Manage cache via data attribute to persist it in the same manner as server-side to prevent any existing style rules re-insertion
 			// in case of hot reload update (which reset the global scope including in-memory cache)
-			if (cacheSplitKeys?.includes(key)) return;
+			if (cacheKeys.includes(key)) return;
 
 			if (IS_PROD_ENV && element.sheet) {
 				// Faster, more reliable (check rule insertion order (e.g. "@import" must be inserted first)), but not debug friendly
@@ -68,7 +75,8 @@ const createWebStyleSheet: CreateStyleSheet = (scope) => {
 				element.insertAdjacentHTML("beforeend", rule);
 			}
 
-			element.dataset.coulisCache = `${cacheData},${key}`;
+			cacheKeys.push(key);
+			element.dataset.coulisCache = cacheKeys.join(",");
 		},
 		element,
 		flush() {
@@ -76,8 +84,8 @@ const createWebStyleSheet: CreateStyleSheet = (scope) => {
 		},
 		getAttributes() {
 			return {
-				"data-coulis-cache": element.dataset.coulisCache,
-				"data-coulis-scope": element.dataset.scope,
+				"data-coulis-cache": element.dataset.coulisCache as string,
+				"data-coulis-scope": element.dataset.scope as ScopeKey,
 			};
 		},
 		getContent() {

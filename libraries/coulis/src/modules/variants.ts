@@ -1,8 +1,8 @@
 import type { ClassName } from "../entities/className";
+import { compose } from "../helpers";
 import type { AtomicStyleObject } from "../types";
 
 import { styles } from "./styles";
-import { compose } from "./tools";
 
 export const createVariants = <
 	Variants extends Record<string, Record<string, AtomicStyleObject>>,

@@ -93,29 +93,6 @@ if (container) {
 
 This section aims to deep dive into each public API with focused examples:
 
-### styles
-
-```tsx
-import { styles } from "coulis";
-
-export const App = () => {
-	return (
-		<p
-			className={styles({
-				color: {
-					default: "black",
-					":hover": "lightcoral",
-				},
-				fontSize: 26,
-				textAlign: "center",
-			})}
-		>
-			Hello 🤗
-		</p>
-	);
-};
-```
-
 ### globalStyles
 
 ```tsx
@@ -148,26 +125,7 @@ export const App = () => {
 
 ### createStyles
 
-```tsx
-import { createStyles, compose } from "coulis";
-
-const tabletStyles = createStyles("@media", "(min-width: 576px)");
-
-export const App = () => {
-	return (
-		<p
-			className={compose(
-				tabletStyles({ fontSize: 20 }),
-				styles({
-					fontSize: 26,
-				}),
-			)}
-		>
-			Hello 🤗
-		</p>
-	);
-};
-```
+TODO
 
 ### createKeyframes
 

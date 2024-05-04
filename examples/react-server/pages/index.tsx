@@ -1,5 +1,4 @@
 import {
-	compose,
 	createCustomProperties,
 	createKeyframes,
 	createStyles,
@@ -163,18 +162,18 @@ const App = () => {
 					</p>
 				</section>
 				<button
-					className={compose(
+					className={[
 						styles({ marginBottom: 16 }),
 						buttonVariants({
 							color: "brand",
 							size: "large",
 						}),
-					)}
+					].join(" ")}
 				>
 					Variants
 				</button>
 				<a
-					className={compose(
+					className={[
 						styles({
 							backgroundColor: {
 								"[data-plop=true]": "red",
@@ -191,7 +190,7 @@ const App = () => {
 							color: "blue",
 							padding: 24,
 						}),
-					)}
+					].join(" ")}
 					data-plop={false}
 					href="https://reactjs.org"
 					rel="noopener noreferrer"

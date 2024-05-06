@@ -12,7 +12,6 @@ import type { PropsWithChildren, ReactNode } from "react";
  * TODO:
  * - Benchmark and improve performance before release: manage cache only
  * - Only include allowNativeValues if values is set (make sense only in this case).
- * - Add changelog.
  */
 
 const STYLE_KEYS_FACTORIES: Record<
@@ -97,7 +96,7 @@ globalStyles({
 	"*,*::before,*::after": {
 		boxSizing: "inherit",
 	},
-	".globalClass+.otherGlobalClass": {
+	".globalClass": {
 		border: "1px solid black",
 		borderRadius: 4,
 	},
@@ -201,20 +200,20 @@ const App = () => {
 	return (
 		<Layout>
 			<Example title="With global styles">
-				<span className="globalClass">GlobalClass</span>
-				<span className="otherGlobalClass">OtherGlobalClass</span>
+				<p className="globalClass">{TEXT}</p>
 			</Example>
 			<Example title="With static styles">
 				<p
 					className={styles({
 						backgroundColor: "surfacePrimary",
+						borderRadius: "large",
 						color: "neutralLight",
 						fontSize: "body",
 						fontWeight: "body",
 						padding: 24,
 					})}
 				>
-					Hello 👋
+					{TEXT}
 				</p>
 			</Example>
 			<Example title="With dynamic styles">
@@ -226,7 +225,7 @@ const App = () => {
 								: "surfaceSecondary",
 					})}
 				>
-					Hello 👋
+					{TEXT}
 				</p>
 			</Example>
 			<Example title="With contextual styles">
@@ -249,7 +248,7 @@ const App = () => {
 						borderRadius: theme.radii.large,
 					})}
 				>
-					Hello 👋
+					{TEXT}
 				</p>
 			</Example>
 			<Example title="With variants">
@@ -259,7 +258,7 @@ const App = () => {
 						size: "large",
 					})}
 				>
-					Hello 👋
+					{TEXT.split(" ")[0]}
 				</button>
 			</Example>
 			<Example title="With keyframes">
@@ -277,6 +276,9 @@ const App = () => {
 		</Layout>
 	);
 };
+
+const TEXT =
+	"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
 
 type ExampleProps = {
 	title: string;

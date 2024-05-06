@@ -6,6 +6,7 @@ import {
 	globalStyles,
 } from "coulis";
 import { useEffect, useState } from "react";
+import type { PropsWithChildren, ReactNode } from "react";
 
 /**
  * TODO:
@@ -125,34 +126,54 @@ const animationName = createKeyframes({
 	},
 });
 
-const styles = createStyles({
-	accentColor: true,
-	animation: true,
-	backgroundColor: {
-		keys: STYLE_KEYS_FACTORIES,
-		values: theme.colors,
+const styles = createStyles(
+	{
+		accentColor: true,
+		animation: true,
+		backgroundColor: {
+			allowNativeValues: true,
+			keys: STYLE_KEYS_FACTORIES,
+			values: theme.colors,
+		},
+		borderRadius: {
+			allowNativeValues: true,
+			values: theme.radii,
+		},
+		color: {
+			values: theme.colors,
+		},
+		display: true,
+		flex: true,
+		flexDirection: true,
+		fontSize: {
+			values: theme.typographies.fontSizes,
+		},
+		fontWeight: {
+			values: theme.typographies.fontWeights,
+		},
+		gap: true,
+		height: true,
+		margin: true,
+		marginBottom: true,
+		marginLeft: true,
+		marginRight: true,
+		marginTop: true,
+		padding: true,
+		paddingBottom: true,
+		paddingLeft: true,
+		paddingRight: true,
+		paddingTop: true,
+		width: true,
 	},
-	borderRadius: {
-		allowNativeValues: true,
-		values: theme.radii,
+	{
+		shorthands: {
+			marginHorizontal: ["marginLeft", "marginRight"],
+			marginVertical: ["marginTop", "marginBottom"],
+			paddingHorizontal: ["paddingLeft", "paddingRight"],
+			paddingVertical: ["paddingTop", "paddingBottom"],
+		},
 	},
-	color: {
-		values: theme.colors,
-	},
-	display: true,
-	flex: true,
-	flexDirection: true,
-	fontSize: {
-		values: theme.typographies.fontSizes,
-	},
-	fontWeight: {
-		values: theme.typographies.fontWeights,
-	},
-	gap: true,
-	height: true,
-	padding: true,
-	width: true,
-});
+);
 
 const buttonVariants = createVariants(styles, {
 	color: {
@@ -181,60 +202,15 @@ const App = () => {
 	});
 
 	return (
-		<div>
-			<header
-				className={styles({
-					borderRadius: 4,
-					display: "flex",
-					flexDirection: "column",
-					gap: 16,
-					padding: 10,
-				})}
-			>
-				<section>
-					<h1
-						className={styles({
-							color:
-								counter % 2 === 0
-									? "surfacePrimary"
-									: "surfaceSecondary",
-						})}
-					>
-						createCustomProperties
-					</h1>
-					<p
-						className={styles({
-							backgroundColor: "surfacePrimary",
-							borderRadius: theme.radii.large,
-							color: "neutralLight",
-							fontSize: "body",
-							fontWeight: "body",
-							padding: 24,
-						})}
-					>
-						Hello 👋
-					</p>
-				</section>
-				<button
-					className={buttonVariants({
-						color: "brand",
-						size: "large",
-					})}
-				>
-					Variants
-				</button>
-			</header>
-			<span className="globalClass">GlobalClass</span>
-			<span className="otherGlobalClass">OtherGlobalClass</span>
-			<section>
-				<h1>With contextual styles</h1>
+		<Layout>
+			<Example title="With global styles">
+				<span className="globalClass">GlobalClass</span>
+				<span className="otherGlobalClass">OtherGlobalClass</span>
+			</Example>
+			<Example title="With static styles">
 				<p
 					className={styles({
-						backgroundColor: {
-							base: "surfacePrimary",
-							medium: "surfaceSecondary",
-						},
-						borderRadius: theme.radii.large,
+						backgroundColor: "surfacePrimary",
 						color: "neutralLight",
 						fontSize: "body",
 						fontWeight: "body",
@@ -243,23 +219,92 @@ const App = () => {
 				>
 					Hello 👋
 				</p>
-			</section>
-			<div
-				className={styles({
-					padding: 24,
-				})}
-			>
+			</Example>
+			<Example title="With dynamic styles">
+				<p
+					className={styles({
+						color:
+							counter % 2 === 0
+								? "surfacePrimary"
+								: "surfaceSecondary",
+					})}
+				>
+					Hello 👋
+				</p>
+			</Example>
+			<Example title="With contextual styles">
+				<p
+					className={styles({
+						backgroundColor: {
+							base: "surfacePrimary",
+							medium: "surfaceSecondary",
+						},
+					})}
+				>
+					Resize to test
+				</p>
+			</Example>
+			<Example title="With custom properties">
+				<p
+					className={styles({
+						backgroundColor: theme.colors.neutralLight,
+						borderRadius: theme.radii.large,
+					})}
+				>
+					Hello 👋
+				</p>
+			</Example>
+			<Example title="With variants">
+				<button
+					className={buttonVariants({
+						color: "brand",
+						size: "large",
+					})}
+				>
+					Hello 👋
+				</button>
+			</Example>
+			<Example title="With keyframes">
 				<div
 					className={styles({
 						animation: `${animationName} 2000ms linear infinite`,
-						backgroundColor: "neutralLight",
+						backgroundColor: "surfacePrimary",
 						borderRadius: 4,
 						height: 50,
+						marginHorizontal: 24,
 						width: 50,
 					})}
 				/>
-			</div>
-		</div>
+			</Example>
+		</Layout>
+	);
+};
+
+type ExampleProps = {
+	title: string;
+	children: ReactNode;
+};
+
+const Example = ({ title, children }: ExampleProps) => {
+	return (
+		<section>
+			<h3>{title}</h3>
+			<div>{children}</div>
+		</section>
+	);
+};
+
+const Layout = ({ children }: PropsWithChildren) => {
+	return (
+		<main
+			className={styles({
+				display: "flex",
+				flexDirection: "column",
+				gap: 16,
+			})}
+		>
+			{children}
+		</main>
 	);
 };
 

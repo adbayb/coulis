@@ -1,12 +1,24 @@
-import { atoms } from "coulis";
+import { createStyles } from "coulis";
 import React from "react";
 
 import { NUMBER_OF_DATA } from "../../constants";
 
+const styles = createStyles({
+	backgroundColor: {
+		allowNativeValues: true,
+		keys({ className, declaration }) {
+			return {
+				base: `${className}{${declaration}}`,
+				hover: `${className}:hover{${declaration}}`,
+			};
+		},
+	},
+});
+
 export const Component = () => {
 	return (
 		<table
-			className={atoms({
+			className={styles({
 				border: "1px solid black",
 			})}
 		>
@@ -21,20 +33,20 @@ export const Component = () => {
 					return (
 						<tr key={index}>
 							<td
-								className={atoms({
+								className={styles({
 									backgroundColor: {
-										":hover": "lightyellow",
-										default: "lightcoral",
+										base: "lightcoral",
+										hover: "lightyellow",
 									},
 								})}
 							>
 								The table body
 							</td>
 							<td
-								className={atoms({
+								className={styles({
 									backgroundColor: {
-										":hover": "lightyellow",
-										default: "lightblue",
+										base: "lightblue",
+										hover: "lightyellow",
 									},
 								})}
 							>

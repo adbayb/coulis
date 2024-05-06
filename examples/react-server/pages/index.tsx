@@ -4,62 +4,25 @@ import {
 	createStyles,
 	createVariants,
 	globalStyles,
-	styles,
 } from "coulis";
 import { useEffect, useState } from "react";
 
-globalStyles({
-	"@import":
-		"url('https://fonts.googleapis.com/css?family=Open+Sans&display=swap')",
-	// eslint-disable-next-line sort-keys-custom-order/object-keys
-	"@font-face": {
-		fontFamily: "'AliasedHelvetica'",
-		src: "local(Helvetica)",
-	},
-	// eslint-disable-next-line sort-keys-custom-order/object-keys
-	"*,*::before,*::after": {
-		boxSizing: "inherit",
-	},
-	".globalClass+.otherGlobalClass": {
-		border: "1px solid black",
-		borderRadius: 4,
-	},
-	html: {
-		boxSizing: "border-box",
-	},
-	"html,body": {
-		fontFamily: "Open Sans, AliasedHelvetica",
-		margin: 0,
-		padding: 0,
-	},
-});
-
-const largerStyles = createStyles("@media", "(min-width: 576px)");
-
-const animationName = createKeyframes({
-	50: {
-		transform: "scale(1.5)",
-	},
-	from: {
-		transform: "scale(1)",
-	},
-	to: {
-		transform: "scale(1)",
-	},
-});
-
-const buttonVariants = createVariants({
-	color: {
-		accent: { backgroundColor: "lightsalmon" },
-		brand: { backgroundColor: "lightseagreen" },
-		neutral: { backgroundColor: "lightskyblue" },
-	},
-	size: {
-		large: { padding: 18 },
-		medium: { padding: 12 },
-		small: { padding: 6 },
-	},
-});
+const createKeys = ({
+	className,
+	declaration,
+}: {
+	className: string;
+	declaration: string;
+}) => {
+	return {
+		base: `${className}{${declaration}}`,
+		hover: `${className}:hover{${declaration}}`,
+		large: `@media (min-width: 1024px){${className}{${declaration}}}`,
+		medium: `@media (min-width: 768px){${className}{${declaration}}}`,
+		small: `@media (min-width: 360px){${className}{${declaration}}}`,
+		smallWithHover: `@media (min-width: 360px){${className}:hover{${declaration}}}`,
+	};
+};
 
 const px = (value: number) => `${value}px`;
 
@@ -107,10 +70,92 @@ const theme = createCustomProperties({
 		small: tokens.radii[1],
 	},
 	typographies: {
-		body: {
-			fontSize: tokens.fontSizes[2],
-			fontWeight: tokens.fontWeights[1],
+		fontSizes: {
+			body: tokens.fontSizes[2],
 		},
+		fontWeights: {
+			body: tokens.fontWeights[1],
+		},
+	},
+});
+
+globalStyles({
+	"@import":
+		"url('https://fonts.googleapis.com/css?family=Open+Sans&display=swap')",
+	// eslint-disable-next-line sort-keys-custom-order/object-keys
+	"@font-face": {
+		fontFamily: "'AliasedHelvetica'",
+		src: "local(Helvetica)",
+	},
+	// eslint-disable-next-line sort-keys-custom-order/object-keys
+	"*,*::before,*::after": {
+		boxSizing: "inherit",
+	},
+	".globalClass+.otherGlobalClass": {
+		border: "1px solid black",
+		borderRadius: 4,
+	},
+	html: {
+		boxSizing: "border-box",
+	},
+	"html,body": {
+		fontFamily: "Open Sans, AliasedHelvetica",
+		margin: 0,
+		padding: 0,
+	},
+});
+
+const animationName = createKeyframes({
+	50: {
+		transform: "scale(1.5)",
+	},
+	from: {
+		transform: "scale(1)",
+	},
+	to: {
+		transform: "scale(1)",
+	},
+});
+
+const styles = createStyles({
+	accentColor: true,
+	animation: true,
+	backgroundColor: {
+		keys: createKeys,
+		values: theme.colors,
+	},
+	borderRadius: {
+		allowNativeValues: true,
+		values: theme.radii,
+	},
+	color: {
+		values: theme.colors,
+	},
+	display: true,
+	flex: true,
+	flexDirection: true,
+	fontSize: {
+		values: theme.typographies.fontSizes,
+	},
+	fontWeight: {
+		values: theme.typographies.fontWeights,
+	},
+	gap: true,
+	height: true,
+	padding: true,
+	width: true,
+});
+
+const buttonVariants = createVariants(styles, {
+	color: {
+		accent: { backgroundColor: "lightsalmon" },
+		brand: { backgroundColor: "lightseagreen" },
+		neutral: { backgroundColor: "lightskyblue" },
+	},
+	size: {
+		large: { padding: 18 },
+		medium: { padding: 12 },
+		small: { padding: 6 },
 	},
 });
 
@@ -131,7 +176,6 @@ const App = () => {
 		<div>
 			<header
 				className={styles({
-					backgroundColor: "lightblue",
 					borderRadius: 4,
 					display: "flex",
 					flexDirection: "column",
@@ -139,25 +183,24 @@ const App = () => {
 					padding: 10,
 				})}
 			>
-				<p
-					className={styles({
-						color: {
-							":hover": "red",
-							default: counter % 2 === 0 ? "blue" : "red",
-						},
-					})}
-				>
-					Edit <code>src/App.tsx</code> and save to reload.
-				</p>
 				<section>
-					<h1>createCustomProperties</h1>
+					<h1
+						className={styles({
+							color:
+								counter % 2 === 0
+									? "surfacePrimary"
+									: "surfaceSecondary",
+						})}
+					>
+						createCustomProperties
+					</h1>
 					<p
 						className={styles({
-							backgroundColor: "lightcoral",
+							backgroundColor: "surfacePrimary",
 							borderRadius: theme.radii.large,
-							color: theme.colors.neutralLight,
-							fontSize: theme.typographies.body.fontSize,
-							fontWeight: theme.typographies.body.fontWeight,
+							color: "neutralLight",
+							fontSize: "body",
+							fontWeight: "body",
 							padding: 24,
 						})}
 					>
@@ -172,35 +215,27 @@ const App = () => {
 				>
 					Variants
 				</button>
-				<a
-					className={[
-						styles({
-							backgroundColor: {
-								"[data-plop=true]": "red",
-								default: "lightcoral",
-							},
-							color: {
-								":hover": "purple",
-								"[target=_blank]": undefined,
-								default: "yellow",
-							},
-							display: "flex",
-						}),
-						largerStyles({
-							color: "blue",
-							padding: 24,
-						}),
-					].join(" ")}
-					data-plop={false}
-					href="https://reactjs.org"
-					rel="noopener noreferrer"
-					target="_blank"
-				>
-					Learn React
-				</a>
 			</header>
 			<span className="globalClass">GlobalClass</span>
 			<span className="otherGlobalClass">OtherGlobalClass</span>
+			<section>
+				<h1>With contextual styles</h1>
+				<p
+					className={styles({
+						backgroundColor: {
+							base: "surfacePrimary",
+							medium: "surfaceSecondary",
+						},
+						borderRadius: theme.radii.large,
+						color: "neutralLight",
+						fontSize: "body",
+						fontWeight: "body",
+						padding: 24,
+					})}
+				>
+					Hello 👋
+				</p>
+			</section>
 			<div
 				className={styles({
 					padding: 24,
@@ -209,7 +244,7 @@ const App = () => {
 				<div
 					className={styles({
 						animation: `${animationName} 2000ms linear infinite`,
-						backgroundColor: "lightgray",
+						backgroundColor: "neutralLight",
 						borderRadius: 4,
 						height: 50,
 						width: 50,

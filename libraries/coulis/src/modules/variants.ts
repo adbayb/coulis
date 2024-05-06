@@ -2,11 +2,12 @@ import type { ClassName } from "../entities/className";
 import { compose } from "../helpers";
 import type { AtomicStyleObject } from "../types";
 
-import { styles } from "./styles";
+import type { createStyles } from "./stylesNext";
 
 export const createVariants = <
 	Variants extends Record<string, Record<string, AtomicStyleObject>>,
 >(
+	styles: ReturnType<typeof createStyles>,
 	variants: Variants,
 ) => {
 	return (selectedValueByVariant: {
@@ -25,6 +26,7 @@ export const createVariants = <
 			const variantStyleObject =
 				styleObjectByValue?.[selectedValue as string];
 
+			// @ts-expect-error to fix
 			if (variantStyleObject) classNames.push(styles(variantStyleObject));
 		}
 

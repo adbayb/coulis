@@ -1,4 +1,4 @@
-import type { ClassName } from "../entities/className";
+import type { ClassName } from "../entities/style";
 import { compose } from "../helpers";
 
 import type { createStyles } from "./styles";
@@ -17,15 +17,15 @@ export const createVariants = <
 		const variantKeys = Object.keys(selectedValueByVariant);
 
 		for (const variant of variantKeys) {
-			const selectedValue = selectedValueByVariant[variant];
-			const styleObjectByValue = variants[variant];
+			const selectedVariant = selectedValueByVariant[variant];
+			const propertiesByVariant = variants[variant];
 
-			const variantStyleObject =
-				styleObjectByValue?.[selectedValue as string];
+			const variantProperties =
+				propertiesByVariant?.[selectedVariant as string];
 
-			if (variantStyleObject === undefined) continue;
+			if (variantProperties === undefined) continue;
 
-			classNames.push(styles(variantStyleObject));
+			classNames.push(styles(variantProperties));
 		}
 
 		return compose(...classNames);

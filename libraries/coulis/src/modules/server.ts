@@ -23,8 +23,8 @@ export const extract = (
 	const ids = Object.keys(STYLESHEETS) as (keyof typeof STYLESHEETS)[];
 
 	const output = ids.map((id) => {
-		const { flush, getAttributes, target } = STYLESHEETS[id];
-		const content = target.getContent();
+		const { flush, getAttributes, getContent } = STYLESHEETS[id];
+		const content = getContent();
 		const attributes = getAttributes();
 
 		const toString = () => {

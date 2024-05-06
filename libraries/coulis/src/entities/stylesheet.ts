@@ -1,12 +1,16 @@
 import { IS_BROWSER_ENV, IS_PROD_ENV } from "../constants";
-import type { ScopeKey } from "../types";
 
 import { createCache } from "./cache";
 import type { Cache, CacheKey } from "./cache";
-import { createClassName } from "./className";
-import type { ClassName } from "./className";
+import { createClassName } from "./style";
+import type { ClassName } from "./style";
 
-type StyleSheetIdentifier = ScopeKey; // TODO: internalize and remove ScopeKey type
+type StyleSheetIdentifier =
+	| "conditionalLonghand"
+	| "conditionalShorthand"
+	| "global"
+	| "longhand"
+	| "shorthand";
 
 export type StyleSheet = {
 	id: StyleSheetIdentifier;
@@ -19,7 +23,7 @@ export type StyleSheet = {
 	getAttributes: (
 		cachedKeys?: string,
 	) => Record<"data-coulis-cache" | "data-coulis-id", string>;
-	target: StyleSheetTarget;
+	getContent: () => string;
 };
 
 export type StyleSheetTarget = {
@@ -88,7 +92,7 @@ const createWebStyleSheetTarget: CreateStyleSheet = (id) => {
 };
 
 /**
- * Aggregate to scope and manage invariants for a given coulis instance.
+ * Aggregate to scope and manage invariants for a given stylesheet instance.
  * @param id - The identifier representing the targetted style.
  * @returns Cache, stylesheet instances and methods.
  * @example
@@ -135,7 +139,9 @@ export const createStyleSheet = (id: StyleSheetIdentifier): StyleSheet => {
 				"data-coulis-id": id,
 			};
 		},
-		target: styleSheetTarget,
+		getContent() {
+			return styleSheetTarget.getContent();
+		},
 	};
 };
 

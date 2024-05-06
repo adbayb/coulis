@@ -10,8 +10,7 @@ import type { PropsWithChildren, ReactNode } from "react";
 
 /**
  * TODO:
- * - Benchmark and improve performance before release: manage cache only
- * - Only include allowNativeValues if values is set (make sense only in this case).
+ * - Update documentation.
  */
 
 const STYLE_KEYS_FACTORIES: Record<

@@ -1,117 +1,18 @@
-import { SHORTHAND_PROPERTIES } from "../../constants";
+import { createDeclaration } from "../../entities/style";
+import type { StyleProperties } from "../../entities/style";
 import { STYLESHEETS } from "../../entities/stylesheet";
-import { isObject, toDeclaration } from "../../helpers";
-import type { StyleObject } from "../../types";
+import { isObject } from "../../helpers";
 
-type CustomProperty = {
-	allowNativeValues?: boolean;
-	keys?: Record<
-		string,
-		(input: { className: string; declaration: string }) => string
-	> & {
-		// The `base` state cannot be overwritten consumer side
-		base?: never;
-	};
-	values?: (number | string)[] | Record<string, number | string>;
-};
-
-type NativeProperty = true;
-
-type PropertyConfiguration = Partial<
-	Record<keyof StyleObject, CustomProperty | NativeProperty>
->;
-
-type ShorthandConfiguration<Properties extends PropertyConfiguration> = Record<
-	string,
-	(keyof Properties)[]
->;
-
-type StylePropsOutput<Value> = Value | undefined;
-
-type CustomStylePropsOutput<
-	Property extends CustomProperty,
-	Value,
-> = StylePropsOutput<
-	Property["keys"] extends Record<
-		infer Key,
-		NonNullable<Property["keys"]>[string]
-	>
-		?
-				| Value
-				| (Partial<Record<Key, Value>> & {
-						base: Value;
-				  })
-		: Value
->;
-
-type StyleProps<
-	Properties extends PropertyConfiguration,
-	Shorthands extends ShorthandConfiguration<Properties>,
-> = {
-	[PropertyName in keyof Properties]?: Properties[PropertyName] extends CustomProperty
-		? CustomStylePropsOutput<
-				Properties[PropertyName],
-				| (Properties[PropertyName]["allowNativeValues"] extends true
-						? PropertyName extends keyof StyleObject
-							? StyleObject[PropertyName]
-							: never
-						: never)
-				| (Properties[PropertyName]["values"] extends unknown[]
-						? Properties[PropertyName]["values"][number]
-						: Properties[PropertyName]["values"] extends Record<
-									string,
-									unknown
-							  >
-							? keyof Properties[PropertyName]["values"]
-							: PropertyName extends keyof StyleObject
-								? StylePropsOutput<StyleObject[PropertyName]>
-								: never)
-			>
-		: Properties[PropertyName] extends NativeProperty
-			? PropertyName extends keyof StyleObject
-				? StylePropsOutput<StyleObject[PropertyName]>
-				: never
-			: never;
-} & {
-	[PropertyName in keyof Shorthands]?: Shorthands[PropertyName] extends unknown[]
-		? Properties[Shorthands[PropertyName][number]] extends infer ReferencedProperty
-			? ReferencedProperty extends CustomProperty
-				? CustomStylePropsOutput<
-						ReferencedProperty,
-						ReferencedProperty["values"] extends unknown[]
-							? ReferencedProperty["values"][number]
-							: ReferencedProperty["values"] extends Record<
-										string,
-										unknown
-								  >
-								? keyof ReferencedProperty["values"]
-								: Shorthands[PropertyName][number] extends keyof StyleObject
-									? StylePropsOutput<
-											StyleObject[Shorthands[PropertyName][number]]
-										>
-									: never
-					>
-				: ReferencedProperty extends NativeProperty
-					? Shorthands[PropertyName][number] extends keyof StyleObject
-						? StylePropsOutput<
-								StyleObject[Shorthands[PropertyName][number]]
-							>
-						: never
-					: never
-			: never
-		: never;
-};
-
-type Exactify<T, X extends T> = T & {
-	[K in keyof X]: K extends keyof T ? X[K] : never;
-};
-
-type StyleInputValue =
-	| Record<string, number | string | undefined>
-	| number
-	| string
-	| undefined;
-
+/**
+ * A factory to configure and create type-safe `styles` method.
+ * @param configuration - Properties configuration.
+ * @param options - Optional values to decorate and/or modify the provided configuration.
+ * @param options.shorthands - The shorthand aliases configuration.
+ * @returns The `styles` method to generate a class name from a list of type-safe CSS properties.
+ * @example
+ * 	const styles = createStyles({ backgroundColor: { values: ["red"] }});
+ * 	const className = styles({ backgroundColor: "red" });
+ */
 export const createStyles = <
 	const Properties extends PropertyConfiguration,
 	const Shorthands extends ShorthandConfiguration<Properties>,
@@ -127,7 +28,7 @@ export const createStyles = <
 		return configuredShorthandNames.includes(key);
 	};
 
-	const createDeclaration = ({
+	const getDeclaration = ({
 		name,
 		value,
 	}: {
@@ -147,7 +48,7 @@ export const createStyles = <
 
 		if (mappedValue === undefined) return;
 
-		return toDeclaration({
+		return createDeclaration({
 			name,
 			value: mappedValue,
 		});
@@ -157,14 +58,14 @@ export const createStyles = <
 	const createRules = (name: string, value: StyleInputValue) => {
 		const classNames: string[] = [];
 		const propConfig = configuration[name];
-		const isNativeShorthandProperty = SHORTHAND_PROPERTIES[name];
+		const isNativeShorthandProperty = isShorthandProperty(name);
 
 		let styleSheet = isNativeShorthandProperty
 			? STYLESHEETS.shorthand
 			: STYLESHEETS.longhand;
 
 		if (!isObject(value)) {
-			const declaration = createDeclaration({
+			const declaration = getDeclaration({
 				name,
 				value,
 			});
@@ -194,7 +95,7 @@ export const createStyles = <
 		for (const key of keys) {
 			const inputValue = value[key];
 
-			const declaration = createDeclaration({
+			const declaration = getDeclaration({
 				name,
 				value: inputValue,
 			});
@@ -232,7 +133,7 @@ export const createStyles = <
 		return classNames;
 	};
 
-	return (input: StyleProps<Properties, Shorthands>) => {
+	return (input: StylesInput<Properties, Shorthands>) => {
 		const classNames: string[] = [];
 
 		for (const propertyName of Object.keys(input)) {
@@ -253,4 +154,114 @@ export const createStyles = <
 
 		return classNames.join(" ");
 	};
+};
+
+type StylesInput<
+	Properties extends PropertyConfiguration,
+	Shorthands extends ShorthandConfiguration<Properties>,
+> = {
+	[PropertyName in keyof Properties]?: Properties[PropertyName] extends CustomProperty
+		? CustomStylesOutput<
+				Properties[PropertyName],
+				| (Properties[PropertyName]["allowNativeValues"] extends true
+						? PropertyName extends keyof StyleProperties
+							? StyleProperties[PropertyName]
+							: never
+						: never)
+				| (Properties[PropertyName]["values"] extends unknown[]
+						? Properties[PropertyName]["values"][number]
+						: Properties[PropertyName]["values"] extends Record<
+									string,
+									unknown
+							  >
+							? keyof Properties[PropertyName]["values"]
+							: PropertyName extends keyof StyleProperties
+								? StylesOutput<StyleProperties[PropertyName]>
+								: never)
+			>
+		: Properties[PropertyName] extends NativeProperty
+			? PropertyName extends keyof StyleProperties
+				? StylesOutput<StyleProperties[PropertyName]>
+				: never
+			: never;
+} & {
+	[PropertyName in keyof Shorthands]?: Shorthands[PropertyName] extends unknown[]
+		? Properties[Shorthands[PropertyName][number]] extends infer ReferencedProperty
+			? ReferencedProperty extends CustomProperty
+				? CustomStylesOutput<
+						ReferencedProperty,
+						ReferencedProperty["values"] extends unknown[]
+							? ReferencedProperty["values"][number]
+							: ReferencedProperty["values"] extends Record<
+										string,
+										unknown
+								  >
+								? keyof ReferencedProperty["values"]
+								: Shorthands[PropertyName][number] extends keyof StyleProperties
+									? StylesOutput<
+											StyleProperties[Shorthands[PropertyName][number]]
+										>
+									: never
+					>
+				: ReferencedProperty extends NativeProperty
+					? Shorthands[PropertyName][number] extends keyof StyleProperties
+						? StylesOutput<
+								StyleProperties[Shorthands[PropertyName][number]]
+							>
+						: never
+					: never
+			: never
+		: never;
+};
+
+type StyleInputValue =
+	| Record<string, number | string | undefined>
+	| number
+	| string
+	| undefined;
+
+type CustomProperty = {
+	/**
+	 * Option to enable extending configured values with vanilla allowed values.
+	 * @default false
+	 */
+	allowNativeValues?: boolean;
+	keys?: Record<
+		string,
+		(input: { className: string; declaration: string }) => string
+	> & {
+		// The `base` state cannot be overwritten consumer side
+		base?: never;
+	};
+	values?: (number | string)[] | Record<string, number | string>;
+};
+
+type NativeProperty = true;
+
+type PropertyConfiguration = Partial<
+	Record<keyof StyleProperties, CustomProperty | NativeProperty>
+>;
+
+type ShorthandConfiguration<Properties extends PropertyConfiguration> = Record<
+	string,
+	(keyof Properties)[]
+>;
+
+type StylesOutput<Value> = Value | undefined;
+
+type CustomStylesOutput<Property extends CustomProperty, Value> = StylesOutput<
+	Property["keys"] extends Record<
+		infer Key,
+		NonNullable<Property["keys"]>[string]
+	>
+		?
+				| Value
+				| (Partial<Record<Key, Value>> & {
+						base: Value;
+				  })
+		: Value
+>;
+
+type Exactify<T, X extends T> = T & {
+	[K in keyof X]: K extends keyof T ? X[K] : never;
 };

@@ -10,8 +10,6 @@ import { useEffect, useState } from "react";
 /**
  * TODO:
  * - Fix starting colon in CSR environment for style keys
- * - Update keys API to go from string to function as a value
- * - Update keys API to exclude base overwriting and manage its value internally
  * - Fix variants (missing className and intellisence)
  * - Update examples with section-based structure.
  * - Remove scope entity and go exclusively with stylesheets (create a createStyleSheets?)
@@ -19,20 +17,19 @@ import { useEffect, useState } from "react";
  * - Only include allowNativeValues if values is set (make sense only in this case).
  */
 
-const createKeys = ({
-	className,
-	declaration,
-}: {
-	className: string;
-	declaration: string;
-}) => {
-	return {
-		hover: `${className}:hover{${declaration}}`,
-		large: `@media (min-width: 1024px){${className}{${declaration}}}`,
-		medium: `@media (min-width: 768px){${className}{${declaration}}}`,
-		small: `@media (min-width: 360px){${className}{${declaration}}}`,
-		smallWithHover: `@media (min-width: 360px){${className}:hover{${declaration}}}`,
-	};
+const STYLE_KEYS_FACTORIES: Record<
+	"hover" | "large" | "medium" | "small" | "smallWithHover",
+	(params: { className: string; declaration: string }) => string
+> = {
+	hover: ({ className, declaration }) => `${className}:hover{${declaration}}`,
+	large: ({ className, declaration }) =>
+		`@media (min-width: 1024px){${className}{${declaration}}}`,
+	medium: ({ className, declaration }) =>
+		`@media (min-width: 768px){${className}{${declaration}}}`,
+	small: ({ className, declaration }) =>
+		`@media (min-width: 360px){${className}{${declaration}}}`,
+	smallWithHover: ({ className, declaration }) =>
+		`@media (min-width: 360px){${className}:hover{${declaration}}}`,
 };
 
 const px = (value: number) => `${value}px`;
@@ -132,7 +129,7 @@ const styles = createStyles({
 	accentColor: true,
 	animation: true,
 	backgroundColor: {
-		keys: createKeys,
+		keys: STYLE_KEYS_FACTORIES,
 		values: theme.colors,
 	},
 	borderRadius: {

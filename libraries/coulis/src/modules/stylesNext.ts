@@ -6,10 +6,11 @@ import type { StyleObject } from "../types";
 
 type CustomProperty = {
 	allowNativeValues?: boolean;
-	keys?: (input: { className: string; declaration: string }) => Record<
+	keys?: Record<
 		string,
-		string
+		(input: { className: string; declaration: string }) => string
 	> & {
+		// The `base` state cannot be overwritten consumer side
 		base?: never;
 	};
 	values?: (number | string)[] | Record<string, number | string>;
@@ -32,9 +33,10 @@ type CustomStylePropsOutput<
 	Property extends CustomProperty,
 	Value,
 > = StylePropsOutput<
-	Property["keys"] extends (
-		...params: Parameters<NonNullable<Property["keys"]>>
-	) => Record<infer Key, string>
+	Property["keys"] extends Record<
+		infer Key,
+		NonNullable<Property["keys"]>[string]
+	>
 		?
 				| Value
 				| (Partial<Record<Key, Value>> & {
@@ -206,10 +208,10 @@ export const createStyles = <
 			);
 
 			const rule =
-				propConfig.keys({
+				propConfig.keys[key]?.({
 					className: `.${className}`,
 					declaration,
-				})[key] ?? `.${className}{${declaration}}`;
+				}) ?? `.${className}{${declaration}}`;
 
 			if (rule.startsWith("@")) {
 				scope = isNativeShorthandProperty

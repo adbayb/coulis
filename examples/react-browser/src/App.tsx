@@ -7,6 +7,18 @@ import {
 } from "coulis";
 import { useEffect, useState } from "react";
 
+/**
+ * TODO:
+ * - Fix starting colon in CSR environment for style keys
+ * - Update keys API to go from string to function as a value
+ * - Update keys API to exclude base overwriting and manage its value internally
+ * - Fix variants (missing className and intellisence)
+ * - Update examples with section-based structure.
+ * - Remove scope entity and go exclusively with stylesheets (create a createStyleSheets?)
+ * - Benchmark and improve performance before release: manage cache only
+ * - Only include allowNativeValues if values is set (make sense only in this case).
+ */
+
 const createKeys = ({
 	className,
 	declaration,
@@ -15,7 +27,6 @@ const createKeys = ({
 	declaration: string;
 }) => {
 	return {
-		base: `${className}{${declaration}}`,
 		hover: `${className}:hover{${declaration}}`,
 		large: `@media (min-width: 1024px){${className}{${declaration}}}`,
 		medium: `@media (min-width: 768px){${className}{${declaration}}}`,

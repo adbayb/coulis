@@ -24,13 +24,13 @@ const createVirtualStyleSheet: CreateStyleSheet = (scope) => {
 		commit(key, rule) {
 			if (cache.has(key)) return;
 
-			rules.push(rule);
 			cache.add(key);
+			rules.push(rule);
 		},
 		element: null,
 		flush() {
-			rules = [];
 			cache.clear();
+			rules = [];
 		},
 		getAttributes() {
 			return {
@@ -48,6 +48,8 @@ const createVirtualStyleSheet: CreateStyleSheet = (scope) => {
 };
 
 const createWebStyleSheet: CreateStyleSheet = (scope) => {
+	const cache = new Set<ClassName>();
+
 	let element = document.querySelector<HTMLStyleElement>(
 		`style[data-coulis-scope="${scope}"]`,
 	);
@@ -61,12 +63,7 @@ const createWebStyleSheet: CreateStyleSheet = (scope) => {
 
 	return {
 		commit(key, rule) {
-			const cacheData = element.dataset.coulisCache ?? "";
-			const cacheKeys = cacheData.split(",");
-
-			// Manage cache via data attribute to persist it in the same manner as server-side to prevent any existing style rules re-insertion
-			// in case of hot reload update (which reset the global scope including in-memory cache)
-			if (cacheKeys.includes(key)) return;
+			if (cache.has(key)) return;
 
 			if (IS_PROD_ENV && element.sheet) {
 				// Faster, more reliable (check rule insertion order (e.g. "@import" must be inserted first)), but not debug friendly
@@ -75,11 +72,11 @@ const createWebStyleSheet: CreateStyleSheet = (scope) => {
 				element.insertAdjacentHTML("beforeend", rule);
 			}
 
-			cacheKeys.push(key);
-			element.dataset.coulisCache = cacheKeys.join(",");
+			cache.add(key);
 		},
 		element,
 		flush() {
+			cache.clear();
 			element.remove();
 		},
 		getAttributes() {

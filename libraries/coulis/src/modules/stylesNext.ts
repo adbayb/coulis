@@ -6,9 +6,11 @@ import type { StyleObject } from "../types";
 
 type CustomProperty = {
 	allowNativeValues?: boolean;
-	keys?: (input: { className: string; declaration: string }) => {
-		[x: string]: string;
-		base: string;
+	keys?: (input: { className: string; declaration: string }) => Record<
+		string,
+		string
+	> & {
+		base?: never;
 	};
 	values?: (number | string)[] | Record<string, number | string>;
 };
@@ -203,16 +205,11 @@ export const createStyles = <
 				key === "base" ? declaration : `${key}${declaration}`,
 			);
 
-			const rule = propConfig.keys({
-				className: `.${className}`,
-				declaration,
-			})[key];
-
-			if (rule === undefined) {
-				throw new Error(
-					`Missing \`${key}\` key configuration for property ${name}. It must be defined to apply the contextual style statements (e.g. conditional at rules, selectors, ...).`,
-				);
-			}
+			const rule =
+				propConfig.keys({
+					className: `.${className}`,
+					declaration,
+				})[key] ?? `.${className}{${declaration}}`;
 
 			if (rule.startsWith("@")) {
 				scope = isNativeShorthandProperty

@@ -10,7 +10,6 @@ import type { PropsWithChildren, ReactNode } from "react";
 
 /**
  * TODO:
- * - Fix variants (missing className and intellisence)
  * - Benchmark and improve performance before release: manage cache only
  * - Only include allowNativeValues if values is set (make sense only in this case).
  * - Add changelog.
@@ -175,9 +174,9 @@ const styles = createStyles(
 
 const buttonVariants = createVariants(styles, {
 	color: {
-		accent: { backgroundColor: "lightsalmon" },
-		brand: { backgroundColor: "lightseagreen" },
-		neutral: { backgroundColor: "lightskyblue" },
+		accent: { backgroundColor: "surfaceSecondary" },
+		brand: { backgroundColor: "surfacePrimary" },
+		neutral: { backgroundColor: "neutralDark" },
 	},
 	size: {
 		large: { padding: 18 },

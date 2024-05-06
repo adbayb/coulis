@@ -1,8 +1,7 @@
-import { SHORTHAND_PROPERTIES } from "../constants";
-import { createClassName } from "../entities/className";
-import { SCOPES } from "../entities/scope";
-import { isObject, toDeclaration } from "../helpers";
-import type { StyleObject } from "../types";
+import { SHORTHAND_PROPERTIES } from "../../constants";
+import { STYLESHEETS } from "../../entities/stylesheet";
+import { isObject, toDeclaration } from "../../helpers";
+import type { StyleObject } from "../../types";
 
 type CustomProperty = {
 	allowNativeValues?: boolean;
@@ -133,8 +132,10 @@ export const createStyles = <
 		value,
 	}: {
 		name: string;
-		value: number | string;
+		value: number | string | undefined;
 	}) => {
+		if (value === undefined) return;
+
 		const propConfig = configuration[name];
 
 		if (!propConfig) return;
@@ -158,11 +159,9 @@ export const createStyles = <
 		const propConfig = configuration[name];
 		const isNativeShorthandProperty = SHORTHAND_PROPERTIES[name];
 
-		let scope = isNativeShorthandProperty
-			? SCOPES.shorthand
-			: SCOPES.longhand;
-
-		if (value === undefined) return classNames;
+		let styleSheet = isNativeShorthandProperty
+			? STYLESHEETS.shorthand
+			: STYLESHEETS.longhand;
 
 		if (!isObject(value)) {
 			const declaration = createDeclaration({
@@ -172,11 +171,14 @@ export const createStyles = <
 
 			if (!declaration) return classNames;
 
-			const className = createClassName(declaration);
-			const rule = `.${className}{${declaration}}`;
-
-			classNames.push(className);
-			scope.styleSheet.commit(className, rule);
+			classNames.push(
+				styleSheet.commit({
+					key: declaration,
+					createRules(className) {
+						return `.${className}{${declaration}}`;
+					},
+				}),
+			);
 
 			return classNames;
 		}
@@ -192,8 +194,6 @@ export const createStyles = <
 		for (const key of keys) {
 			const inputValue = value[key];
 
-			if (inputValue === undefined) continue;
-
 			const declaration = createDeclaration({
 				name,
 				value: inputValue,
@@ -201,26 +201,32 @@ export const createStyles = <
 
 			if (!declaration) continue;
 
-			const className = createClassName(
-				// The key is not included to compute the className when `key` equals to "base" as base is equivalent to an unconditional value.
-				// This exclusion will allow to recycle cache if the style value has been already defined unconditionally.
-				key === "base" ? declaration : `${key}${declaration}`,
-			);
-
-			const rule =
+			const preComputedRule =
 				propConfig.keys[key]?.({
-					className: `.${className}`,
+					className: ".{{className}}",
 					declaration,
-				}) ?? `.${className}{${declaration}}`;
+				}) ?? `.{{className}}{${declaration}}`;
 
-			if (rule.startsWith("@")) {
-				scope = isNativeShorthandProperty
-					? SCOPES.conditionalShorthand
-					: SCOPES.conditionalLonghand;
+			if (preComputedRule.startsWith("@")) {
+				styleSheet = isNativeShorthandProperty
+					? STYLESHEETS.conditionalShorthand
+					: STYLESHEETS.conditionalLonghand;
 			}
 
-			classNames.push(className);
-			scope.styleSheet.commit(className, rule);
+			classNames.push(
+				styleSheet.commit({
+					key:
+						// The key is not included to compute the className when `key` equals to "base" as base is equivalent to an unconditional value.
+						// This exclusion will allow to recycle cache if the style value has been already defined unconditionally.
+						key === "base" ? declaration : `${key}${declaration}`,
+					createRules(className) {
+						return preComputedRule.replace(
+							"{{className}}",
+							className,
+						);
+					},
+				}),
+			);
 		}
 
 		return classNames;

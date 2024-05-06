@@ -1,6 +1,6 @@
-import { SCOPES } from "../entities/scope";
-import { toManyDeclaration } from "../helpers";
-import type { AtTextualRule, GlobalStyleObject } from "../types";
+import { STYLESHEETS } from "../../entities/stylesheet";
+import { toManyDeclaration } from "../../helpers";
+import type { AtTextualRule, GlobalStyleObject } from "../../types";
 
 /**
  * Apply style rules globally.
@@ -9,7 +9,7 @@ import type { AtTextualRule, GlobalStyleObject } from "../types";
  * 	globalStyles({ "html": { "background-color": "red" } });
  */
 export const globalStyles = (styleObject: GlobalStyleObject) => {
-	SCOPES.global.commit({
+	STYLESHEETS.global.commit({
 		key: JSON.stringify(styleObject),
 		createRules() {
 			const rules: string[] = [];

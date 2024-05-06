@@ -6,11 +6,11 @@ import { NUMBER_OF_DATA } from "../../constants";
 const styles = createStyles({
 	backgroundColor: {
 		allowNativeValues: true,
-		keys({ className, declaration }) {
-			return {
-				base: `${className}{${declaration}}`,
-				hover: `${className}:hover{${declaration}}`,
-			};
+		keys: {
+			base: ({ className, declaration }) =>
+				`${className}{${declaration}}`,
+			hover: ({ className, declaration }) =>
+				`${className}:hover{${declaration}}`,
 		},
 	},
 });

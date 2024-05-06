@@ -1,4 +1,4 @@
-import { SCOPES } from "../entities/scope";
+import { STYLESHEETS } from "../entities/stylesheet";
 import { isNumber, toManyDeclaration } from "../helpers";
 import type { KeyframeStyleObject } from "../types";
 
@@ -12,7 +12,7 @@ import type { KeyframeStyleObject } from "../types";
  * 	document.getElementById("my-element-id").className = className;
  */
 export const createKeyframes = (styleObject: KeyframeStyleObject) => {
-	return SCOPES.global.commit({
+	return STYLESHEETS.global.commit({
 		key: JSON.stringify(styleObject),
 		createRules(className) {
 			let rule = "";
@@ -31,7 +31,7 @@ export const createKeyframes = (styleObject: KeyframeStyleObject) => {
 				}{${toManyDeclaration(style)}}`;
 			}
 
-			return [`@keyframes ${className}{${rule}}`];
+			return `@keyframes ${className}{${rule}}`;
 		},
 	});
 };

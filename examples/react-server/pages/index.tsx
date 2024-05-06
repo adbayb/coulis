@@ -10,12 +10,10 @@ import type { PropsWithChildren, ReactNode } from "react";
 
 /**
  * TODO:
- * - Fix starting colon in CSR environment for style keys
  * - Fix variants (missing className and intellisence)
- * - Update examples with section-based structure.
- * - Remove scope entity and go exclusively with stylesheets (create a createStyleSheets?)
  * - Benchmark and improve performance before release: manage cache only
  * - Only include allowNativeValues if values is set (make sense only in this case).
+ * - Add changelog.
  */
 
 const STYLE_KEYS_FACTORIES: Record<
@@ -238,10 +236,11 @@ const App = () => {
 						backgroundColor: {
 							base: "surfacePrimary",
 							medium: "surfaceSecondary",
+							smallWithHover: "neutralLight",
 						},
 					})}
 				>
-					Resize to test
+					Resize and/or hover to test
 				</p>
 			</Example>
 			<Example title="With custom properties">

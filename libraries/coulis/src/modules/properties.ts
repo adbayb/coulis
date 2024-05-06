@@ -1,5 +1,5 @@
 import type { Property } from "../entities/property";
-import { SCOPES } from "../entities/scope";
+import { STYLESHEETS } from "../entities/stylesheet";
 import { isObject } from "../helpers";
 import type { RecordLike } from "../types";
 
@@ -40,16 +40,16 @@ export const createCustomProperties = <const P extends Properties>(
 	const { collectedProperties, nodes } =
 		createCustomPropertiesWithoutSideEffects(properties);
 
-	SCOPES.global.commit({
+	STYLESHEETS.global.commit({
 		key: JSON.stringify(collectedProperties),
 		createRules() {
-			return [
-				`:root{${collectedProperties.reduce(
-					(output, property) =>
-						`${output}--${property.name}:${property.value};`,
-					"",
-				)}}`,
-			];
+			const variables = collectedProperties.reduce(
+				(output, property) =>
+					`${output}--${property.name}:${property.value};`,
+				"",
+			);
+
+			return `:root{${variables}}`;
 		},
 	});
 

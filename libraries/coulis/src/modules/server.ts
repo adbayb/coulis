@@ -1,5 +1,4 @@
-import { SCOPES } from "../entities/scope";
-import type { ScopeKey } from "../types";
+import { STYLESHEETS } from "../entities/stylesheet";
 
 /**
  * Collect the generated styles including global ones.
@@ -21,12 +20,12 @@ export const extract = (
 	} = { flush: true },
 ) => {
 	let stringifiedStyles = "";
-	const scopeKeys = Object.keys(SCOPES) as ScopeKey[];
+	const ids = Object.keys(STYLESHEETS) as (keyof typeof STYLESHEETS)[];
 
-	const output = scopeKeys.map((scopeKey) => {
-		const { styleSheet } = SCOPES[scopeKey];
-		const content = styleSheet.getContent();
-		const attributes = styleSheet.getAttributes();
+	const output = ids.map((id) => {
+		const { flush, getAttributes, target } = STYLESHEETS[id];
+		const content = target.getContent();
+		const attributes = getAttributes();
 
 		const toString = () => {
 			const stringifiedAttributes = (
@@ -49,9 +48,9 @@ export const extract = (
 			toString,
 		};
 
-		if (options.flush && scopeKey !== "global") {
+		if (options.flush && id !== "global") {
 			// Flush only local styles to preserve styles defined globally as they're not re-rendered:
-			styleSheet.flush();
+			flush();
 		}
 
 		return scopedOutput;

@@ -68,14 +68,22 @@ describe("coulis", () => {
 	test("should type `createStyles` in a safe manner", () => {
 		const styles = createStyles(
 			{
-				backgroundColor: {
-					values: ["red", "blue"],
+				backgroundColor: ["red", "blue", "titi"],
+				color: {
+					danger: "red",
+					warning: "yellow",
 				},
+				height: ["100%"],
 				width: true,
 			},
 			{
-				shorthands: {
+				looseProperties: ["color"],
+				shorthandProperties: {
 					size: ["width"],
+				},
+				states: {
+					hover: ({ className, declaration }) =>
+						`${className}:hover{${declaration}}`,
 				},
 			},
 		);
@@ -104,11 +112,10 @@ describe("coulis", () => {
 		expect(
 			createVariants(styles, {
 				color: {
-					// @ts-expect-error property key does not exist
-					accent: { color: "surfaceSecondary" },
+					accent: { color: "warning" },
 					// @ts-expect-error property value does not exist
 					brand: { backgroundColor: "surfacePrimary" },
-					neutral: { backgroundColor: "red" },
+					neutral: { backgroundColor: "red", color: "lightgrey" },
 				},
 				size: {
 					// @ts-expect-error property key does not exist
@@ -116,12 +123,16 @@ describe("coulis", () => {
 					small: { size: "auto", width: 100 },
 				},
 			}),
-		).toBeTypeOf("string");
+		).toBeTypeOf("function");
 
 		expect(
 			styles({
-				backgroundColor: "blue",
-				size: "auto",
+				color: "red",
+				height: "100%",
+				size: {
+					base: "auto",
+					hover: "100%",
+				},
 				width: "auto",
 			}),
 		).toBeTypeOf("string");
@@ -143,9 +154,14 @@ const animationName = createKeyframes({
 	},
 });
 
-const styles = createStyles({
-	backgroundColor: {
-		keys: {
+const styles = createStyles(
+	{
+		backgroundColor: true,
+		color: true,
+		padding: true,
+	},
+	{
+		states: {
 			alt({ className, declaration }) {
 				return `${className}[alt]{${declaration}}`;
 			},
@@ -154,9 +170,7 @@ const styles = createStyles({
 			},
 		},
 	},
-	color: true,
-	padding: true,
-});
+);
 
 const buttonVariants = createVariants(styles, {
 	color: {

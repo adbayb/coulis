@@ -29,52 +29,67 @@ yarn add coulis
 2️⃣ Play ✌️
 
 ```tsx
+import { createStyles, globalStyles } from "coulis";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-import { createStyles, globalStyles } from "coulis";
 
 globalStyles({
+	"*,*::before,*::after": {
+		boxSizing: "inherit",
+	},
 	"@import":
 		"url('https://fonts.googleapis.com/css?family=Open+Sans&display=swap')",
 	html: {
 		boxSizing: "border-box",
 	},
 	"html,body": {
-		padding: 0,
-		margin: 0,
 		fontFamily: "Open Sans",
-	},
-	"*,*::before,*::after": {
-		boxSizing: "inherit",
+		margin: 0,
+		padding: 0,
 	},
 });
 
-const styles = createStyles({
-	alignItems: true,
-	display: true,
-	fontSize: true,
-	height: true,
-	justifyContent: true,
-	textAlign: true,
-	width: true,
-	color: {
-		keys: {
+const styles = createStyles(
+	{
+		alignItems: true,
+		color: ["black", "lightcoral"],
+		display: ["flex"],
+		fontSize: true,
+		height: {
+			full: "100%",
+		},
+		justifyContent: true,
+		marginLeft: [0, 4, 8, 16],
+		marginRight: [0, 4, 8, 16],
+		paddingLeft: [0, 4, 8, 16],
+		paddingRight: [0, 4, 8, 16],
+		width: {
+			full: "100%",
+		},
+	},
+	{
+		looseProperties: ["marginLeft", "marginRight"],
+		shorthandProperties: {
+			marginHorizontal: ["marginLeft", "marginRight"],
+			paddingHorizontal: ["paddingLeft", "paddingRight"],
+		},
+		states: {
 			hover({ className, declaration }) {
 				return `${className}:hover{${declaration}}`;
 			},
 		},
 	},
-});
+);
 
 const App = () => {
 	return (
 		<main
 			className={styles({
-				display: "flex",
-				width: "100%",
-				height: "100%",
 				alignItems: "center",
+				display: "flex",
+				height: "full",
 				justifyContent: "center",
+				width: "full",
 			})}
 		>
 			<p
@@ -84,7 +99,8 @@ const App = () => {
 						hover: "lightcoral",
 					},
 					fontSize: 26,
-					textAlign: "center",
+					marginHorizontal: "auto",
+					paddingHorizontal: 16,
 				})}
 			>
 				Hello 🤗
@@ -145,32 +161,35 @@ export const App = () => {
 ```tsx
 import { createStyles } from "coulis";
 
-const styles = createStyles({
-	alignItems: true,
-	display: true,
-	fontSize: true,
-	height: true,
-	justifyContent: true,
-	textAlign: true,
-	width: true,
-	color: {
-		keys: {
+const styles = createStyles(
+	{
+		alignItems: true,
+		color: true,
+		display: true,
+		fontSize: true,
+		height: true,
+		justifyContent: true,
+		textAlign: true,
+		width: true,
+	},
+	{
+		states: {
 			hover({ className, declaration }) {
 				return `${className}:hover{${declaration}}`;
 			},
 		},
 	},
-});
+);
 
 export const App = () => {
 	return (
 		<main
 			className={styles({
-				display: "flex",
-				width: "100%",
-				height: "100%",
 				alignItems: "center",
+				display: "flex",
+				height: "100%",
 				justifyContent: "center",
+				width: "100%",
 			})}
 		>
 			<p
@@ -193,7 +212,7 @@ export const App = () => {
 ### createKeyframes
 
 ```tsx
-import { createStyles, createKeyframes } from "coulis";
+import { createKeyframes, createStyles } from "coulis";
 
 const zoomIn = createKeyframes({
 	from: {
@@ -324,21 +343,11 @@ const theme = createCustomProperties({
 });
 
 const styles = createStyles({
-	backgroundColor: {
-		values: theme.colors,
-	},
-	borderRadius: {
-		values: theme.radii,
-	},
-	color: {
-		values: theme.colors,
-	},
-	fontSize: {
-		values: theme.fontSizes,
-	},
-	fontWeight: {
-		values: theme.fontWeights,
-	},
+	backgroundColor: theme.colors,
+	borderRadius: theme.radii,
+	color: theme.colors,
+	fontSize: theme.fontSizes,
+	fontWeight: theme.fontWeights,
 });
 
 export const App = () => {

@@ -8,21 +8,6 @@ import {
 import { useEffect, useState } from "react";
 import type { PropsWithChildren, ReactNode } from "react";
 
-const STYLE_KEYS_FACTORIES: Record<
-	"hover" | "large" | "medium" | "small" | "smallWithHover",
-	(params: { className: string; declaration: string }) => string
-> = {
-	hover: ({ className, declaration }) => `${className}:hover{${declaration}}`,
-	large: ({ className, declaration }) =>
-		`@media (min-width: 1024px){${className}{${declaration}}}`,
-	medium: ({ className, declaration }) =>
-		`@media (min-width: 768px){${className}{${declaration}}}`,
-	small: ({ className, declaration }) =>
-		`@media (min-width: 360px){${className}{${declaration}}}`,
-	smallWithHover: ({ className, declaration }) =>
-		`@media (min-width: 360px){${className}:hover{${declaration}}}`,
-};
-
 const px = (value: number) => `${value}px`;
 
 const tokens = Object.freeze({
@@ -118,27 +103,14 @@ const styles = createStyles(
 	{
 		accentColor: true,
 		animation: true,
-		backgroundColor: {
-			allowNativeValues: true,
-			keys: STYLE_KEYS_FACTORIES,
-			values: theme.colors,
-		},
-		borderRadius: {
-			allowNativeValues: true,
-			values: theme.radii,
-		},
-		color: {
-			values: theme.colors,
-		},
+		backgroundColor: theme.colors,
+		borderRadius: theme.radii,
+		color: theme.colors,
 		display: true,
 		flex: true,
 		flexDirection: true,
-		fontSize: {
-			values: theme.fontSizes,
-		},
-		fontWeight: {
-			values: theme.fontWeights,
-		},
+		fontSize: theme.fontSizes,
+		fontWeight: theme.fontWeights,
 		gap: true,
 		height: true,
 		margin: true,
@@ -151,14 +123,27 @@ const styles = createStyles(
 		paddingLeft: true,
 		paddingRight: true,
 		paddingTop: true,
-		width: true,
+		width: [50, 100],
 	},
 	{
-		shorthands: {
+		looseProperties: ["backgroundColor", "borderRadius"],
+		shorthandProperties: {
 			marginHorizontal: ["marginLeft", "marginRight"],
 			marginVertical: ["marginTop", "marginBottom"],
 			paddingHorizontal: ["paddingLeft", "paddingRight"],
 			paddingVertical: ["paddingTop", "paddingBottom"],
+		},
+		states: {
+			hover: ({ className, declaration }) =>
+				`${className}:hover{${declaration}}`,
+			large: ({ className, declaration }) =>
+				`@media (min-width: 1024px){${className}{${declaration}}}`,
+			medium: ({ className, declaration }) =>
+				`@media (min-width: 768px){${className}{${declaration}}}`,
+			small: ({ className, declaration }) =>
+				`@media (min-width: 360px){${className}{${declaration}}}`,
+			smallWithHover: ({ className, declaration }) =>
+				`@media (min-width: 360px){${className}:hover{${declaration}}}`,
 		},
 	},
 );

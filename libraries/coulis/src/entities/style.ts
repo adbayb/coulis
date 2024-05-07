@@ -15,18 +15,13 @@ import type { PropertiesFallback } from "csstype";
 
 import type { UngreedyString } from "../types";
 
-type CSSTypeProperty = PropertiesFallback<UngreedyString | number>;
+export type RelaxedStyleProperties = Record<
+	UngreedyString,
+	number | string | undefined
+> &
+	StyleProperties;
 
-export type StyleProperties = {
-	[Key in StyleProperty["name"]]?: Key extends keyof CSSTypeProperty
-		? CSSTypeProperty[Key]
-		: StyleProperty["value"];
-};
-
-export type StyleProperty<Value extends number | string = number | string> = {
-	name: UngreedyString | keyof CSSTypeProperty;
-	value: Value;
-};
+export type StyleProperties = PropertiesFallback<UngreedyString | number>;
 
 export type ClassName = string;
 
@@ -50,7 +45,13 @@ export const createClassName = (value: string) => {
 	return `c${Number(uHash).toString(16)}`;
 };
 
-export const createDeclaration = ({ name, value }: StyleProperty) => {
+export const createDeclaration = ({
+	name,
+	value,
+}: {
+	name: keyof StyleProperties;
+	value: StyleProperties[keyof StyleProperties];
+}) => {
 	// From JS camelCase to CSS kebeb-case
 	const transformedPropertyName = name.replace(
 		/([A-Z])/g,
@@ -60,8 +61,8 @@ export const createDeclaration = ({ name, value }: StyleProperty) => {
 	// Format value to follow CSS specs (unitless number)
 	const transformedPropertyValue =
 		typeof value === "string" || UNITLESS_PROPERTIES[name]
-			? value
-			: `${value}px`;
+			? String(value)
+			: `${String(value)}px`;
 
 	return `${transformedPropertyName}:${transformedPropertyValue};`;
 };
@@ -70,8 +71,9 @@ export const createDeclarations = <Properties extends StyleProperties>(
 	properties: Properties,
 ) => {
 	let declarationBlock = "";
+	const propertyNames = Object.keys(properties) as (keyof StyleProperties)[];
 
-	for (const propertyName of Object.keys(properties)) {
+	for (const propertyName of propertyNames) {
 		const value = properties[propertyName];
 
 		if (value) {
@@ -85,11 +87,11 @@ export const createDeclarations = <Properties extends StyleProperties>(
 	return declarationBlock;
 };
 
-export const isShorthandProperty = (name: StyleProperty["name"]) => {
+export const isShorthandProperty = (name: keyof StyleProperties) => {
 	return Boolean(SHORTHAND_PROPERTIES[name]);
 };
 
-type Indexable = Partial<Record<StyleProperty["name"], boolean>>;
+type Indexable = Partial<Record<keyof StyleProperties, boolean>>;
 
 // Taken from https://raw.githubusercontent.com/facebook/react/b98adb648a27640db8467064e537b238b8c306ce/packages/react-dom/src/shared/CSSProperty.js
 const UNITLESS_PROPERTIES: Indexable = {
@@ -104,18 +106,13 @@ const UNITLESS_PROPERTIES: Indexable = {
 	columns: true,
 	flex: true,
 	flexGrow: true,
-	flexPositive: true,
 	flexShrink: true,
-	flexNegative: true,
-	flexOrder: true,
 	gridArea: true,
 	gridRow: true,
 	gridRowEnd: true,
-	gridRowSpan: true,
 	gridRowStart: true,
 	gridColumn: true,
 	gridColumnEnd: true,
-	gridColumnSpan: true,
 	gridColumnStart: true,
 	fontWeight: true,
 	lineClamp: true,

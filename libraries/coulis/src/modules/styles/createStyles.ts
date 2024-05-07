@@ -32,12 +32,12 @@ export const createStyles = <
 		name,
 		value,
 	}: {
-		name: string;
+		name: keyof StyleProperties;
 		value: number | string | undefined;
 	}) => {
 		if (value === undefined) return;
 
-		const propConfig = configuration[name];
+		const propConfig = configuration[name as keyof typeof configuration];
 
 		if (!propConfig) return;
 
@@ -54,10 +54,13 @@ export const createStyles = <
 		});
 	};
 
-	// eslint-disable-next-line sonarjs/cognitive-complexity
-	const createRules = (name: string, value: StyleInputValue) => {
+	const createRules = (
+		name: keyof StyleProperties,
+		value: StyleInputValue,
+		// eslint-disable-next-line sonarjs/cognitive-complexity
+	) => {
 		const classNames: string[] = [];
-		const propConfig = configuration[name];
+		const propConfig = configuration[name as keyof typeof configuration];
 		const isNativeShorthandProperty = isShorthandProperty(name);
 
 		let styleSheet = isNativeShorthandProperty
@@ -142,13 +145,18 @@ export const createStyles = <
 			if (isShorthandProperty(propertyName)) {
 				const shorthandConfig = (
 					options.shorthands as NonNullable<Shorthands>
-				)[propertyName] as string[];
+				)[propertyName] as (keyof StyleProperties)[];
 
 				for (const shorthandName of shorthandConfig) {
 					classNames.push(...createRules(shorthandName, value));
 				}
 			} else {
-				classNames.push(...createRules(propertyName, value));
+				classNames.push(
+					...createRules(
+						propertyName as keyof StyleProperties,
+						value,
+					),
+				);
 			}
 		}
 

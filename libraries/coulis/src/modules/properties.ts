@@ -1,13 +1,17 @@
-import type { StyleProperty } from "../entities/style";
 import { STYLESHEETS } from "../entities/stylesheet";
 import { isObject } from "../helpers";
 import type { RecordLike } from "../types";
+
+type CustomProperty = {
+	name: string;
+	value: string;
+};
 
 /**
  * Allow only string-based value to prevent type checking issues with property that doesn't accept `number` values (e.g. `color`, ...).
  * It'll also reduce the logic complexity: by enforcing string values, the unitless logic can be delegated and controlled consumer side.
  */
-type PropertyValue = StyleProperty<string>["value"];
+type PropertyValue = CustomProperty["value"];
 
 /**
  * A utility type to preserve the record data structure except for leaf nodes that are mutated to match the `LeafType`.
@@ -58,8 +62,8 @@ export const createCustomProperties = <const P extends Properties>(
 
 const createCustomPropertiesWithoutSideEffects = <const P extends Properties>(
 	properties: P,
-	propertyNameParts: StyleProperty["name"][] = [],
-	collectedProperties: StyleProperty[] = [],
+	propertyNameParts: CustomProperty["name"][] = [],
+	collectedProperties: CustomProperty[] = [],
 ) => {
 	// eslint-disable-next-line @typescript-eslint/consistent-type-assertions
 	const nodes = {} as WithNewLeafNodes<P, PropertyValue>;
@@ -80,7 +84,7 @@ const createCustomPropertiesWithoutSideEffects = <const P extends Properties>(
 			propertyNameParts = [];
 			nodes[tokenName] = output.nodes as (typeof nodes)[keyof P];
 		} else {
-			const property: StyleProperty = {
+			const property: CustomProperty = {
 				name: propertyNameParts.join("-"),
 				value: value as string,
 			};

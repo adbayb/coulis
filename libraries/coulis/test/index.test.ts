@@ -6,7 +6,6 @@ import {
 	createVariants,
 	extract,
 	globalStyles,
-	styles,
 } from "../src";
 
 describe("coulis", () => {
@@ -41,22 +40,19 @@ describe("coulis", () => {
 	test("should generate classNames", () => {
 		expect(animationName).toBe("c77e20e50");
 		expect(buttonVariants({ color: "brand", size: "large" })).toBe(
-			"c5bb3b59a cd66da2a4",
+			"c72f7daf8 c6a0088d1",
 		);
 		expect(buttonVariants({ color: "brand", size: "medium" })).toBe(
-			"c5bb3b59a cdc6dac18",
+			"c72f7daf8 ccadc8a20",
 		);
 		expect(buttonVariants({ color: "neutral", size: "medium" })).toBe(
-			"cbe211eb4 cdc6dac18",
+			"c5ea183e8 ccadc8a20",
 		);
 		expect(buttonVariants({ color: "accent", size: "small" })).toBe(
-			"cbb3db274 c36214926",
+			"cbb3938 c2a100aa4",
 		);
 		expect(classNames).toBe(
-			"c571db958 ce9403afc cbb3db274 c3c5816c4 cde6daf3c",
-		);
-		expect(largerClassNames).toBe(
-			"cf33f0fbe cec510c6c c3d523ba0 c721688f8 c3123b398",
+			"cdd299de8 cbb3938 ce31a3799 c18a19c73 cd0c53d28",
 		);
 	});
 
@@ -85,7 +81,22 @@ const animationName = createKeyframes({
 	},
 });
 
-const buttonVariants = createVariants({
+const styles = createStyles({
+	backgroundColor: {
+		keys: {
+			alt({ className, declaration }) {
+				return `${className}[alt]{${declaration}}`;
+			},
+			hover({ className, declaration }) {
+				return `${className}{${declaration}}`;
+			},
+		},
+	},
+	color: true,
+	padding: true,
+});
+
+const buttonVariants = createVariants(styles, {
 	color: {
 		accent: { backgroundColor: "lightcoral" },
 		brand: { backgroundColor: "lightseagreen" },
@@ -100,22 +111,10 @@ const buttonVariants = createVariants({
 
 const classNames = styles({
 	backgroundColor: {
-		":hover": "lightcyan",
-		"[alt]": "lightgray",
-		default: "lightcoral",
+		alt: "lightgray",
+		base: "lightcoral",
+		hover: "lightcyan",
 	},
 	color: "lightblue",
 	padding: 10,
-});
-
-const largerAtoms = createStyles("@media", "(min-width: 576px)");
-
-const largerClassNames = largerAtoms({
-	backgroundColor: {
-		":hover": "lightcyan",
-		"[alt]": "lightgray",
-		default: "lightcoral",
-	},
-	color: "lightblue",
-	padding: 24,
 });

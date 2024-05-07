@@ -5,44 +5,44 @@ exports[`coulis > should extract styles given object format 1`] = `
   {
     "attributes": {
       "data-coulis-cache": "c77e20e50,c8e4ce7ac",
-      "data-coulis-scope": "global",
+      "data-coulis-id": "global",
     },
-    "content": "@keyframes c77e20e50{25%{transform:scale(1.25);}50%{transform:scale(1.5);}from{transform:scale(1);}to{transform:scale(1);}}*,*::before,*::after{box-sizing:inherit;}",
+    "content": "@keyframes c77e20e50{25%{transform:scale(1.25);}50%{transform:scale(1.5);}from{transform:scale(1);}to{transform:scale(1);}}*,*::before,*::after{box-sizing:inherit;}.globalClass+.otherGlobalClass{border:1px solid black;border-radius:4px;}@charset "utf-8";@font-face{font-family:'AliasedHelvetica';src:local(Helvetica);}@import url('https://fonts.googleapis.com/css?family=Open+Sans&display=swap');html{box-sizing:border-box;}html,body{background-color:lightcoral;font-family:Open Sans, AliasedHelvetica;}",
     "toString": [Function],
   },
   {
     "attributes": {
-      "data-coulis-cache": "cde6daf3c,cd66da2a4,cdc6dac18,c36214926",
-      "data-coulis-scope": "shorthand",
+      "data-coulis-cache": "",
+      "data-coulis-id": "shorthand",
     },
-    "content": ".cde6daf3c{padding:10px;}.cd66da2a4{padding:18px;}.cdc6dac18{padding:12px;}.c36214926{padding:6px;}",
+    "content": "",
     "toString": [Function],
   },
   {
     "attributes": {
-      "data-coulis-cache": "c571db958,ce9403afc,cbb3db274,c3c5816c4,c5bb3b59a,cbe211eb4",
-      "data-coulis-scope": "longhand",
+      "data-coulis-cache": "cdd299de8,cbb3938,ce31a3799,c18a19c73,cd0c53d28,c72f7daf8,c6a0088d1,ccadc8a20,c5ea183e8,c2a100aa4",
+      "data-coulis-id": "longhand",
     },
-    "content": ".c571db958:hover{background-color:lightcyan;}.ce9403afc[alt]{background-color:lightgray;}.cbb3db274{background-color:lightcoral;}.c3c5816c4{color:lightblue;}.c5bb3b59a{background-color:lightseagreen;}.cbe211eb4{background-color:lightgrey;}",
+    "content": ".cdd299de8[alt]{background-color:lightgray;}.cbb3938{background-color:lightcoral;}.ce31a3799{background-color:lightcyan;}.c18a19c73{color:lightblue;}.cd0c53d28{padding:10px;}.c72f7daf8{background-color:lightseagreen;}.c6a0088d1{padding:18px;}.ccadc8a20{padding:12px;}.c5ea183e8{background-color:lightgrey;}.c2a100aa4{padding:6px;}",
     "toString": [Function],
   },
   {
     "attributes": {
-      "data-coulis-cache": "c3123b398",
-      "data-coulis-scope": "conditionalShorthand",
+      "data-coulis-cache": "",
+      "data-coulis-id": "conditionalShorthand",
     },
-    "content": "@media (min-width: 576px){.c3123b398{padding:24px;}}",
+    "content": "",
     "toString": [Function],
   },
   {
     "attributes": {
-      "data-coulis-cache": "cf33f0fbe,cec510c6c,c3d523ba0,c721688f8",
-      "data-coulis-scope": "conditionalLonghand",
+      "data-coulis-cache": "",
+      "data-coulis-id": "conditionalLonghand",
     },
-    "content": "@media (min-width: 576px){.cf33f0fbe:hover{background-color:lightcyan;}}@media (min-width: 576px){.cec510c6c[alt]{background-color:lightgray;}}@media (min-width: 576px){.c3d523ba0{background-color:lightcoral;}}@media (min-width: 576px){.c721688f8{color:lightblue;}}",
+    "content": "",
     "toString": [Function],
   },
 ]
 `;
 
-exports[`coulis > should extract styles given string format 1`] = `"<style data-coulis-cache="c77e20e50,c8e4ce7ac" data-coulis-scope="global">@keyframes c77e20e50{25%{transform:scale(1.25);}50%{transform:scale(1.5);}from{transform:scale(1);}to{transform:scale(1);}}*,*::before,*::after{box-sizing:inherit;}</style><style data-coulis-cache="" data-coulis-scope="shorthand"></style><style data-coulis-cache="" data-coulis-scope="longhand"></style><style data-coulis-cache="" data-coulis-scope="conditionalShorthand"></style><style data-coulis-cache="" data-coulis-scope="conditionalLonghand"></style>"`;
+exports[`coulis > should extract styles given string format 1`] = `"<style data-coulis-cache="c77e20e50,c8e4ce7ac" data-coulis-id="global">@keyframes c77e20e50{25%{transform:scale(1.25);}50%{transform:scale(1.5);}from{transform:scale(1);}to{transform:scale(1);}}*,*::before,*::after{box-sizing:inherit;}.globalClass+.otherGlobalClass{border:1px solid black;border-radius:4px;}@charset "utf-8";@font-face{font-family:'AliasedHelvetica';src:local(Helvetica);}@import url('https://fonts.googleapis.com/css?family=Open+Sans&display=swap');html{box-sizing:border-box;}html,body{background-color:lightcoral;font-family:Open Sans, AliasedHelvetica;}</style><style data-coulis-cache="" data-coulis-id="shorthand"></style><style data-coulis-cache="" data-coulis-id="longhand"></style><style data-coulis-cache="" data-coulis-id="conditionalShorthand"></style><style data-coulis-cache="" data-coulis-id="conditionalLonghand"></style>"`;

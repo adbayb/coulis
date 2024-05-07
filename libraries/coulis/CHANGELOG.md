@@ -1,5 +1,19 @@
 # Change Log
 
+## 0.8.0
+
+### Minor Changes
+
+- [`3e5bbf0`](https://github.com/adbayb/coulis/commit/3e5bbf0a19d8dd8a800ec120c0db0d542538ce58) Thanks [@adbayb](https://github.com/adbayb)! - Rename `createAnimationName` to `createKeyframes` to reduce API learning curve.
+
+- [`30af02c`](https://github.com/adbayb/coulis/commit/30af02c21e8c5bae179b7b8356663932ed348a55) Thanks [@adbayb](https://github.com/adbayb)! - Remove compose API.
+
+- [`e86f307`](https://github.com/adbayb/coulis/commit/e86f307959b17cf44d861d17cb76d9d92d1fddaa) Thanks [@adbayb](https://github.com/adbayb)! - Improve `createCustomProperties` properties inference by using a `const` generic type.
+
+- [`a042073`](https://github.com/adbayb/coulis/commit/a04207353a35f7503b793974ad8016c2ed2a394c) Thanks [@adbayb](https://github.com/adbayb)! - Welcome the new `createStyles` API and remove `styles` API.
+
+- [`a042073`](https://github.com/adbayb/coulis/commit/a04207353a35f7503b793974ad8016c2ed2a394c) Thanks [@adbayb](https://github.com/adbayb)! - Update `createVariants` API to benefit from custom styles props via dependency injection.
+
 ## 0.7.0
 
 ### Minor Changes

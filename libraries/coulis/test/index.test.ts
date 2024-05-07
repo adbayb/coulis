@@ -64,6 +64,68 @@ describe("coulis", () => {
 		// eslint-disable-next-line @typescript-eslint/restrict-template-expressions
 		expect(`${extract()}`).toMatchSnapshot();
 	});
+
+	test("should type `createStyles` in a safe manner", () => {
+		const styles = createStyles(
+			{
+				backgroundColor: {
+					values: ["red", "blue"],
+				},
+				width: true,
+			},
+			{
+				shorthands: {
+					size: ["width"],
+				},
+			},
+		);
+
+		expect(
+			styles({
+				// @ts-expect-error property value does not exist (custom value)
+				backgroundColor: "blue2",
+			}),
+		).toBeTypeOf("string");
+
+		expect(
+			styles({
+				// @ts-expect-error property value does not exist (native value)
+				width: new Date(),
+			}),
+		).toBeTypeOf("string");
+
+		expect(
+			styles({
+				// @ts-expect-error property key does not exist
+				nonExistingProperty: "unknownValue",
+			}),
+		).toBeTypeOf("string");
+
+		expect(
+			createVariants(styles, {
+				color: {
+					// @ts-expect-error property key does not exist
+					accent: { color: "surfaceSecondary" },
+					// @ts-expect-error property value does not exist
+					brand: { backgroundColor: "surfacePrimary" },
+					neutral: { backgroundColor: "red" },
+				},
+				size: {
+					// @ts-expect-error property key does not exist
+					medium: { height: 12 },
+					small: { size: "auto", width: 100 },
+				},
+			}),
+		).toBeTypeOf("string");
+
+		expect(
+			styles({
+				backgroundColor: "blue",
+				size: "auto",
+				width: "auto",
+			}),
+		).toBeTypeOf("string");
+	});
 });
 
 const animationName = createKeyframes({

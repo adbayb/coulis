@@ -17,3 +17,7 @@ export const isNumber = (value: unknown): value is number => {
 export const isObject = (value: unknown): value is Record<string, unknown> => {
 	return typeof value === "object" && value !== null && !Array.isArray(value);
 };
+
+export const minify = (value: string) => {
+	return value.replace(/\s{2,}|\s+(?={)|\r?\n/gm, "");
+};

@@ -1,5 +1,5 @@
 import { createDeclarations } from "../../entities/style";
-import type { RelaxedStyleProperties } from "../../entities/style";
+import type { LooseStyleProperties } from "../../entities/style";
 import { STYLESHEETS } from "../../entities/stylesheet";
 import type { UngreedyString } from "../../types";
 
@@ -59,8 +59,8 @@ type GlobalStyleProperties =
 			| keyof HTMLElementTagNameMap]?: Selector extends AtTextualRule
 			? string
 			: Selector extends AtGroupingRule | keyof HTMLElementTagNameMap
-				? RelaxedStyleProperties
-				: RelaxedStyleProperties | string;
+				? LooseStyleProperties
+				: LooseStyleProperties | string;
 	};
 
 type AtTextualRule = "@charset" | "@import" | "@layer" | "@namespace";

@@ -2,6 +2,7 @@ import { createDeclaration, isShorthandProperty } from "../../entities/style";
 import type { StyleProperties } from "../../entities/style";
 import { STYLESHEETS } from "../../entities/stylesheet";
 import { isObject } from "../../helpers";
+import type { Exactify } from "../../types";
 
 /**
  * A factory to configure and create type-safe `styles` method.
@@ -15,9 +16,10 @@ import { isObject } from "../../helpers";
  */
 export const createStyles = <
 	const Properties extends PropertyConfiguration,
-	const Shorthands extends ShorthandConfiguration<Properties>,
+	// eslint-disable-next-line @typescript-eslint/ban-types
+	const Shorthands extends ShorthandConfiguration<Properties> = {},
 >(
-	configuration: Exactify<PropertyConfiguration, Properties>,
+	configuration: Exactify<Properties, keyof PropertyConfiguration>,
 	options: { shorthands?: Shorthands } = {},
 ) => {
 	const configuredShorthandNames = Object.keys(options.shorthands ?? {});
@@ -37,7 +39,7 @@ export const createStyles = <
 	}) => {
 		if (value === undefined) return;
 
-		const propConfig = configuration[name as keyof typeof configuration];
+		const propConfig = configuration[name];
 
 		if (!propConfig) return;
 
@@ -60,7 +62,7 @@ export const createStyles = <
 		// eslint-disable-next-line sonarjs/cognitive-complexity
 	) => {
 		const classNames: string[] = [];
-		const propConfig = configuration[name as keyof typeof configuration];
+		const propConfig = configuration[name];
 		const isNativeShorthandProperty = isShorthandProperty(name);
 
 		let styleSheet = isNativeShorthandProperty
@@ -136,7 +138,12 @@ export const createStyles = <
 		return classNames;
 	};
 
-	return (input: StylesInput<Properties, Shorthands>) => {
+	return <
+		const Input extends StylesInput<Properties, Shorthands>,
+		AllowedKeys extends keyof Properties | keyof Shorthands,
+	>(
+		input: Exactify<Input, AllowedKeys>,
+	) => {
 		const classNames: string[] = [];
 
 		for (const propertyName of Object.keys(input)) {
@@ -269,7 +276,3 @@ type CustomStylesOutput<Property extends CustomProperty, Value> = StylesOutput<
 				  })
 		: Value
 >;
-
-type Exactify<T, X extends T> = T & {
-	[K in keyof X]: K extends keyof T ? X[K] : never;
-};

@@ -7,3 +7,7 @@ export type RecordLike = Record<number | string | symbol, unknown>;
  * @see For more details, https://github.com/Microsoft/TypeScript/issues/29729#issuecomment-567871939
  */
 export type UngreedyString = Record<never, never> & string;
+
+export type Exactify<Value, AllowedKeys extends number | string | symbol> = {
+	[K in keyof Value]: K extends AllowedKeys ? Value[K] : never;
+};

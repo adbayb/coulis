@@ -4,7 +4,8 @@ import { compose } from "../helpers";
 import type { createStyles } from "./styles";
 
 export const createVariants = <
-	Styles extends ReturnType<typeof createStyles>,
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	Styles extends ReturnType<typeof createStyles<any, any>>,
 	Variants extends Record<string, Record<string, Parameters<Styles>[0]>>,
 >(
 	styles: Styles,

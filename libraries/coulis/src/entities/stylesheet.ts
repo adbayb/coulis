@@ -1,4 +1,5 @@
 import { IS_BROWSER_ENV, IS_PROD_ENV } from "../constants";
+import { minify } from "../helpers";
 
 import { createCache } from "./cache";
 import type { Cache, CacheKey } from "./cache";
@@ -179,7 +180,3 @@ export const createStyleSheets = (): Record<
 };
 
 export const STYLESHEETS = createStyleSheets();
-
-const minify = (value: string) => {
-	return value.replace(/\s{2,}|\s+(?={)|\r?\n/gm, "");
-};

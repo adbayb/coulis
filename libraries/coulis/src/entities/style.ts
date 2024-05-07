@@ -15,7 +15,7 @@ import type { PropertiesFallback } from "csstype";
 
 import type { UngreedyString } from "../types";
 
-export type RelaxedStyleProperties = Record<
+export type LooseStyleProperties = Record<
 	UngreedyString,
 	number | string | undefined
 > &

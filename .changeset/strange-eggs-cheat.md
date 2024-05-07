@@ -2,4 +2,4 @@
 "coulis": patch
 ---
 
-Make styles input stricter by not allowing undefined properties.
+Make styles input stricter by not allowing unknown properties.

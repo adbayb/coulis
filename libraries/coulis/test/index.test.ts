@@ -68,7 +68,7 @@ describe("coulis", () => {
 	test("should type `createStyles` in a safe manner", () => {
 		const styles = createStyles(
 			{
-				backgroundColor: ["red", "blue", "titi"],
+				backgroundColor: ["red", "blue"],
 				color: {
 					danger: "red",
 					warning: "yellow",
@@ -158,7 +158,7 @@ const styles = createStyles(
 	{
 		backgroundColor: true,
 		color: true,
-		padding: true,
+		padding: [6, 12, 18],
 	},
 	{
 		states: {
@@ -192,5 +192,7 @@ const classNames = styles({
 		hover: "lightcyan",
 	},
 	color: "lightblue",
-	padding: 10,
+	padding: {
+		base: 6,
+	},
 });

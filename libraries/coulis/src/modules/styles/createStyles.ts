@@ -203,7 +203,7 @@ type PropertyValue<
 				StyleProperties[PropertyName]
 			>
 		: never
-	: Properties[PropertyName] extends CustomPropertyValue
+	: Properties[PropertyName] extends CustomPropertyValue<unknown>
 		? Properties[PropertyName] extends (infer Value)[]
 			? CreatePropertyValue<Properties, Options, PropertyName, Value>
 			: Properties[PropertyName] extends Record<infer Value, unknown>
@@ -248,15 +248,15 @@ type WithLooseValue<
 		: Value
 	: Value;
 
-type CustomPropertyValue =
-	| (number | string)[]
-	| Record<string, number | string>;
+type CustomPropertyValue<Value> = Record<string, Value> | Value[];
 
 type NativePropertyValue = true;
 
-type CreateStylesProperties = Partial<
-	Record<keyof StyleProperties, CustomPropertyValue | NativePropertyValue>
->;
+type CreateStylesProperties = {
+	[K in keyof StyleProperties]?:
+		| CustomPropertyValue<StyleProperties[K]>
+		| NativePropertyValue;
+};
 
 type CreateStylesOptions<Properties extends CreateStylesProperties> = {
 	looseProperties?: (keyof Properties)[];

@@ -11,7 +11,7 @@
  */
 
 /* eslint-disable sort-keys-custom-order/object-keys */
-import type { PropertiesFallback } from "csstype";
+import type { Properties as CSSProperties } from "csstype";
 
 import type { UngreedyString } from "../types";
 
@@ -21,7 +21,7 @@ export type LooseStyleProperties = Record<
 > &
 	StyleProperties;
 
-export type StyleProperties = PropertiesFallback<UngreedyString | number>;
+export type StyleProperties = CSSProperties<UngreedyString | number>;
 
 export type ClassName = string;
 

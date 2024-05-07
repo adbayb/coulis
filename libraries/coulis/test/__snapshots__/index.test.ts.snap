@@ -29,7 +29,7 @@ exports[`coulis > should extract styles given object format 1`] = `
   {
     "attributes": {
       "data-coulis-cache": "",
-      "data-coulis-id": "conditionalShorthand",
+      "data-coulis-id": "atShorthand",
     },
     "content": "",
     "toString": [Function],
@@ -37,7 +37,7 @@ exports[`coulis > should extract styles given object format 1`] = `
   {
     "attributes": {
       "data-coulis-cache": "",
-      "data-coulis-id": "conditionalLonghand",
+      "data-coulis-id": "atLonghand",
     },
     "content": "",
     "toString": [Function],
@@ -45,4 +45,4 @@ exports[`coulis > should extract styles given object format 1`] = `
 ]
 `;
 
-exports[`coulis > should extract styles given string format 1`] = `"<style data-coulis-cache="c77e20e50,c8e4ce7ac" data-coulis-id="global">@keyframes c77e20e50{25%{transform:scale(1.25);}50%{transform:scale(1.5);}from{transform:scale(1);}to{transform:scale(1);}}*,*::before,*::after{box-sizing:inherit;}.globalClass+.otherGlobalClass{border:1px solid black;border-radius:4px;}@charset "utf-8";@font-face{font-family:'AliasedHelvetica';src:local(Helvetica);}@import url('https://fonts.googleapis.com/css?family=Open+Sans&display=swap');html{box-sizing:border-box;}html,body{background-color:lightcoral;font-family:Open Sans, AliasedHelvetica;}</style><style data-coulis-cache="" data-coulis-id="shorthand"></style><style data-coulis-cache="" data-coulis-id="longhand"></style><style data-coulis-cache="" data-coulis-id="conditionalShorthand"></style><style data-coulis-cache="" data-coulis-id="conditionalLonghand"></style>"`;
+exports[`coulis > should extract styles given string format 1`] = `"<style data-coulis-cache="c77e20e50,c8e4ce7ac" data-coulis-id="global">@keyframes c77e20e50{25%{transform:scale(1.25);}50%{transform:scale(1.5);}from{transform:scale(1);}to{transform:scale(1);}}*,*::before,*::after{box-sizing:inherit;}.globalClass+.otherGlobalClass{border:1px solid black;border-radius:4px;}@charset "utf-8";@font-face{font-family:'AliasedHelvetica';src:local(Helvetica);}@import url('https://fonts.googleapis.com/css?family=Open+Sans&display=swap');html{box-sizing:border-box;}html,body{background-color:lightcoral;font-family:Open Sans, AliasedHelvetica;}</style><style data-coulis-cache="" data-coulis-id="shorthand"></style><style data-coulis-cache="" data-coulis-id="longhand"></style><style data-coulis-cache="" data-coulis-id="atShorthand"></style><style data-coulis-cache="" data-coulis-id="atLonghand"></style>"`;

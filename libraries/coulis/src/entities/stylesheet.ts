@@ -7,8 +7,8 @@ import { createClassName } from "./style";
 import type { ClassName } from "./style";
 
 type StyleSheetIdentifier =
-	| "conditionalLonghand"
-	| "conditionalShorthand"
+	| "atLonghand"
+	| "atShorthand"
 	| "global"
 	| "longhand"
 	| "shorthand";
@@ -159,8 +159,8 @@ export const createStyleSheets = (): Record<
 	 * global (e.g div { background-color }) < shorthand (e.g background) < longhand (e.g background-color) < conditional-shorthand (e.g @media { background }) < conditional-longhand (e.g @media { background-color }) properties.
 	 */
 	const INSERTION_ORDER_BY_ID = Object.freeze({
-		conditionalLonghand: 4,
-		conditionalShorthand: 3,
+		atLonghand: 4,
+		atShorthand: 3,
 		global: 0,
 		longhand: 2,
 		shorthand: 1,

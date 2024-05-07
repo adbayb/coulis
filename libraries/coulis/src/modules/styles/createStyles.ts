@@ -119,8 +119,8 @@ export const createStyles = <
 
 			if (preComputedRule.startsWith("@")) {
 				styleSheet = isNativeShorthandProperty
-					? STYLESHEETS.conditionalShorthand
-					: STYLESHEETS.conditionalLonghand;
+					? STYLESHEETS.atShorthand
+					: STYLESHEETS.atLonghand;
 			}
 
 			classNames.push(

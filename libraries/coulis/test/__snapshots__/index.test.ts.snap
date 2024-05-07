@@ -12,18 +12,18 @@ exports[`coulis > should extract styles given object format 1`] = `
   },
   {
     "attributes": {
-      "data-coulis-cache": "",
+      "data-coulis-cache": "cd0c53d28,c6a0088d1,ccadc8a20,c2a100aa4",
       "data-coulis-id": "shorthand",
     },
-    "content": "",
+    "content": ".cd0c53d28{padding:10px;}.c6a0088d1{padding:18px;}.ccadc8a20{padding:12px;}.c2a100aa4{padding:6px;}",
     "toString": [Function],
   },
   {
     "attributes": {
-      "data-coulis-cache": "cdd299de8,cbb3938,ce31a3799,c18a19c73,cd0c53d28,c72f7daf8,c6a0088d1,ccadc8a20,c5ea183e8,c2a100aa4",
+      "data-coulis-cache": "cdd299de8,cbb3938,ce31a3799,c18a19c73,c72f7daf8,c5ea183e8",
       "data-coulis-id": "longhand",
     },
-    "content": ".cdd299de8[alt]{background-color:lightgray;}.cbb3938{background-color:lightcoral;}.ce31a3799{background-color:lightcyan;}.c18a19c73{color:lightblue;}.cd0c53d28{padding:10px;}.c72f7daf8{background-color:lightseagreen;}.c6a0088d1{padding:18px;}.ccadc8a20{padding:12px;}.c5ea183e8{background-color:lightgrey;}.c2a100aa4{padding:6px;}",
+    "content": ".cdd299de8[alt]{background-color:lightgray;}.cbb3938{background-color:lightcoral;}.ce31a3799{background-color:lightcyan;}.c18a19c73{color:lightblue;}.c72f7daf8{background-color:lightseagreen;}.c5ea183e8{background-color:lightgrey;}",
     "toString": [Function],
   },
   {

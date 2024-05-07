@@ -1,4 +1,4 @@
-import { createDeclaration } from "../../entities/style";
+import { createDeclaration, isShorthandProperty } from "../../entities/style";
 import type { StyleProperties } from "../../entities/style";
 import { STYLESHEETS } from "../../entities/stylesheet";
 import { isObject } from "../../helpers";
@@ -22,7 +22,7 @@ export const createStyles = <
 ) => {
 	const configuredShorthandNames = Object.keys(options.shorthands ?? {});
 
-	const isShorthandProperty = (
+	const isShorthandKey = (
 		key: string,
 	): key is Extract<keyof Shorthands, string> => {
 		return configuredShorthandNames.includes(key);
@@ -142,7 +142,7 @@ export const createStyles = <
 		for (const propertyName of Object.keys(input)) {
 			const value = input[propertyName] as StyleInputValue;
 
-			if (isShorthandProperty(propertyName)) {
+			if (isShorthandKey(propertyName)) {
 				const shorthandConfig = (
 					options.shorthands as NonNullable<Shorthands>
 				)[propertyName] as (keyof StyleProperties)[];

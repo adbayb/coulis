@@ -8,11 +8,6 @@ import {
 import { useEffect, useState } from "react";
 import type { PropsWithChildren, ReactNode } from "react";
 
-/**
- * TODO:
- * - Update documentation.
- */
-
 const STYLE_KEYS_FACTORIES: Record<
 	"hover" | "large" | "medium" | "small" | "smallWithHover",
 	(params: { className: string; declaration: string }) => string
@@ -30,7 +25,7 @@ const STYLE_KEYS_FACTORIES: Record<
 
 const px = (value: number) => `${value}px`;
 
-const tokens = {
+const tokens = Object.freeze({
 	colors: {
 		black: "black",
 		blue: [
@@ -56,7 +51,7 @@ const tokens = {
 	],
 	fontWeights: ["100", "400", "900"],
 	radii: [px(0), px(4), px(8), px(12), px(999)],
-} as const;
+} as const);
 
 const theme = createCustomProperties({
 	colors: {
@@ -66,20 +61,18 @@ const theme = createCustomProperties({
 		surfacePrimary: tokens.colors.blue[4],
 		surfaceSecondary: tokens.colors.blue[2],
 	},
+	fontSizes: {
+		body: tokens.fontSizes[2],
+	},
+	fontWeights: {
+		body: tokens.fontWeights[1],
+	},
 	radii: {
 		full: tokens.radii[4],
 		large: tokens.radii[3],
 		medium: tokens.radii[2],
 		none: tokens.radii[0],
 		small: tokens.radii[1],
-	},
-	typographies: {
-		fontSizes: {
-			body: tokens.fontSizes[2],
-		},
-		fontWeights: {
-			body: tokens.fontWeights[1],
-		},
 	},
 });
 
@@ -141,10 +134,10 @@ const styles = createStyles(
 		flex: true,
 		flexDirection: true,
 		fontSize: {
-			values: theme.typographies.fontSizes,
+			values: theme.fontSizes,
 		},
 		fontWeight: {
-			values: theme.typographies.fontWeights,
+			values: theme.fontWeights,
 		},
 		gap: true,
 		height: true,

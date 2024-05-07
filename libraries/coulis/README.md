@@ -31,7 +31,7 @@ yarn add coulis
 ```tsx
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-import { styles, globalStyles } from "coulis";
+import { createStyles, globalStyles } from "coulis";
 
 globalStyles({
 	"@import":
@@ -49,6 +49,23 @@ globalStyles({
 	},
 });
 
+const styles = createStyles({
+	alignItems: true,
+	display: true,
+	fontSize: true,
+	height: true,
+	justifyContent: true,
+	textAlign: true,
+	width: true,
+	color: {
+		keys: {
+			hover({ className, declaration }) {
+				return `${className}:hover{${declaration}}`;
+			},
+		},
+	},
+});
+
 const App = () => {
 	return (
 		<main
@@ -63,8 +80,8 @@ const App = () => {
 			<p
 				className={styles({
 					color: {
-						default: "black",
-						":hover": "lightcoral",
+						base: "black",
+						hover: "lightcoral",
 					},
 					fontSize: 26,
 					textAlign: "center",
@@ -125,12 +142,58 @@ export const App = () => {
 
 ### createStyles
 
-TODO
+```tsx
+import { createStyles } from "coulis";
+
+const styles = createStyles({
+	alignItems: true,
+	display: true,
+	fontSize: true,
+	height: true,
+	justifyContent: true,
+	textAlign: true,
+	width: true,
+	color: {
+		keys: {
+			hover({ className, declaration }) {
+				return `${className}:hover{${declaration}}`;
+			},
+		},
+	},
+});
+
+export const App = () => {
+	return (
+		<main
+			className={styles({
+				display: "flex",
+				width: "100%",
+				height: "100%",
+				alignItems: "center",
+				justifyContent: "center",
+			})}
+		>
+			<p
+				className={styles({
+					color: {
+						base: "black",
+						hover: "lightcoral",
+					},
+					fontSize: 26,
+					textAlign: "center",
+				})}
+			>
+				Hello 🤗
+			</p>
+		</main>
+	);
+};
+```
 
 ### createKeyframes
 
 ```tsx
-import { styles, createKeyframes } from "coulis";
+import { createStyles, createKeyframes } from "coulis";
 
 const zoomIn = createKeyframes({
 	from: {
@@ -142,6 +205,15 @@ const zoomIn = createKeyframes({
 	to: {
 		transform: "scale(1)",
 	},
+});
+
+const styles = createStyles({
+	animation: true,
+	backgroundColor: true,
+	borderRadius: true,
+	height: true,
+	margin: true,
+	width: true,
 });
 
 export const App = () => {
@@ -163,9 +235,14 @@ export const App = () => {
 ### createVariants
 
 ```tsx
-import { createVariants } from "coulis";
+import { createStyles, createVariants } from "coulis";
 
-const buttonVariants = createVariants({
+const styles = createStyles({
+	backgroundColor: true,
+	padding: true,
+});
+
+const buttonVariants = createVariants(styles, {
 	color: {
 		accent: { backgroundColor: "lightcoral" },
 		brand: { backgroundColor: "lightseagreen" },
@@ -182,7 +259,7 @@ export const App = () => {
 	return (
 		<button
 			className={buttonVariants({
-				color: "accent",
+				color: "brand",
 				size: "large",
 			})}
 		>
@@ -195,11 +272,11 @@ export const App = () => {
 ### createCustomProperties
 
 ```tsx
-import { createCustomProperties } from "coulis";
+import { createCustomProperties, createStyles } from "coulis";
 
 const px = (value: number) => `${value}px`;
 
-const tokens = {
+const tokens = Object.freeze({
 	colors: {
 		black: "black",
 		blue: [
@@ -225,7 +302,7 @@ const tokens = {
 	],
 	fontWeights: ["100", "400", "900"],
 	radii: [px(0), px(4), px(8), px(12), px(999)],
-} as const;
+});
 
 const theme = createCustomProperties({
 	colors: {
@@ -235,6 +312,8 @@ const theme = createCustomProperties({
 		surfacePrimary: tokens.colors.blue[4],
 		surfaceSecondary: tokens.colors.blue[2],
 	},
+	fontSizes: { body: tokens.fontSizes[2] },
+	fontWeights: { body: tokens.fontWeights[1] },
 	radii: {
 		full: tokens.radii[4],
 		large: tokens.radii[3],
@@ -242,11 +321,23 @@ const theme = createCustomProperties({
 		none: tokens.radii[0],
 		small: tokens.radii[1],
 	},
-	typographies: {
-		body: {
-			fontSize: tokens.fontSizes[2],
-			fontWeight: tokens.fontWeights[1],
-		},
+});
+
+const styles = createStyles({
+	backgroundColor: {
+		values: theme.colors,
+	},
+	borderRadius: {
+		values: theme.radii,
+	},
+	color: {
+		values: theme.colors,
+	},
+	fontSize: {
+		values: theme.fontSizes,
+	},
+	fontWeight: {
+		values: theme.fontWeights,
 	},
 });
 
@@ -254,12 +345,11 @@ export const App = () => {
 	return (
 		<p
 			className={styles({
-				backgroundColor: "lightcoral",
-				borderRadius: theme.radii.large,
-				color: theme.colors.neutralLight,
-				fontSize: theme.typographies.body.fontSize,
-				fontWeight: theme.typographies.body.fontWeight,
-				padding: 24,
+				backgroundColor: "surfacePrimary",
+				borderRadius: "large",
+				color: "neutralLight",
+				fontSize: "body",
+				fontWeight: "body",
 			})}
 		>
 			Hello 👋

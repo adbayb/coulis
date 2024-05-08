@@ -1,5 +1,17 @@
 # Change Log
 
+## 0.9.0
+
+### Minor Changes
+
+- [`56310fc`](https://github.com/adbayb/coulis/commit/56310fc381ed316da9418d1e4bb8e734e2190d75) Thanks [@adbayb](https://github.com/adbayb)! - Review `createStyles` to make transversal setup (e.g. states, loose properties, ...) more cohesive.
+
+- [`4495c4a`](https://github.com/adbayb/coulis/commit/4495c4a9ab67a15202ca9bcd934903a927a68298) Thanks [@adbayb](https://github.com/adbayb)! - Allow values autocomplete in the first `createStyles` argument.
+
+### Patch Changes
+
+- [`d2f89ce`](https://github.com/adbayb/coulis/commit/d2f89cedcdce50019fe714ea558b2cbf3395f3e5) Thanks [@adbayb](https://github.com/adbayb)! - Make styles input stricter by not allowing unknown properties.
+
 ## 0.8.0
 
 ### Minor Changes

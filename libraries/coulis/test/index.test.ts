@@ -97,6 +97,33 @@ describe("coulis", () => {
 
 		expect(
 			styles({
+				backgroundColor: {
+					// @ts-expect-error stateful property value does not exist (custom value)
+					base: "blue3",
+				},
+			}),
+		).toBeTypeOf("string");
+
+		expect(
+			styles({
+				backgroundColor: {
+					// @ts-expect-error state key does not exist
+					toto: "red",
+				},
+			}),
+		).toBeTypeOf("string");
+
+		expect(
+			styles({
+				// @ts-expect-error base state key is missing
+				backgroundColor: {
+					hover: "red",
+				},
+			}),
+		).toBeTypeOf("string");
+
+		expect(
+			styles({
 				// @ts-expect-error property value does not exist (native value)
 				width: new Date(),
 			}),

@@ -2,7 +2,7 @@ import { createDeclaration, isShorthandProperty } from "../../entities/style";
 import type { StyleProperties } from "../../entities/style";
 import { STYLESHEETS } from "../../entities/stylesheet";
 import { isObject } from "../../helpers";
-import type { Exactify } from "../../types";
+import type { Exactify, Greedify } from "../../types";
 
 /**
  * A factory to configure and create type-safe `styles` method.
@@ -211,27 +211,41 @@ type PropertyValue<
 				: never
 		: never;
 
+// TODO test generic extends Value | Record<string, Value> (one at a given time)
 type CreatePropertyValue<
 	Properties extends CreateStylesProperties,
 	Options extends CreateStylesOptions<Properties>,
 	PropertyName extends keyof Properties,
 	Value,
 > =
-	| WithLooseValue<Properties, Options, PropertyName, Value>
+	// By default, `csstype` includes `(string | number) & {}` hacky values on some CSS properties to allow preserving the autocomplete for literal enums.
+	// However it comes with a tradeoff: string prototype keys are included if the property value is unioned with a record.
+	// It lead to key pollution with undesired keys if the property is stateful.
+	// To prevent such issue, the `csstype` hack is disabled via `Greedify` and let the primitive type widen the literal enum.
+	// For more details, check the `Greedify` utility type JSDoc.
+
+	| Greedify<WithLooseValue<Properties, Options, PropertyName, Value>>
 	| (Options["states"] extends Record<infer State, unknown>
-			? Partial<
-					Record<
-						State,
-						WithLooseValue<Properties, Options, PropertyName, Value>
-					>
-				> & {
-					base: WithLooseValue<
-						Properties,
-						Options,
-						PropertyName,
-						Value
-					>;
-				}
+			? Greedify<
+					Partial<
+						Record<
+							State,
+							WithLooseValue<
+								Properties,
+								Options,
+								PropertyName,
+								Value
+							>
+						>
+					> & {
+						base: WithLooseValue<
+							Properties,
+							Options,
+							PropertyName,
+							Value
+						>;
+					}
+				>
 			: never)
 	| undefined;
 

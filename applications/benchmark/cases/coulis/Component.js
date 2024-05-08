@@ -3,17 +3,18 @@ import React from "react";
 
 import { NUMBER_OF_DATA } from "../../constants";
 
-const styles = createStyles({
-	backgroundColor: {
-		allowNativeValues: true,
-		keys: {
-			base: ({ className, declaration }) =>
-				`${className}{${declaration}}`,
+const styles = createStyles(
+	{
+		backgroundColor: true,
+		border: true,
+	},
+	{
+		states: {
 			hover: ({ className, declaration }) =>
 				`${className}:hover{${declaration}}`,
 		},
 	},
-});
+);
 
 export const Component = () => {
 	return (

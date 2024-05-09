@@ -3,27 +3,13 @@ import React from "react";
 
 import { NUMBER_OF_DATA } from "../../constants";
 
-const tableClassName = css`
-	border: 1px solid black;
-`;
-
-const firstTdClassName = css`
-	background-color: lightcoral;
-	&:hover {
-		background-color: lightyellow;
-	}
-`;
-
-const secondTdClassName = css`
-	background-color: lightblue;
-	&:hover {
-		background-color: lightyellow;
-	}
-`;
-
 export const Component = () => {
 	return (
-		<table className={tableClassName}>
+		<table
+			className={css`
+				border: 1px solid black;
+			`}
+		>
 			<thead>
 				<tr>
 					<th>Column1</th>
@@ -34,8 +20,24 @@ export const Component = () => {
 				{[...new Array(NUMBER_OF_DATA)].map((_, index) => {
 					return (
 						<tr key={index}>
-							<td className={firstTdClassName}>The table body</td>
-							<td className={secondTdClassName}>
+							<td
+								className={css`
+									background-color: lightcoral;
+									&:hover {
+										background-color: lightyellow;
+									}
+								`}
+							>
+								The table body
+							</td>
+							<td
+								className={css`
+									background-color: lightblue;
+									&:hover {
+										background-color: lightyellow;
+									}
+								`}
+							>
 								with two columns
 							</td>
 						</tr>

@@ -16,27 +16,13 @@ const styles = createStyles(
 	},
 );
 
-const tableClassName = styles({
-	border: "1px solid black",
-});
-
-const firstTdClassName = styles({
-	backgroundColor: {
-		base: "lightcoral",
-		hover: "lightyellow",
-	},
-});
-
-const secondTdClassName = styles({
-	backgroundColor: {
-		base: "lightblue",
-		hover: "lightyellow",
-	},
-});
-
 export const Component = () => {
 	return (
-		<table className={tableClassName}>
+		<table
+			className={styles({
+				border: "1px solid black",
+			})}
+		>
 			<thead>
 				<tr>
 					<th>Column1</th>
@@ -47,8 +33,24 @@ export const Component = () => {
 				{[...new Array(NUMBER_OF_DATA)].map((_, index) => {
 					return (
 						<tr key={index}>
-							<td className={firstTdClassName}>The table body</td>
-							<td className={secondTdClassName}>
+							<td
+								className={styles({
+									backgroundColor: {
+										base: "lightcoral",
+										hover: "lightyellow",
+									},
+								})}
+							>
+								The table body
+							</td>
+							<td
+								className={styles({
+									backgroundColor: {
+										base: "lightblue",
+										hover: "lightyellow",
+									},
+								})}
+							>
 								with two columns
 							</td>
 						</tr>

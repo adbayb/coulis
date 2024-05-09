@@ -223,7 +223,6 @@ type CreatePropertyValue<
 	// It lead to key pollution with undesired keys if the property is stateful.
 	// To prevent such issue, the `csstype` hack is disabled via `Greedify` and let the primitive type widen the literal enum.
 	// For more details, check the `Greedify` utility type JSDoc.
-
 	| Greedify<WithLooseValue<Properties, Options, PropertyName, Value>>
 	| (Options["states"] extends Record<infer State, unknown>
 			? Greedify<

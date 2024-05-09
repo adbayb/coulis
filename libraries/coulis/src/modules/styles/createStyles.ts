@@ -200,7 +200,7 @@ type PropertyValue<
 				Properties,
 				Options,
 				PropertyName,
-				StyleProperties[PropertyName]
+				GreedyStyleProperty<PropertyName>
 			>
 		: never
 	: Properties[PropertyName] extends CustomPropertyValue<unknown>
@@ -218,33 +218,21 @@ type CreatePropertyValue<
 	PropertyName extends keyof Properties,
 	Value,
 > =
-	// By default, `csstype` includes `(string | number) & {}` hacky values on some CSS properties to allow preserving the autocomplete for literal enums.
-	// However it comes with a tradeoff: string prototype keys are included if the property value is unioned with a record.
-	// It lead to key pollution with undesired keys if the property is stateful.
-	// To prevent such issue, the `csstype` hack is disabled via `Greedify` and let the primitive type widen the literal enum.
-	// For more details, check the `Greedify` utility type JSDoc.
-	| Greedify<WithLooseValue<Properties, Options, PropertyName, Value>>
+	| WithLooseValue<Properties, Options, PropertyName, Value>
 	| (Options["states"] extends Record<infer State, unknown>
-			? Greedify<
-					Partial<
-						Record<
-							State,
-							WithLooseValue<
-								Properties,
-								Options,
-								PropertyName,
-								Value
-							>
-						>
-					> & {
-						base: WithLooseValue<
-							Properties,
-							Options,
-							PropertyName,
-							Value
-						>;
-					}
-				>
+			? Partial<
+					Record<
+						State,
+						WithLooseValue<Properties, Options, PropertyName, Value>
+					>
+				> & {
+					base: WithLooseValue<
+						Properties,
+						Options,
+						PropertyName,
+						Value
+					>;
+				}
 			: never)
 	| undefined;
 
@@ -256,7 +244,7 @@ type WithLooseValue<
 > = Options["looseProperties"] extends unknown[]
 	? PropertyName extends Options["looseProperties"][number]
 		? PropertyName extends keyof StyleProperties
-			? StyleProperties[PropertyName] | Value
+			? GreedyStyleProperty<PropertyName> | Value
 			: Value
 		: Value
 	: Value;
@@ -282,3 +270,15 @@ type CreateStylesOptions<Properties extends CreateStylesProperties> = {
 		base?: never;
 	};
 };
+
+/**
+ * Utility type to create a greedy style property value type.
+ * By default, `csstype` includes `(string | number) & {}` hacky values on some CSS properties to allow preserving the autocomplete for literal enums.
+ * However it comes with a tradeoff: string prototype keys are included if the property value is unioned with a record.
+ * It lead to key pollution with undesired keys if the property is stateful.
+ * To prevent such issue, the `csstype` hack is disabled via `Greedify` and let the primitive type widen the literal enum.
+ * For more details, check the `Greedify` utility type JSDoc.
+ */
+type GreedyStyleProperty<PropertyName extends keyof StyleProperties> = Greedify<
+	StyleProperties[PropertyName]
+>;

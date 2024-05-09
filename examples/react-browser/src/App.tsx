@@ -181,7 +181,7 @@ const App = () => {
 			</Example>
 			<Example title="With static styles">
 				<p
-					className={styles({
+					{...styles({
 						backgroundColor: "surfacePrimary",
 						borderRadius: "large",
 						color: "neutralLight",
@@ -195,7 +195,7 @@ const App = () => {
 			</Example>
 			<Example title="With dynamic styles">
 				<p
-					className={styles({
+					{...styles({
 						color:
 							counter % 2 === 0
 								? "surfacePrimary"
@@ -207,7 +207,7 @@ const App = () => {
 			</Example>
 			<Example title="With contextual styles">
 				<p
-					className={styles({
+					{...styles({
 						backgroundColor: {
 							base: "surfacePrimary",
 							medium: "surfaceSecondary",
@@ -220,7 +220,7 @@ const App = () => {
 			</Example>
 			<Example title="With custom properties">
 				<p
-					className={styles({
+					{...styles({
 						backgroundColor: theme.colors.neutralLight,
 						borderRadius: theme.radii.large,
 					})}
@@ -230,7 +230,7 @@ const App = () => {
 			</Example>
 			<Example title="With variants">
 				<button
-					className={buttonVariants({
+					{...buttonVariants({
 						color: "brand",
 						size: "large",
 					})}
@@ -240,7 +240,7 @@ const App = () => {
 			</Example>
 			<Example title="With keyframes">
 				<div
-					className={styles({
+					{...styles({
 						animation: `${animationName} 2000ms linear infinite`,
 						backgroundColor: "surfacePrimary",
 						borderRadius: 4,
@@ -274,7 +274,7 @@ const Example = ({ title, children }: ExampleProps) => {
 const Layout = ({ children }: PropsWithChildren) => {
 	return (
 		<main
-			className={styles({
+			{...styles({
 				display: "flex",
 				flexDirection: "column",
 				gap: 16,

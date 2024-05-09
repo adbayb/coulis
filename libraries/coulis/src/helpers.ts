@@ -7,7 +7,7 @@
  * document.getElementById("my-element-id").className = classNames;
  */
 export const compose = (...classNames: string[]) => {
-	return classNames.join(" ");
+	return classNames.filter(Boolean).join(" ");
 };
 
 export const isNumber = (value: unknown): value is number => {

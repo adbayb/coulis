@@ -13,9 +13,9 @@ import { isNumber } from "../helpers";
  * 	document.getElementById("my-element-id").className = className;
  */
 export const createKeyframes = (properties: KeyframesStyleProperties) => {
-	return STYLESHEETS.global.commit({
+	const { className } = STYLESHEETS.global.commit({
 		key: JSON.stringify(properties),
-		createRules(className) {
+		createRules(cName) {
 			let rule = "";
 
 			const selectors = Object.keys(
@@ -32,9 +32,11 @@ export const createKeyframes = (properties: KeyframesStyleProperties) => {
 				}{${createDeclarations(style)}}`;
 			}
 
-			return `@keyframes ${className}{${rule}}`;
+			return `@keyframes ${cName}{${rule}}`;
 		},
 	});
+
+	return className;
 };
 
 type KeyframesStyleProperties = {

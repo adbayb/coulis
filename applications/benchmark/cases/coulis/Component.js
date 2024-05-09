@@ -16,12 +16,29 @@ const styles = createStyles(
 	},
 );
 
+const tableStyles = styles({
+	border: "1px solid black",
+});
+
+const tdStylesFirst = styles({
+	backgroundColor: {
+		base: "lightcoral",
+		hover: "lightyellow",
+	},
+});
+
+const tdStylesSecond = styles({
+	backgroundColor: {
+		base: "lightblue",
+		hover: "lightyellow",
+	},
+});
+
 export const Component = () => {
 	return (
 		<table
-			className={styles({
-				border: "1px solid black",
-			})}
+			className={tableStyles.className}
+			style={tableStyles.style}
 		>
 			<thead>
 				<tr>
@@ -34,22 +51,14 @@ export const Component = () => {
 					return (
 						<tr key={index}>
 							<td
-								className={styles({
-									backgroundColor: {
-										base: "lightcoral",
-										hover: "lightyellow",
-									},
-								})}
+								className={tdStylesFirst.className}
+								style={tdStylesFirst.style}
 							>
 								The table body
 							</td>
 							<td
-								className={styles({
-									backgroundColor: {
-										base: "lightblue",
-										hover: "lightyellow",
-									},
-								})}
+								className={tdStylesSecond.className}
+								style={tdStylesSecond.style}
 							>
 								with two columns
 							</td>

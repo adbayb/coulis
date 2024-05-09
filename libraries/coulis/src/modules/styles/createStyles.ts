@@ -34,9 +34,11 @@ export const createStyles = <
 
 	const getDeclaration = ({
 		name,
+		importantFlag = false,
 		value,
 	}: {
 		name: keyof StyleProperties;
+		importantFlag?: boolean;
 		value: number | string | undefined;
 	}) => {
 		if (value === undefined) return;
@@ -54,6 +56,7 @@ export const createStyles = <
 
 		return createDeclaration({
 			name,
+			importantFlag,
 			value: mappedValue,
 		});
 	};
@@ -65,81 +68,79 @@ export const createStyles = <
 			| number
 			| string
 			| undefined,
-		// eslint-disable-next-line sonarjs/cognitive-complexity
 	) => {
-		const classNames: string[] = [];
+		const output: {
+			classNames: string[];
+			styles: Record<string, number | string | undefined>;
+		} = {
+			classNames: [],
+			styles: {},
+		};
+
+		const commitStyles = (params: {
+			name: keyof StyleProperties;
+			value: number | string | undefined;
+		}) => {
+			const declaration = getDeclaration(params);
+
+			if (!declaration) return output;
+
+			output.styles[name] = declaration.value;
+
+			return output;
+		};
+
 		const isNativeShorthandProperty = isShorthandProperty(name);
 
-		let styleSheet = isNativeShorthandProperty
-			? STYLESHEETS.shorthand
-			: STYLESHEETS.longhand;
-
 		if (!isObject(value)) {
-			const declaration = getDeclaration({
-				name,
-				value,
-			});
-
-			if (!declaration) return classNames;
-
-			classNames.push(
-				styleSheet.commit({
-					key: declaration,
-					createRules(className) {
-						return `.${className}{${declaration}}`;
-					},
-				}),
-			);
-
-			return classNames;
+			return commitStyles({ name, value });
 		}
 
 		const keys = Object.keys(value);
 
 		for (const key of keys) {
+			const stateBuilder = options?.states?.[key];
 			const inputValue = value[key];
+			const isBaseState = key === "base";
+
+			if (isBaseState) {
+				commitStyles({ name, value: inputValue });
+
+				continue;
+			}
 
 			const declaration = getDeclaration({
 				name,
+				importantFlag: true,
 				value: inputValue,
 			});
 
-			if (!declaration) continue;
+			if (!declaration || typeof stateBuilder !== "function") continue;
 
-			const stateBuilder = options?.states?.[key];
-			const isBaseState = key === "base";
+			const stringifiedDeclaration = String(declaration);
 
-			const preComputedRule =
-				isBaseState || typeof stateBuilder !== "function"
-					? `.{{className}}{${declaration}}`
-					: stateBuilder({
-							className: ".{{className}}",
-							declaration,
-						});
+			const preComputedRule = stateBuilder({
+				className: ".{{className}}",
+				declaration: stringifiedDeclaration,
+			});
 
-			if (preComputedRule.startsWith("@")) {
-				styleSheet = isNativeShorthandProperty
-					? STYLESHEETS.atShorthand
-					: STYLESHEETS.atLonghand;
-			}
+			const isAtRule = preComputedRule.startsWith("@");
 
-			classNames.push(
-				styleSheet.commit({
-					key:
-						// The key is not included to compute the className when `key` equals to "base" as base is equivalent to an unconditional value.
-						// This exclusion will allow to recycle cache if the style value has been already defined unconditionally.
-						isBaseState ? declaration : `${key}${declaration}`,
-					createRules(className) {
-						return preComputedRule.replace(
-							"{{className}}",
-							className,
-						);
-					},
-				}),
-			);
+			const styleSheet = isNativeShorthandProperty
+				? STYLESHEETS[isAtRule ? "atShorthand" : "shorthand"]
+				: STYLESHEETS[isAtRule ? "atLonghand" : "longhand"];
+
+			const { className } = styleSheet.commit({
+				key: `${key}${stringifiedDeclaration}`,
+				createRules(cName) {
+					return preComputedRule.replace("{{className}}", cName);
+				},
+			});
+
+			output.classNames.push(className);
 		}
 
-		return classNames;
+		return output;
 	};
 
 	return (
@@ -161,6 +162,7 @@ export const createStyles = <
 				: never;
 		},
 	) => {
+		let styles: Record<string, number | string | undefined> = {};
 		const classNames: string[] = [];
 
 		for (const propertyName of Object.keys(input)) {
@@ -174,19 +176,32 @@ export const createStyles = <
 				)[propertyName] as (keyof StyleProperties)[];
 
 				for (const shorthandName of shorthandConfig) {
-					classNames.push(...createRules(shorthandName, value));
+					const output = createRules(shorthandName, value);
+
+					styles = {
+						...styles,
+						...output.styles,
+					};
+					classNames.push(...output.classNames);
 				}
 			} else {
-				classNames.push(
-					...createRules(
-						propertyName as keyof StyleProperties,
-						value,
-					),
+				const output = createRules(
+					propertyName as keyof StyleProperties,
+					value,
 				);
+
+				styles = {
+					...styles,
+					...output.styles,
+				};
+				classNames.push(...output.classNames);
 			}
 		}
 
-		return classNames.join(" ");
+		return {
+			className: classNames.join(" "),
+			style: styles,
+		};
 	};
 };
 

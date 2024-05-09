@@ -4,7 +4,7 @@ import { minify } from "../helpers";
 import { createCache } from "./cache";
 import type { Cache, CacheKey } from "./cache";
 import { createClassName } from "./style";
-import type { ClassName } from "./style";
+import type { ClassName, StyleProperties } from "./style";
 
 type StyleSheetIdentifier =
 	| "atLonghand"
@@ -19,7 +19,8 @@ export type StyleSheet = {
 	commit: (params: {
 		key: CacheKey;
 		createRules: (className: string) => string[] | string;
-	}) => ClassName;
+		properties?: StyleProperties;
+	}) => { className: ClassName; style: StyleProperties };
 	flush: () => void;
 	getAttributes: (
 		cachedKeys?: string,
@@ -111,12 +112,17 @@ export const createStyleSheet = (id: StyleSheetIdentifier): StyleSheet => {
 	return {
 		id,
 		cache,
-		commit(params) {
-			const className = createClassName(params.key);
+		commit({ key, createRules, properties }) {
+			if (properties) {
+				return { className: "", style: properties };
+			}
 
-			if (cache.has(className)) return className;
+			const style = {};
+			const className = createClassName(key);
 
-			const rules = params.createRules(className);
+			if (cache.has(className)) return { className, style };
+
+			const rules = createRules(className);
 
 			if (typeof rules === "string") {
 				styleSheetTarget.insert(rules);
@@ -128,7 +134,7 @@ export const createStyleSheet = (id: StyleSheetIdentifier): StyleSheet => {
 
 			cache.add(className);
 
-			return className;
+			return { className, style };
 		},
 		flush() {
 			cache.flush();

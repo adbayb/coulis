@@ -14,6 +14,7 @@ export const createVariants = <
 	return (selectedValueByVariant: {
 		[Variant in keyof Variants]: keyof Variants[Variant];
 	}) => {
+		let style: Record<string, number | string | undefined> = {};
 		const classNames: ClassName[] = [];
 		const variantKeys = Object.keys(selectedValueByVariant);
 
@@ -26,9 +27,15 @@ export const createVariants = <
 
 			if (variantProperties === undefined) continue;
 
-			classNames.push(styles(variantProperties));
+			const output = styles(variantProperties); // TODO style merging
+
+			classNames.push(output.className);
+			style = {
+				...style,
+				...output.style,
+			};
 		}
 
-		return compose(...classNames);
+		return { className: compose(...classNames), style };
 	};
 };

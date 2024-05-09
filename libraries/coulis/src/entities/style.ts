@@ -48,8 +48,10 @@ export const createClassName = (value: string) => {
 export const createDeclaration = ({
 	name,
 	value,
+	importantFlag = false,
 }: {
 	name: keyof StyleProperties;
+	importantFlag?: boolean;
 	value: StyleProperties[keyof StyleProperties];
 }) => {
 	// From JS camelCase to CSS kebeb-case
@@ -60,11 +62,17 @@ export const createDeclaration = ({
 
 	// Format value to follow CSS specs (unitless number)
 	const transformedPropertyValue =
-		typeof value === "string" || UNITLESS_PROPERTIES[name]
+		(typeof value === "string" || UNITLESS_PROPERTIES[name]
 			? String(value)
-			: `${String(value)}px`;
+			: `${String(value)}px`) + (importantFlag ? " !important" : "");
 
-	return `${transformedPropertyName}:${transformedPropertyValue};`;
+	return {
+		name: transformedPropertyName,
+		value: transformedPropertyValue,
+		toString() {
+			return `${transformedPropertyName}:${transformedPropertyValue};`;
+		},
+	};
 };
 
 export const createDeclarations = <Properties extends StyleProperties>(
@@ -77,10 +85,12 @@ export const createDeclarations = <Properties extends StyleProperties>(
 		const value = properties[propertyName];
 
 		if (value) {
-			declarationBlock += createDeclaration({
-				name: propertyName,
-				value,
-			});
+			declarationBlock += String(
+				createDeclaration({
+					name: propertyName,
+					value,
+				}),
+			);
 		}
 	}
 

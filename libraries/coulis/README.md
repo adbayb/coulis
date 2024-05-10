@@ -68,8 +68,8 @@ const styles = createStyles(
 		},
 	},
 	{
-		looseProperties: ["marginLeft", "marginRight"],
-		shorthandProperties: {
+		loose: ["marginLeft", "marginRight"],
+		shorthands: {
 			marginHorizontal: ["marginLeft", "marginRight"],
 			paddingHorizontal: ["paddingLeft", "paddingRight"],
 		},

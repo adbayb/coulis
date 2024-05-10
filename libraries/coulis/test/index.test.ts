@@ -77,8 +77,8 @@ describe("coulis", () => {
 				width: true,
 			},
 			{
-				looseProperties: ["color"],
-				shorthandProperties: {
+				loose: ["color"],
+				shorthands: {
 					size: ["width"],
 				},
 				states: {

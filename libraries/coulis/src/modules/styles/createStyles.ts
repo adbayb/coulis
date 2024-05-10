@@ -20,11 +20,9 @@ export const createStyles = <
 	properties: Exactify<Properties, keyof CreateStylesProperties>,
 	options?: Options,
 ) => {
-	type ShorthandProperties = Options["shorthandProperties"];
+	type ShorthandProperties = Options["shorthands"];
 
-	const configuredShorthandNames = Object.keys(
-		options?.shorthandProperties ?? {},
-	);
+	const configuredShorthandNames = Object.keys(options?.shorthands ?? {});
 
 	const isShorthandKey = (
 		key: string,
@@ -177,7 +175,7 @@ export const createStyles = <
 
 			if (isShorthandKey(propertyName)) {
 				const shorthandConfig = (
-					options?.shorthandProperties as NonNullable<ShorthandProperties>
+					options?.shorthands as NonNullable<ShorthandProperties>
 				)[propertyName] as (keyof StyleProperties)[];
 
 				for (const shorthandName of shorthandConfig) {
@@ -248,8 +246,8 @@ type WithLooseValue<
 	Options extends CreateStylesOptions<Properties>,
 	PropertyName extends keyof Properties,
 	Value,
-> = Options["looseProperties"] extends unknown[]
-	? PropertyName extends Options["looseProperties"][number]
+> = Options["loose"] extends unknown[]
+	? PropertyName extends Options["loose"][number]
 		? PropertyName extends keyof StyleProperties
 			? GreedyStyleProperty<PropertyName> | Value
 			: Value
@@ -267,8 +265,8 @@ type CreateStylesProperties = {
 };
 
 type CreateStylesOptions<Properties extends CreateStylesProperties> = {
-	looseProperties?: (keyof Properties)[];
-	shorthandProperties?: Record<string, (keyof Properties)[]>;
+	loose?: (keyof Properties)[];
+	shorthands?: Record<string, (keyof Properties)[]>;
 	states?: Record<
 		string,
 		(input: { className: string; declaration: string }) => string

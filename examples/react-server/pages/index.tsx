@@ -126,8 +126,8 @@ const styles = createStyles(
 		width: [50, 100],
 	},
 	{
-		looseProperties: ["backgroundColor", "borderRadius"],
-		shorthandProperties: {
+		loose: ["backgroundColor", "borderRadius"],
+		shorthands: {
 			marginHorizontal: ["marginLeft", "marginRight"],
 			marginVertical: ["marginTop", "marginBottom"],
 			paddingHorizontal: ["paddingLeft", "paddingRight"],

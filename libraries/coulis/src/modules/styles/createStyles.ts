@@ -1,7 +1,7 @@
 import { createDeclaration, isShorthandProperty } from "../../entities/style";
 import type { StyleProperties } from "../../entities/style";
 import { STYLESHEETS } from "../../entities/stylesheet";
-import { isObject } from "../../helpers";
+import { createError, isObject } from "../../helpers";
 import type { Exactify, Greedify } from "../../types";
 
 /**
@@ -43,18 +43,25 @@ export const createStyles = <
 
 		const propConfig = properties[name];
 
-		if (!propConfig) return;
+		if (!propConfig) {
+			throw new Error(
+				createError({
+					api: "styles",
+					cause: `No configuration found for property \`${name}\``,
+					solution:
+						"Review the corresponding `createStyles` factory to include the needed property configuration",
+				}),
+			);
+		}
 
 		const mappedValue =
 			typeof propConfig === "boolean" || !isObject(propConfig)
 				? value
 				: propConfig[value];
 
-		if (mappedValue === undefined) return;
-
 		return createDeclaration({
 			name,
-			value: mappedValue,
+			value: mappedValue ?? value,
 		});
 	};
 

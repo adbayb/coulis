@@ -21,3 +21,11 @@ export const isObject = (value: unknown): value is Record<string, unknown> => {
 export const minify = (value: string) => {
 	return value.replace(/\s{2,}|\s+(?={)|\r?\n/gm, "");
 };
+
+export const createError = (params: {
+	api: string;
+	cause: string;
+	solution: string;
+}) => {
+	return `\`${params.api}\`: ${params.cause}. ${params.solution}.`;
+};

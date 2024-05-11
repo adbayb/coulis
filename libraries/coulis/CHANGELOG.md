@@ -1,5 +1,11 @@
 # Change Log
 
+## 0.11.0
+
+### Minor Changes
+
+- [`82daed3`](https://github.com/adbayb/coulis/commit/82daed3bd650ba23bc3e07f089208e01d77fe30b) Thanks [@adbayb](https://github.com/adbayb)! - Add static helper to retrieve `createStyles` defined property names.
+
 ## 0.10.0
 
 ### Minor Changes

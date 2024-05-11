@@ -1,5 +1,19 @@
 # Change Log
 
+## 0.10.0
+
+### Minor Changes
+
+- [`6f241ae`](https://github.com/adbayb/coulis/commit/6f241ae6e3e40e81825f5635494636a4247a609a) Thanks [@adbayb](https://github.com/adbayb)! - Improve performance by caching className hash creation.
+
+- [`f527ae7`](https://github.com/adbayb/coulis/commit/f527ae7bc52262ffcd03aeb8b29de5eb68773e1b) Thanks [@adbayb](https://github.com/adbayb)! - Rename `looseProperties` and `shorthandProperties` optional `createStyles` parameters respectively to `loose` and `shorthands`.
+
+### Patch Changes
+
+- [`478b44c`](https://github.com/adbayb/coulis/commit/478b44cbab86a8dd5dc5cfa9bf6ffb89e49ac998) Thanks [@adbayb](https://github.com/adbayb)! - Fix state object key pollution due to literal union csstype hack.
+
+- [`609d4f8`](https://github.com/adbayb/coulis/commit/609d4f8a18733639e42ebd3bd8197886dfbcf0b0) Thanks [@adbayb](https://github.com/adbayb)! - Make `styles` fallback to value if a key is not available in a custom property.
+
 ## 0.9.0
 
 ### Minor Changes

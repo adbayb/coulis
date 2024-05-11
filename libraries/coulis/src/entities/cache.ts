@@ -1,33 +1,39 @@
 export type CacheKey = string;
 
-type CacheRecord = Set<CacheKey>; // TODO: transform to Map
+type CacheValue = string;
 
 export type Cache = {
-	add: (key: CacheKey) => void;
+	add: (key: CacheKey, value: CacheValue) => void;
 	flush: () => void;
-	getValues: () => string[];
+	get: (key: CacheKey) => CacheValue | undefined;
+	getAll: () => CacheValue[];
 	has: (key: CacheKey) => boolean;
 	toString: () => string;
 };
 
-export const createCache = (initialValues: string[]): Cache => {
-	let cache: CacheRecord = new Set(initialValues);
+export const createCache = (): Cache => {
+	const cache = new Map<CacheKey, string>();
+
+	const getAll = () => {
+		return [...cache.values()];
+	};
 
 	return {
-		add(key) {
-			cache.add(key);
+		add(key, value) {
+			cache.set(key, value);
 		},
 		flush() {
-			cache = new Set();
+			cache.clear();
 		},
-		getValues() {
-			return [...cache.values()];
+		get(key) {
+			return cache.get(key);
 		},
+		getAll,
 		has(key) {
 			return cache.has(key);
 		},
 		toString() {
-			return Array.from(cache).join();
+			return getAll().join();
 		},
 	};
 };

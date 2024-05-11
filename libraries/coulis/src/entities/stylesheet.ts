@@ -106,15 +106,24 @@ export const createStyleSheet = (id: StyleSheetIdentifier): StyleSheet => {
 			: createVirtualStyleSheetTarget
 	)(id);
 
-	const cache = createCache(styleSheetTarget.getHydrationInput());
+	const hydrationInput = styleSheetTarget.getHydrationInput();
+	const cache = createCache();
 
 	return {
 		id,
 		cache,
 		commit(params) {
-			const className = createClassName(params.key);
+			let className = cache.get(params.key);
 
-			if (cache.has(className)) return className;
+			if (className) return className;
+
+			className = createClassName(params.key);
+
+			cache.add(params.key, className);
+
+			if (hydrationInput.includes(className)) {
+				return className;
+			}
 
 			const rules = params.createRules(className);
 
@@ -126,8 +135,6 @@ export const createStyleSheet = (id: StyleSheetIdentifier): StyleSheet => {
 				}
 			}
 
-			cache.add(className);
-
 			return className;
 		},
 		flush() {
@@ -136,7 +143,7 @@ export const createStyleSheet = (id: StyleSheetIdentifier): StyleSheet => {
 		},
 		getAttributes() {
 			return {
-				"data-coulis-cache": cache.getValues().join(","),
+				"data-coulis-cache": cache.getAll().join(","),
 				"data-coulis-id": id,
 			};
 		},

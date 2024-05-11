@@ -22,7 +22,9 @@ export const createStyles = <
 ) => {
 	type ShorthandProperties = Options["shorthands"];
 
-	const configuredShorthandNames = Object.keys(options?.shorthands ?? {});
+	const shorthands = options?.shorthands ?? {};
+	const states = options?.states ?? {};
+	const configuredShorthandNames = Object.keys(shorthands);
 
 	const isShorthandKey = (
 		key: string,
@@ -111,16 +113,27 @@ export const createStyles = <
 
 			if (!declaration) continue;
 
-			const stateBuilder = options?.states?.[key];
 			const isBaseState = key === "base";
 
-			const preComputedRule =
-				isBaseState || typeof stateBuilder !== "function"
-					? `.{{className}}{${declaration}}`
-					: stateBuilder({
-							className: ".{{className}}",
-							declaration,
-						});
+			const stateBuilder = isBaseState
+				? () => `.{{className}}{${declaration}}`
+				: states[key];
+
+			if (typeof stateBuilder !== "function") {
+				throw new Error(
+					createError({
+						api: "styles",
+						cause: `No configuration found for state \`${key}\``,
+						solution:
+							"Review the corresponding `createStyles` factory to include the needed `states` configuration",
+					}),
+				);
+			}
+
+			const preComputedRule = stateBuilder({
+				className: ".{{className}}",
+				declaration,
+			});
 
 			if (preComputedRule.startsWith("@")) {
 				styleSheet = isNativeShorthandProperty
@@ -174,9 +187,9 @@ export const createStyles = <
 			)[propertyName];
 
 			if (isShorthandKey(propertyName)) {
-				const shorthandConfig = (
-					options?.shorthands as NonNullable<ShorthandProperties>
-				)[propertyName] as (keyof StyleProperties)[];
+				const shorthandConfig = shorthands[
+					propertyName
+				] as (keyof StyleProperties)[];
 
 				for (const shorthandName of shorthandConfig) {
 					classNames.push(...createRules(shorthandName, value));

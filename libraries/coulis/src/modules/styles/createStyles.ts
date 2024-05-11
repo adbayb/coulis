@@ -236,7 +236,6 @@ type PropertyValue<
 				: never
 		: never;
 
-// TODO test generic extends Value | Record<string, Value> (one at a given time)
 type CreatePropertyValue<
 	Properties extends CreateStylesProperties,
 	Options extends CreateStylesOptions<Properties>,

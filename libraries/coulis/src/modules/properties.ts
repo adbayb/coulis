@@ -36,7 +36,7 @@ type Properties = {
  * @param properties - Record of custom properties .
  * @returns Ready-to-consume CSS custom properties.
  * @example
- * const properties = createCustomProperties({}); // TODO
+ * const properties = createCustomProperties({ colors: { neutralDark: "black", neutralLight: "white" } });
  */
 export const createCustomProperties = <const P extends Properties>(
 	properties: P,

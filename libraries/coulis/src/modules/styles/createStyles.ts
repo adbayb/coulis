@@ -22,7 +22,6 @@ export const createStyles = <
 ) => {
 	type ShorthandProperties = Options["shorthands"];
 
-	const propertyNames = Object.keys(properties) as (keyof Properties)[];
 	const shorthands = options?.shorthands ?? {};
 	const states = options?.states ?? {};
 	const configuredShorthandNames = Object.keys(shorthands);
@@ -210,7 +209,13 @@ export const createStyles = <
 
 	return Object.assign(styles, {
 		getPropertyNames() {
-			return propertyNames;
+			const nativeNames = Object.keys(properties) as (keyof Properties)[];
+
+			const shorthandNames = Object.keys(
+				shorthands,
+			) as (keyof Options["shorthands"])[];
+
+			return [...nativeNames, ...shorthandNames];
 		},
 	});
 };

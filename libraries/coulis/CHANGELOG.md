@@ -1,5 +1,13 @@
 # Change Log
 
+## 0.11.1
+
+### Patch Changes
+
+- [`d50ff81`](https://github.com/adbayb/coulis/commit/d50ff8121fcb7e74201a578dd4890590d1468ad4) Thanks [@adbayb](https://github.com/adbayb)! - Fix missing shorhand properties in `styles.getPropertyNames` method.
+
+- [`731f778`](https://github.com/adbayb/coulis/commit/731f77825a1a9853c61735de8dd91cb16705c619) Thanks [@adbayb](https://github.com/adbayb)! - Escape invalid characters while generating custom properties.
+
 ## 0.11.0
 
 ### Minor Changes

@@ -36,6 +36,12 @@ const tokens = Object.freeze({
 	],
 	fontWeights: ["100", "400", "900"],
 	radii: [px(0), px(4), px(8), px(12), px(999)],
+	spacings: {
+		0: "0px",
+		0.5: "0.5rem",
+		1: "1rem",
+		1.5: "2rem",
+	},
 } as const);
 
 const theme = createCustomProperties({
@@ -59,6 +65,7 @@ const theme = createCustomProperties({
 		none: tokens.radii[0],
 		small: tokens.radii[1],
 	},
+	spacings: tokens.spacings,
 });
 
 globalStyles({
@@ -113,16 +120,16 @@ const styles = createStyles(
 		fontWeight: theme.fontWeights,
 		gap: true,
 		height: true,
-		margin: true,
-		marginBottom: true,
-		marginLeft: true,
-		marginRight: true,
-		marginTop: true,
-		padding: true,
-		paddingBottom: true,
-		paddingLeft: true,
-		paddingRight: true,
-		paddingTop: true,
+		margin: theme.spacings,
+		marginBottom: theme.spacings,
+		marginLeft: theme.spacings,
+		marginRight: theme.spacings,
+		marginTop: theme.spacings,
+		padding: theme.spacings,
+		paddingBottom: theme.spacings,
+		paddingLeft: theme.spacings,
+		paddingRight: theme.spacings,
+		paddingTop: theme.spacings,
 		width: [50, 100],
 	},
 	{
@@ -155,9 +162,9 @@ const buttonVariants = createVariants(styles, {
 		neutral: { backgroundColor: "neutralDark" },
 	},
 	size: {
-		large: { padding: 18 },
-		medium: { padding: 12 },
-		small: { padding: 6 },
+		large: { padding: 1.5 },
+		medium: { padding: 1 },
+		small: { padding: 0.5 },
 	},
 });
 
@@ -187,7 +194,7 @@ const App = () => {
 						color: "neutralLight",
 						fontSize: "body",
 						fontWeight: "body",
-						padding: 24,
+						padding: 1,
 					})}
 				>
 					{TEXT}
@@ -245,7 +252,7 @@ const App = () => {
 						backgroundColor: "surfacePrimary",
 						borderRadius: 4,
 						height: 50,
-						marginHorizontal: 24,
+						marginHorizontal: 1.5,
 						width: 50,
 					})}
 				/>

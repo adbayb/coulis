@@ -85,7 +85,7 @@ const createCustomPropertiesWithoutSideEffects = <const P extends Properties>(
 			nodes[tokenName] = output.nodes as (typeof nodes)[keyof P];
 		} else {
 			const property: CustomProperty = {
-				name: propertyNameParts.join("-"),
+				name: escape(propertyNameParts.join("-")),
 				value: value as string,
 			};
 
@@ -97,4 +97,16 @@ const createCustomPropertiesWithoutSideEffects = <const P extends Properties>(
 	}
 
 	return { collectedProperties, nodes };
+};
+
+/**
+ * Escape invalid CSS characters to generate usable property names.
+ * @param name - The property name to escape with potentially some unsafe characters.
+ * @returns The escaped property name.
+ * @see https://mathiasbynens.be/notes/css-escapes
+ * @example
+ * const safeCssVariable = escape("--spacings-1.5"); // Will generate `--spacings-1\5`
+ */
+const escape = (name: string) => {
+	return name.replace(/[!"#$%&'()*+,./:;<=>?@[\]^`{|}~]/g, "\\");
 };

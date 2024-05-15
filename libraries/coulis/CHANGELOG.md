@@ -1,5 +1,11 @@
 # Change Log
 
+## 0.11.2
+
+### Patch Changes
+
+- [`5f9e787`](https://github.com/adbayb/coulis/commit/5f9e787a1e2dcce61964e5adabcbb843b3b4b5ce) Thanks [@adbayb](https://github.com/adbayb)! - Fix `Expression produces a union type that is too complex to represent` while extrating style properties consumer side.
+
 ## 0.11.1
 
 ### Patch Changes

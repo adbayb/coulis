@@ -254,14 +254,11 @@ type CreatePropertyValue<
 						State,
 						WithLooseValue<Properties, Options, PropertyName, Value>
 					>
-				> & {
-					base: WithLooseValue<
-						Properties,
-						Options,
-						PropertyName,
-						Value
-					>;
-				}
+				> &
+					Record<
+						"base",
+						WithLooseValue<Properties, Options, PropertyName, Value>
+					>
 			: never)
 	| undefined;
 
@@ -295,7 +292,7 @@ type CreateStylesOptions<Properties extends CreateStylesProperties> = {
 		string,
 		(input: { className: string; declaration: string }) => string
 	> & {
-		// The `base` state cannot be overwritten consumer side
+		// The `base` state cannot be overwritten consumer-side
 		base?: never;
 	};
 };

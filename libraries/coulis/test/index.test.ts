@@ -74,6 +74,9 @@ describe("coulis", () => {
 					warning: "yellow",
 				},
 				height: ["100%"],
+				transitionProperty(input: ("background-color" | "color")[]) {
+					return input.join(" ");
+				},
 				width: true,
 			},
 			{
@@ -92,6 +95,7 @@ describe("coulis", () => {
 			styles({
 				// @ts-expect-error property value does not exist (custom value)
 				backgroundColor: "blue2",
+				transitionProperty: ["color", "background-color"],
 			}),
 		).toBeTypeOf("string");
 

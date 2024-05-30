@@ -55,9 +55,11 @@ export const createStyles = <
 		}
 
 		const mappedValue =
-			typeof propConfig === "boolean" || !isObject(propConfig)
-				? value
-				: propConfig[value];
+			typeof propConfig === "function"
+				? propConfig(value)
+				: isObject(propConfig)
+					? propConfig[value]
+					: value;
 
 		return createDeclaration({
 			name,
@@ -234,9 +236,11 @@ type PropertyValue<
 			>
 		: never
 	: Properties[PropertyName] extends CustomPropertyValue<unknown>
-		? Properties[PropertyName] extends (infer Value)[]
+		? Properties[PropertyName] extends (input: infer Value) => unknown
 			? CreatePropertyValue<Properties, Options, PropertyName, Value>
-			: Properties[PropertyName] extends Record<infer Value, unknown>
+			: Properties[PropertyName] extends
+						| (infer Value)[]
+						| Record<infer Value, unknown>
 				? CreatePropertyValue<Properties, Options, PropertyName, Value>
 				: never
 		: never;
@@ -275,7 +279,11 @@ type WithLooseValue<
 		: Value
 	: Value;
 
-type CustomPropertyValue<Value> = Record<string, Value> | Value[];
+type CustomPropertyValue<Value> =
+	| Record<string, Value>
+	| Value[]
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	| ((input: any) => Value);
 
 type NativePropertyValue = true;
 

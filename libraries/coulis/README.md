@@ -63,6 +63,9 @@ const styles = createStyles(
 		marginRight: [0, 4, 8, 16],
 		paddingLeft: [0, 4, 8, 16],
 		paddingRight: [0, 4, 8, 16],
+		transitionProperty(input: ("color" | "background-color")[]) {
+			return input.join(",");
+		},
 		width: {
 			full: "100%",
 		},
@@ -101,6 +104,7 @@ const App = () => {
 					fontSize: 26,
 					marginHorizontal: "auto",
 					paddingHorizontal: 16,
+					transitionProperty: ["color"],
 				})}
 			>
 				Hello 🤗

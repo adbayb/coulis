@@ -113,6 +113,9 @@ const styles = createStyles(
 		backgroundColor: theme.colors,
 		borderRadius: theme.radii,
 		color: theme.colors,
+		colorScheme(input: "black" | "white") {
+			return input === "black" ? "dark" : "light";
+		},
 		display: true,
 		flex: true,
 		flexDirection: true,
@@ -130,6 +133,9 @@ const styles = createStyles(
 		paddingLeft: theme.spacings,
 		paddingRight: theme.spacings,
 		paddingTop: theme.spacings,
+		transitionProperty(input: ("background-color" | "color")[]) {
+			return input.join(",");
+		},
 		width: [50, 100],
 	},
 	{
@@ -192,9 +198,20 @@ const App = () => {
 						backgroundColor: "surfacePrimary",
 						borderRadius: "large",
 						color: "neutralLight",
+						colorScheme: {
+							base: "white",
+							hover: "black",
+						},
 						fontSize: "body",
 						fontWeight: "body",
-						padding: 1,
+						padding: {
+							base: 1,
+							hover: 1.5,
+						},
+						transitionProperty: {
+							base: ["color", "background-color"],
+							hover: ["color"],
+						},
 					})}
 				>
 					{TEXT}

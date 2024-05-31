@@ -1,5 +1,11 @@
 # Change Log
 
+## 0.12.0
+
+### Minor Changes
+
+- [`ed15118`](https://github.com/adbayb/coulis/commit/ed1511848544dc5e307c95e6ac12469d8785393f) Thanks [@adbayb](https://github.com/adbayb)! - Allow computed value by defining a function-based `createStyles` property value.
+
 ## 0.11.2
 
 ### Patch Changes

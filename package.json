@@ -31,7 +31,7 @@
 		"@adbayb/stack": "1.16.1",
 		"@adbayb/ts-config": "1.0.0",
 		"@swc/core": "1.4.17",
-		"execa": "8.0.1",
+		"execa": "9.3.0",
 		"rollup": "4.17.0",
 		"rollup-plugin-dts": "6.1.0",
 		"rollup-plugin-node-externals": "7.1.2",

@@ -1,5 +1,11 @@
 # Change Log
 
+## 0.13.0
+
+### Minor Changes
+
+- [#19](https://github.com/adbayb/coulis/pull/19) [`a2db2fb`](https://github.com/adbayb/coulis/commit/a2db2fbdbe52d240b5ab7dc6a6de33df2dcd8ebf) Thanks [@renovate](https://github.com/apps/renovate)! - Updated dependency `@types/node` to `20.12.13`.
+
 ## 0.12.0
 
 ### Minor Changes

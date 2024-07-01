@@ -20,9 +20,9 @@
 		"react-benchmark": "^5.1.0",
 		"react": "^18.3.1",
 		"react-dom": "^18.3.1",
-		"styled-components": "^6.1.8"
+		"styled-components": "^6.1.11"
 	},
 	"devDependencies": {
-		"@babel/preset-react": "7.24.1"
+		"@babel/preset-react": "7.24.7"
 	}
 }

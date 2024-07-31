@@ -30,12 +30,12 @@
 		"@adbayb/prettier-config": "1.5.0",
 		"@adbayb/stack": "1.16.1",
 		"@adbayb/ts-config": "1.0.0",
-		"@swc/core": "1.7.0",
+		"@swc/core": "1.7.3",
 		"execa": "9.3.0",
-		"rollup": "4.18.1",
+		"rollup": "4.19.1",
 		"rollup-plugin-dts": "6.1.1",
 		"rollup-plugin-node-externals": "7.1.2",
-		"rollup-plugin-output-size": "1.4.0",
+		"rollup-plugin-output-size": "1.4.1",
 		"rollup-plugin-swc3": "0.11.2",
 		"tsx": "4.16.2"
 	}

@@ -18,7 +18,7 @@
 		"release:publish": "stack release --publish"
 	},
 	"prettier": "@adbayb/prettier-config",
-	"packageManager": "pnpm@9.5.0",
+	"packageManager": "pnpm@9.6.0",
 	"engines": {
 		"node": ">=18.0.0",
 		"pnpm": ">=8.0.0",

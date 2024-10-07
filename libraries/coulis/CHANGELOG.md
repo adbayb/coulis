@@ -1,5 +1,37 @@
 # Change Log
 
+## 0.13.0
+
+### Minor Changes
+
+- [#30](https://github.com/adbayb/coulis/pull/30) [`e10c238`](https://github.com/adbayb/coulis/commit/e10c23880f9cff85150b7d99e553d478fb3978d2) Thanks [@renovate](https://github.com/apps/renovate)! - Updated dependency `@types/node` to `20.16.2`.
+
+- [#22](https://github.com/adbayb/coulis/pull/22) [`0a20e13`](https://github.com/adbayb/coulis/commit/0a20e13cf9baa630affc7467ba3d0f1ffa7fee49) Thanks [@renovate](https://github.com/apps/renovate)! - Updated dependency `@emotion/css` to `^11.12.0`.
+  Updated dependency `styled-components` to `^6.1.12`.
+  Updated dependency `@babel/preset-react` to `7.24.7`.
+  Updated dependency `@types/react` to `18.3.3`.
+  Updated dependency `@vitejs/plugin-react` to `4.3.1`.
+  Updated dependency `vite` to `5.3.4`.
+  Updated dependency `next` to `^14.2.5`.
+  Updated dependency `vitest` to `1.6.0`.
+
+- [#19](https://github.com/adbayb/coulis/pull/19) [`a2db2fb`](https://github.com/adbayb/coulis/commit/a2db2fbdbe52d240b5ab7dc6a6de33df2dcd8ebf) Thanks [@renovate](https://github.com/apps/renovate)! - Updated dependency `@types/node` to `20.12.13`.
+
+- [#23](https://github.com/adbayb/coulis/pull/23) [`dead6cf`](https://github.com/adbayb/coulis/commit/dead6cf5481015b1e63311d277cf05569f25e684) Thanks [@renovate](https://github.com/apps/renovate)! - Updated dependency `@types/node` to `20.14.10`.
+
+- [#33](https://github.com/adbayb/coulis/pull/33) [`351a2f9`](https://github.com/adbayb/coulis/commit/351a2f95b952f16ea7358af7b4b4978aa3fdaa45) Thanks [@renovate](https://github.com/apps/renovate)! - Updated dependency `@emotion/css` to `^11.13.4`.
+  Updated dependency `styled-components` to `^6.1.13`.
+  Updated dependency `@babel/preset-react` to `7.25.7`.
+  Updated dependency `@types/react` to `18.3.11`.
+  Updated dependency `@vitejs/plugin-react` to `4.3.2`.
+  Updated dependency `vite` to `5.4.8`.
+  Updated dependency `next` to `^14.2.14`.
+  Updated dependency `vitest` to `2.1.2`.
+
+- [#27](https://github.com/adbayb/coulis/pull/27) [`1f359ba`](https://github.com/adbayb/coulis/commit/1f359ba5233378fc164309083d3bcb4b1d112601) Thanks [@renovate](https://github.com/apps/renovate)! - Updated dependency `vitest` to `2.0.5`.
+
+- [#25](https://github.com/adbayb/coulis/pull/25) [`d72277d`](https://github.com/adbayb/coulis/commit/d72277d909c4e1ea98b160da31b40b038cbf3cb8) Thanks [@renovate](https://github.com/apps/renovate)! - Updated dependency `@types/node` to `20.14.13`.
+
 ## 0.12.0
 
 ### Minor Changes

@@ -5,9 +5,9 @@
 	"description": "Benchmark suite for coulis",
 	"scripts": {
 		"benchmark": "pnpm benchmark:browser && pnpm benchmark:server",
-		"benchmark:browser": "react-benchmark ./cases/coulis/browser.js && react-benchmark ./cases/emotion/browser.js && react-benchmark ./cases/styled-components.js && react-benchmark ./cases/coulis-inlined/browser.js && react-benchmark ./cases/emotion-inlined/browser.js",
-		"benchmark:server": "react-benchmark ./cases/coulis/server.js && react-benchmark ./cases/emotion/server.js",
-		"benchmark:styled-components": "react-benchmark ./cases/styled-components.js"
+		"benchmark:browser": "react-benchmark ./src/cases/coulis/browser.js && react-benchmark ./src/cases/emotion/browser.js && react-benchmark ./src/cases/styled-components.js && react-benchmark ./src/cases/coulis-inlined/browser.js && react-benchmark ./src/cases/emotion-inlined/browser.js",
+		"benchmark:server": "react-benchmark ./src/cases/coulis/server.js && react-benchmark ./src/cases/emotion/server.js",
+		"benchmark:styled-components": "react-benchmark ./src/cases/styled-components.js"
 	},
 	"keywords": [],
 	"author": "Ayoub Adib <adbayb@gmail.com>",

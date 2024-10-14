@@ -6,6 +6,7 @@
 		"lib": ["dom", "dom.iterable", "esnext"],
 		"noEmit": true,
 		"module": "esnext",
+		"moduleResolution": "Bundler",
 		"jsx": "preserve",
 		"strictNullChecks": true
 	}

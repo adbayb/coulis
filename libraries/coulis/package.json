@@ -3,16 +3,12 @@
 	"version": "0.12.0",
 	"description": "Yet another atomic CSS-in-JS library",
 	"type": "module",
-	"source": "src/index.ts",
-	"main": "dist/index.cjs",
-	"module": "dist/index.mjs",
-	"types": "dist/index.d.ts",
 	"exports": {
 		".": {
 			"source": "./src/index.ts",
-			"import": "./dist/index.mjs",
+			"types": "./dist/index.d.ts",
 			"require": "./dist/index.cjs",
-			"types": "./dist/index.d.ts"
+			"import": "./dist/index.mjs"
 		}
 	},
 	"files": [
@@ -20,12 +16,12 @@
 	],
 	"sideEffects": false,
 	"scripts": {
-		"prepublishOnly": "npm run build",
+		"prepublishOnly": "pnpm run build",
 		"clean": "rm -rf dist",
 		"start": "pnpm watch",
-		"watch": "tsx ../../tools/build --watch",
-		"prebuild": "npm run clean",
-		"build": "tsx ../../tools/build",
+		"watch": "quickbundle watch",
+		"prebuild": "pnpm run clean",
+		"build": "quickbundle build",
 		"test": "vitest"
 	},
 	"keywords": [
@@ -50,6 +46,7 @@
 	},
 	"devDependencies": {
 		"@types/node": "20.16.10",
+		"quickbundle": "2.2.0",
 		"vitest": "2.1.2"
 	}
 }

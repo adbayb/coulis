@@ -2,5 +2,6 @@
 	"extends": "@adbayb/ts-config",
 	"compilerOptions": {
 		"moduleResolution": "Bundler"
-	}
+	},
+	"exclude": ["node_modules", "**/dist"]
 }

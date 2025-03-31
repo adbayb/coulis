@@ -28,7 +28,7 @@
 	"devDependencies": {
 		"@adbayb/eslint-config": "1.12.0",
 		"@adbayb/prettier-config": "1.5.0",
-		"@adbayb/stack": "1.16.1",
+		"@adbayb/stack": "2.21.0",
 		"@adbayb/ts-config": "1.0.0"
 	}
 }

@@ -1,4 +1,4 @@
 packages:
-    - "applications/*"
+    - "coulis"
     - "examples/*"
-    - "libraries/*"
+    - "tools/*"

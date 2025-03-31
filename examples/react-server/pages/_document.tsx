@@ -1,10 +1,10 @@
-import { extract } from "coulis";
 import Document, { Head, Html, Main, NextScript } from "next/document";
 import type { DocumentContext } from "next/document";
+import { extract } from "coulis";
 
 class MyDocument extends Document {
-	public static override async getInitialProps(ctx: DocumentContext) {
-		const initialProps = await Document.getInitialProps(ctx);
+	public static override async getInitialProps(context: DocumentContext) {
+		const initialProps = await Document.getInitialProps(context);
 		const styles = extract();
 
 		return {
@@ -16,7 +16,6 @@ class MyDocument extends Document {
 						return (
 							<style
 								{...attributes}
-								// eslint-disable-next-line react/no-danger, react/jsx-sort-props
 								dangerouslySetInnerHTML={{ __html: content }}
 								key={attributes["data-coulis-id"]}
 							/>
@@ -27,7 +26,6 @@ class MyDocument extends Document {
 		};
 	}
 
-	// eslint-disable-next-line @typescript-eslint/class-methods-use-this
 	public override render() {
 		return (
 			<Html lang="en">

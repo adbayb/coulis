@@ -1,0 +1,29 @@
+{
+	"name": "@coulis/benchmark",
+	"version": "0.0.0",
+	"private": "true",
+	"description": "Benchmark suite for coulis",
+	"keywords": [],
+	"license": "MIT",
+	"author": "Ayoub Adib <adbayb@gmail.com>",
+	"scripts": {
+		"benchmark": "pnpm benchmark:browser && pnpm benchmark:server",
+		"benchmark:browser": "react-benchmark ./src/cases/coulis/browser.js && react-benchmark ./src/cases/emotion/browser.js && react-benchmark ./src/cases/styled-components.js && react-benchmark ./src/cases/coulis-inlined/browser.js && react-benchmark ./src/cases/emotion-inlined/browser.js",
+		"benchmark:server": "react-benchmark ./src/cases/coulis/server.js && react-benchmark ./src/cases/emotion/server.js",
+		"benchmark:styled-components": "react-benchmark ./src/cases/styled-components.js"
+	},
+	"dependencies": {
+		"@emotion/css": "^11.13.5",
+		"@emotion/server": "^11.11.0",
+		"benchmark": "^2.1.4",
+		"coulis": "workspace:^",
+		"react": "^19.1.0",
+		"react-benchmark": "^5.1.0",
+		"react-dom": "^19.1.0",
+		"styled-components": "^6.1.16",
+		"typescript": "^5.8.2"
+	},
+	"devDependencies": {
+		"@babel/preset-react": "7.26.3"
+	}
+}

@@ -1,34 +1,28 @@
 {
-	"name": "@coulis/monorepo",
-	"private": true,
+	"name": "root",
 	"version": "0.0.0",
+	"private": true,
 	"type": "module",
 	"scripts": {
-		"prepare": "stack install",
-		"clean": "stack clean",
-		"check": "stack check",
-		"fix": "stack fix",
-		"start": "stack start",
 		"build": "stack build",
-		"watch": "stack watch",
-		"test": "stack test",
-		"benchmark": "pnpm --filter @coulis/benchmark benchmark",
+		"check": "stack check",
+		"clean": "stack clean",
+		"fix": "stack fix",
+		"install": "stack install",
 		"release:log": "stack release --log",
+		"release:publish": "stack release --publish",
 		"release:version": "stack release --tag",
-		"release:publish": "stack release --publish"
+		"start": "stack start",
+		"test": "stack test",
+		"watch": "stack watch"
 	},
-	"prettier": "@adbayb/prettier-config",
-	"packageManager": "pnpm@9.12.0",
-	"engines": {
-		"node": ">=18.0.0",
-		"pnpm": ">=8.0.0",
-		"npm": "please-use-pnpm",
-		"yarn": "please-use-pnpm"
-	},
+	"prettier": "@adbayb/stack/prettier",
 	"devDependencies": {
-		"@adbayb/eslint-config": "1.12.0",
-		"@adbayb/prettier-config": "1.5.0",
-		"@adbayb/stack": "1.16.1",
-		"@adbayb/ts-config": "1.0.0"
+		"@adbayb/stack": "2.22.0"
+	},
+	"packageManager": "pnpm@10.7.0",
+	"engines": {
+		"node": ">=22.0.0",
+		"pnpm": ">=10.0.0"
 	}
 }

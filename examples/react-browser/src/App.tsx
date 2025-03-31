@@ -1,3 +1,5 @@
+import { useEffect, useState } from "react";
+import type { PropsWithChildren, ReactNode } from "react";
 import {
 	createCustomProperties,
 	createKeyframes,
@@ -5,8 +7,6 @@ import {
 	createVariants,
 	globalStyles,
 } from "coulis";
-import { useEffect, useState } from "react";
-import type { PropsWithChildren, ReactNode } from "react";
 
 const px = (value: number) => `${value}px`;
 
@@ -71,12 +71,10 @@ const theme = createCustomProperties({
 globalStyles({
 	"@import":
 		"url('https://fonts.googleapis.com/css?family=Open+Sans&display=swap')",
-	// eslint-disable-next-line sort-keys-custom-order/object-keys
 	"@font-face": {
 		fontFamily: "'AliasedHelvetica'",
 		src: "local(Helvetica)",
 	},
-	// eslint-disable-next-line sort-keys-custom-order/object-keys
 	"*,*::before,*::after": {
 		boxSizing: "inherit",
 	},
@@ -84,7 +82,7 @@ globalStyles({
 		border: "1px solid black",
 		borderRadius: 4,
 	},
-	html: {
+	"html": {
 		boxSizing: "border-box",
 	},
 	"html,body": {
@@ -179,7 +177,9 @@ const App = () => {
 
 	useEffect(() => {
 		const id = setInterval(() => {
-			setCounter((value) => ++value);
+			setCounter((value) => {
+				return value + 1;
+			});
 		}, 1000);
 
 		return () => {
@@ -258,6 +258,7 @@ const App = () => {
 						color: "brand",
 						size: "large",
 					})}
+					type="button"
 				>
 					{TEXT.split(" ")[0]}
 				</button>
@@ -282,8 +283,8 @@ const TEXT =
 	"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
 
 type ExampleProps = {
-	title: string;
-	children: ReactNode;
+	readonly title: string;
+	readonly children: ReactNode;
 };
 
 const Example = ({ title, children }: ExampleProps) => {

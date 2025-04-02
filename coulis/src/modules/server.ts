@@ -7,10 +7,10 @@ import { STYLESHEETS } from "../entities/stylesheet";
  * @param options.flush - Enable cache auto flush after extraction.
  * @returns Object containing the content, attributes and a default `toString` operator.
  * @example
- * 	const styles = extract({ flush: true });
+ * 	const styles = extractStyles({ flush: true });
  *  return `<head>${styles}</head>`;
  */
-export const extract = (options?: {
+export const extractStyles = (options?: {
 	/**
 	 * Automatically flush the cache after extraction.
 	 * @default true - To prevent memory leaks. Set it to `false` if the cache needs to be preserved across requests.

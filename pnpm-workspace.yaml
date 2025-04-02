@@ -1,4 +1,6 @@
 packages:
-    - "coulis"
-    - "examples/*"
-    - "tools/*"
+    - coulis
+    - examples/*
+    - tools/*
+onlyBuiltDependencies:
+    - puppeteer

@@ -4,7 +4,7 @@ import {
 	createKeyframes,
 	createStyles,
 	createVariants,
-	extract,
+	extractStyles,
 	globalStyles,
 } from "../src";
 
@@ -57,12 +57,12 @@ describe("coulis", () => {
 	});
 
 	test("should extract styles given object format", () => {
-		expect(extract()).toMatchSnapshot();
+		expect(extractStyles()).toMatchSnapshot();
 	});
 
 	test("should extract styles given string format", () => {
 		// eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-		expect(`${extract()}`).toMatchSnapshot();
+		expect(`${extractStyles()}`).toMatchSnapshot();
 	});
 
 	test("should type `createStyles` in a safe manner", () => {

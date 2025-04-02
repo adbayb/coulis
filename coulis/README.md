@@ -132,6 +132,8 @@ This section aims to deep dive into each public API with focused examples:
 
 ### globalStyles
 
+A helper to apply some style rules globally:
+
 ```tsx
 import { globalStyles } from "coulis";
 
@@ -161,6 +163,9 @@ export const App = () => {
 ```
 
 ### createStyles
+
+A factory to configure and create type-safe `styles` method.
+It returns a `styles` method to generate a class name from a list of type-safe CSS properties:
 
 ```tsx
 import { createStyles } from "coulis";
@@ -215,6 +220,8 @@ export const App = () => {
 
 ### createKeyframes
 
+A factory to create a `keyframes` rule set globally scoped that describes the animation to apply to an element:
+
 ```tsx
 import { createKeyframes, createStyles } from "coulis";
 
@@ -257,6 +264,9 @@ export const App = () => {
 
 ### createVariants
 
+A factory to create one or several styling variants. The first-level field defines the variant name, the second-level field the variant value, and the third-level field the set of CSS properties applied.
+It returns a function to select the appropriate variant:
+
 ```tsx
 import { createStyles, createVariants } from "coulis";
 
@@ -293,6 +303,9 @@ export const App = () => {
 ```
 
 ### createCustomProperties
+
+A factory to create one or several custom properties globally scoped.  
+A [custom property](https://www.w3.org/TR/css-variables-1/) is any property whose name starts with two dashes. Its main functional purpose is theming: a theme defines a set of consistent and contextual properties (aka [design tokens](https://www.designtokens.org/glossary/)):
 
 ```tsx
 import { createCustomProperties, createStyles } from "coulis";
@@ -367,6 +380,37 @@ export const App = () => {
 		>
 			Hello 👋
 		</p>
+	);
+};
+```
+
+### extractStyles
+
+A helper to extract all styles (including global ones) to be injected in the HTML.  
+It allows preventing "Flash Of Unstyled Content" browser side:
+
+```tsx
+import { extractStyles } from "coulis";
+
+globalStyles({
+	html: {
+		boxSizing: "border-box",
+	},
+});
+
+const localStyles = createStyles({
+	alignItems: true,
+})({ alignItems: true });
+
+// `extractStyles` must be called after creating all styles:
+const extractedStyles = extractStyles();
+
+export const App = () => {
+	return (
+		<>
+			<style dangerously={{ __html: extractedStyles }} />
+			<span className={localStyles}>Hello 🤗</span>
+		</>
 	);
 };
 ```

@@ -1,11 +1,11 @@
 import Document, { Head, Html, Main, NextScript } from "next/document";
 import type { DocumentContext } from "next/document";
-import { extract } from "coulis";
+import { extractStyles } from "coulis";
 
 class MyDocument extends Document {
 	public static override async getInitialProps(context: DocumentContext) {
 		const initialProps = await Document.getInitialProps(context);
-		const styles = extract();
+		const styles = extractStyles();
 
 		return {
 			...initialProps,

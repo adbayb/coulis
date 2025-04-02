@@ -1,10 +1,11 @@
 import { renderToString } from "react-dom/server";
-import { extractStyles } from "coulis";
+import { createElement } from "react";
+import { extract } from "coulis";
 
 import { Component } from "./Component";
 
 export default function BenchmarkCase() {
-	renderToString(Component);
+	renderToString(createElement(Component));
 
-	return extractStyles();
+	return extract();
 }

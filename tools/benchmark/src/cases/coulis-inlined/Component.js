@@ -1,4 +1,3 @@
-import React from "react";
 import { createStyles } from "coulis";
 
 import { NUMBER_OF_DATA } from "../../constants";

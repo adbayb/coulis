@@ -1,5 +1,4 @@
 import styled from "styled-components";
-import React from "react";
 
 import { NUMBER_OF_DATA } from "../constants";
 

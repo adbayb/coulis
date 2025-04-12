@@ -130,38 +130,6 @@ if (container) {
 
 This section aims to deep dive into each public API with focused examples:
 
-### setGlobalStyles
-
-A helper to apply some style rules globally:
-
-```tsx
-import { setGlobalStyles } from "coulis";
-
-setGlobalStyles({
-	"@import":
-		"url('https://fonts.googleapis.com/css?family=Open+Sans&display=swap')",
-	"html": {
-		boxSizing: "border-box",
-	},
-	"html,body": {
-		padding: 0,
-		margin: 0,
-		fontFamily: "Open Sans",
-	},
-	"*,*::before,*::after": {
-		boxSizing: "inherit",
-	},
-	".text": {
-		color: "blue",
-		fontSize: 16,
-	},
-});
-
-export const App = () => {
-	return <span className="text">Hello 🤗</span>;
-};
-```
-
 ### createStyles
 
 A factory to configure and create type-safe `styles` method.
@@ -381,6 +349,38 @@ export const App = () => {
 			Hello 👋
 		</p>
 	);
+};
+```
+
+### setGlobalStyles
+
+A helper to apply some style rules globally:
+
+```tsx
+import { setGlobalStyles } from "coulis";
+
+setGlobalStyles({
+	"@import":
+		"url('https://fonts.googleapis.com/css?family=Open+Sans&display=swap')",
+	"html": {
+		boxSizing: "border-box",
+	},
+	"html,body": {
+		padding: 0,
+		margin: 0,
+		fontFamily: "Open Sans",
+	},
+	"*,*::before,*::after": {
+		boxSizing: "inherit",
+	},
+	".text": {
+		color: "blue",
+		fontSize: 16,
+	},
+});
+
+export const App = () => {
+	return <span className="text">Hello 🤗</span>;
 };
 ```
 

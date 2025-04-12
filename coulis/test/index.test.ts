@@ -5,12 +5,12 @@ import {
 	createStyles,
 	createVariants,
 	extractStyles,
-	globalStyles,
+	setGlobalStyles,
 } from "../src";
 
 describe("coulis", () => {
 	beforeAll(() => {
-		globalStyles({
+		setGlobalStyles({
 			"*,*::before,*::after": {
 				boxSizing: "inherit",
 			},

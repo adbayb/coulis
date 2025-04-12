@@ -29,11 +29,11 @@ yarn add coulis
 2️⃣ Play ✌️
 
 ```tsx
-import { createStyles, globalStyles } from "coulis";
+import { createStyles, setGlobalStyles } from "coulis";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 
-globalStyles({
+setGlobalStyles({
 	"*,*::before,*::after": {
 		boxSizing: "inherit",
 	},
@@ -130,14 +130,14 @@ if (container) {
 
 This section aims to deep dive into each public API with focused examples:
 
-### globalStyles
+### setGlobalStyles
 
 A helper to apply some style rules globally:
 
 ```tsx
-import { globalStyles } from "coulis";
+import { setGlobalStyles } from "coulis";
 
-globalStyles({
+setGlobalStyles({
 	"@import":
 		"url('https://fonts.googleapis.com/css?family=Open+Sans&display=swap')",
 	"html": {
@@ -392,7 +392,7 @@ It allows preventing "Flash Of Unstyled Content" browser side:
 ```tsx
 import { extractStyles } from "coulis";
 
-globalStyles({
+setGlobalStyles({
 	html: {
 		boxSizing: "border-box",
 	},

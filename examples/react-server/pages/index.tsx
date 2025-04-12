@@ -5,7 +5,7 @@ import {
 	createKeyframes,
 	createStyles,
 	createVariants,
-	globalStyles,
+	setGlobalStyles,
 } from "coulis";
 
 const px = (value: number) => `${value}px`;
@@ -68,7 +68,7 @@ const theme = createCustomProperties({
 	spacings: tokens.spacings,
 });
 
-globalStyles({
+setGlobalStyles({
 	"@import":
 		"url('https://fonts.googleapis.com/css?family=Open+Sans&display=swap')",
 	"@font-face": {

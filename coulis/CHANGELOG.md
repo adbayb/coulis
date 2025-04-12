@@ -102,7 +102,7 @@
 
 - [`ba0f87a`](https://github.com/adbayb/coulis/commit/ba0f87a4df10eb60d78d654703a84d49f75b0237) Thanks [@adbayb](https://github.com/adbayb)! - Prevent memory leak server-side by flushing the cache after each extraction.
 
-- [`578a39b`](https://github.com/adbayb/coulis/commit/578a39ba112f10edd10034ff9272bf2e9ec9c939) Thanks [@adbayb](https://github.com/adbayb)! - Rename atoms, createAtoms, globals, keyframes APIs respectively to styles, createStyles, globalStyles, and createAnimationName.
+- [`578a39b`](https://github.com/adbayb/coulis/commit/578a39ba112f10edd10034ff9272bf2e9ec9c939) Thanks [@adbayb](https://github.com/adbayb)! - Rename atoms, createAtoms, globals, keyframes APIs respectively to styles, createStyles, setGlobalStyles, and createAnimationName.
 
 - [`e2ddeb7`](https://github.com/adbayb/coulis/commit/e2ddeb7ec0369a9dd3fc1bd0486aa2a833299364) Thanks [@adbayb](https://github.com/adbayb)! - Add compose API.
 

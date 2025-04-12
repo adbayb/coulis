@@ -71,7 +71,12 @@ const createWebStyleSheetTarget: CreateStyleSheet = (id) => {
 			element.remove();
 		},
 		getContent() {
-			// TODO: replace
+			/*
+			 * TODO: Make benchmark command work again
+			 * TODO: Update CI to include test (see stack template) + fix tests
+			 * TODO: replace innerText by textContent and compare perf gain
+			 * TODO: check other TODOs
+			 */
 			// eslint-disable-next-line unicorn/prefer-dom-node-text-content
 			return element.innerText;
 		},

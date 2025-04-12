@@ -7,9 +7,9 @@ import type { LooseStyleProperties } from "../../entities/style";
  * Apply style rules globally.
  * @param properties - A style record containing CSS declarations to apply to a given element.
  * @example
- * 	globalStyles({ "html": { "background-color": "red" } });
+ * 	setGlobalStyles({ "html": { "background-color": "red" } });
  */
-export const globalStyles = (properties: GlobalStyleProperties) => {
+export const setGlobalStyles = (properties: GlobalStyleProperties) => {
 	STYLESHEETS.global.commit({
 		key: JSON.stringify(properties),
 		createRules() {

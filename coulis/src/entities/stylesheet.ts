@@ -1,5 +1,5 @@
 import { minify } from "../helpers";
-import { IS_BROWSER_ENV, IS_PROD_ENV } from "../constants";
+import { IS_BROWSER_ENVIRONMENT } from "../constants";
 import { createClassName } from "./style";
 import type { ClassName } from "./style";
 import { createCache } from "./cache";
@@ -86,12 +86,7 @@ const createWebStyleSheetTarget: CreateStyleSheet = (id) => {
 			return source.split(",");
 		},
 		insert(rule) {
-			if (IS_PROD_ENV && element.sheet) {
-				// Faster, more reliable (check rule insertion order (e.g. "@import" must be inserted first)), but not debug friendly
-				element.sheet.insertRule(rule, element.sheet.cssRules.length);
-			} else {
-				element.insertAdjacentHTML("beforeend", rule);
-			}
+			element.insertAdjacentHTML("beforeend", rule);
 		},
 	};
 };
@@ -105,7 +100,7 @@ const createWebStyleSheetTarget: CreateStyleSheet = (id) => {
  */
 export const createStyleSheet = (id: StyleSheetIdentifier): StyleSheet => {
 	const styleSheetTarget = (
-		IS_BROWSER_ENV
+		IS_BROWSER_ENVIRONMENT
 			? createWebStyleSheetTarget
 			: createVirtualStyleSheetTarget
 	)(id);

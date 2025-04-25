@@ -73,7 +73,6 @@ const createWebStyleSheetTarget: CreateStyleSheet = (id) => {
 		getContent() {
 			/*
 			 * TODO: Update CI to include test (see stack template) + fix tests
-			 * TODO: replace innerText by textContent and compare perf gain
 			 */
 			// eslint-disable-next-line unicorn/prefer-dom-node-text-content
 			return element.innerText;
@@ -86,7 +85,12 @@ const createWebStyleSheetTarget: CreateStyleSheet = (id) => {
 			return source.split(",");
 		},
 		insert(rule) {
-			element.insertAdjacentHTML("beforeend", rule);
+			/**
+			 * `insertAdjacentText` is the most performant API for our text insertion case .
+			 * @see {@link https://esbench.com/bench/680c1080545f8900a4de2ce6 Benchmark}
+			 */
+			// eslint-disable-next-line unicorn/prefer-modern-dom-apis
+			element.insertAdjacentText("beforeend", rule);
 		},
 	};
 };

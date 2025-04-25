@@ -12,10 +12,10 @@ exports[`coulis > should extract styles given object format 1`] = `
   },
   {
     "attributes": {
-      "data-coulis-cache": "cd0c53d28,c6a0088d1,ccadc8a20,c2a100aa4",
+      "data-coulis-cache": "c2a100aa4,c6a0088d1,ccadc8a20",
       "data-coulis-id": "shorthand",
     },
-    "content": ".cd0c53d28{padding:10px;}.c6a0088d1{padding:18px;}.ccadc8a20{padding:12px;}.c2a100aa4{padding:6px;}",
+    "content": ".c2a100aa4{padding:6px;}.c6a0088d1{padding:18px;}.ccadc8a20{padding:12px;}",
     "toString": [Function],
   },
   {

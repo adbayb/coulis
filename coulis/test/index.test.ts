@@ -52,7 +52,7 @@ describe("coulis", () => {
 			"cbb3938 c2a100aa4",
 		);
 		expect(classNames).toBe(
-			"cdd299de8 cbb3938 ce31a3799 c18a19c73 cd0c53d28",
+			"cdd299de8 cbb3938 ce31a3799 c18a19c73 c2a100aa4",
 		);
 	});
 
@@ -108,14 +108,14 @@ describe("coulis", () => {
 			}),
 		).toBeTypeOf("string");
 
-		expect(
+		expect(() =>
 			styles({
 				backgroundColor: {
 					// @ts-expect-error state key does not exist
 					toto: "red",
 				},
 			}),
-		).toBeTypeOf("string");
+		).toThrow(/No configuration found for state `toto`/);
 
 		expect(
 			styles({
@@ -133,12 +133,12 @@ describe("coulis", () => {
 			}),
 		).toBeTypeOf("string");
 
-		expect(
+		expect(() =>
 			styles({
 				// @ts-expect-error property key does not exist
 				nonExistingProperty: "unknownValue",
 			}),
-		).toBeTypeOf("string");
+		).toThrow(/No configuration found for property `nonExistingProperty`/);
 
 		expect(
 			createVariants(styles, {

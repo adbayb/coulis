@@ -4,6 +4,7 @@
 	"private": true,
 	"type": "module",
 	"scripts": {
+		"benchmark": "pnpm --filter @coulis/benchmark benchmark",
 		"build": "stack build",
 		"check": "stack check",
 		"clean": "stack clean",

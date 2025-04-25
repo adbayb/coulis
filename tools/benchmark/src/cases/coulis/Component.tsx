@@ -15,13 +15,27 @@ const styles = createStyles(
 	},
 );
 
-export const Component = () => {
+const tableClassName = styles({
+	border: "1px solid black",
+});
+
+const firstTdClassName = styles({
+	backgroundColor: {
+		base: "lightcoral",
+		hover: "lightyellow",
+	},
+});
+
+const secondTdClassName = styles({
+	backgroundColor: {
+		base: "lightblue",
+		hover: "lightyellow",
+	},
+});
+
+export const CoulisComponent = () => {
 	return (
-		<table
-			className={styles({
-				border: "1px solid black",
-			})}
-		>
+		<table className={tableClassName}>
 			<thead>
 				<tr>
 					<th>Column1</th>
@@ -32,24 +46,8 @@ export const Component = () => {
 				{Array.from({ length: NUMBER_OF_DATA }).map((_, index) => {
 					return (
 						<tr key={index}>
-							<td
-								className={styles({
-									backgroundColor: {
-										base: "lightcoral",
-										hover: "lightyellow",
-									},
-								})}
-							>
-								The table body
-							</td>
-							<td
-								className={styles({
-									backgroundColor: {
-										base: "lightblue",
-										hover: "lightyellow",
-									},
-								})}
-							>
+							<td className={firstTdClassName}>The table body</td>
+							<td className={secondTdClassName}>
 								with two columns
 							</td>
 						</tr>

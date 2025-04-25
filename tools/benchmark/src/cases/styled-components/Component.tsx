@@ -1,6 +1,6 @@
 import styled from "styled-components";
 
-import { NUMBER_OF_DATA } from "../constants";
+import { NUMBER_OF_DATA } from "../../constants";
 
 const Table = styled.table`
 	border: 1px solid black;
@@ -20,7 +20,7 @@ const Cell2 = styled.td`
 	}
 `;
 
-export default function BenchmarkCase() {
+export const StyledComponentsComponent = () => {
 	return (
 		<Table>
 			<thead>
@@ -41,4 +41,4 @@ export default function BenchmarkCase() {
 			</tbody>
 		</Table>
 	);
-}
+};

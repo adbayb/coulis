@@ -72,7 +72,6 @@ const createWebStyleSheetTarget: CreateStyleSheet = (id) => {
 		},
 		getContent() {
 			/*
-			 * TODO: Make benchmark command work again
 			 * TODO: Update CI to include test (see stack template) + fix tests
 			 * TODO: replace innerText by textContent and compare perf gain
 			 * TODO: check other TODOs

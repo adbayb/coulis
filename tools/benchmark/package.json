@@ -6,24 +6,22 @@
 	"keywords": [],
 	"license": "MIT",
 	"author": "Ayoub Adib <adbayb@gmail.com>",
+	"type": "module",
 	"scripts": {
 		"benchmark": "pnpm benchmark:browser && pnpm benchmark:server",
-		"benchmark:browser": "react-benchmark ./src/cases/coulis/browser.js && react-benchmark ./src/cases/emotion/browser.js && react-benchmark ./src/cases/styled-components.js && react-benchmark ./src/cases/coulis-inlined/browser.js && react-benchmark ./src/cases/emotion-inlined/browser.js",
-		"benchmark:server": "react-benchmark ./src/cases/coulis/server.js && react-benchmark ./src/cases/emotion/server.js",
-		"benchmark:styled-components": "react-benchmark ./src/cases/styled-components.js"
-	},
-	"dependencies": {
-		"@emotion/css": "^11.13.5",
-		"@emotion/server": "^11.11.0",
-		"benchmark": "^2.1.4",
-		"coulis": "workspace:^",
-		"react": "^19.1.0",
-		"react-benchmark": "^5.1.0",
-		"react-dom": "^19.1.0",
-		"styled-components": "^6.1.17",
-		"typescript": "^5.8.3"
+		"benchmark:browser": "playwright-test ./src/cases/browser.tsx --runner benchmark",
+		"benchmark:server": "tsx ./src/cases/server.tsx"
 	},
 	"devDependencies": {
-		"@babel/preset-react": "7.26.3"
+		"@emotion/css": "11.13.5",
+		"@emotion/server": "11.11.0",
+		"coulis": "workspace:*",
+		"playwright-test": "14.1.9",
+		"react": "19.1.0",
+		"react-dom": "19.1.0",
+		"styled-components": "6.1.17",
+		"tinybench": "4.0.1",
+		"tsx": "4.19.3",
+		"typescript": "5.8.3"
 	}
 }

@@ -20,7 +20,7 @@ const secondTdClassName = css`
 	}
 `;
 
-export const Component = () => {
+export const EmotionComponent = () => {
 	return (
 		<table className={tableClassName}>
 			<thead>

@@ -71,11 +71,11 @@ const createWebStyleSheetTarget: CreateStyleSheet = (id) => {
 			element.remove();
 		},
 		getContent() {
-			/*
-			 * TODO: Update CI to include test (see stack template) + fix tests
+			/**
+			 * `textContent` is more performant than `innerText` (no layout reflow).
+			 * @see {@link https://esbench.com/bench/680c1f4e545f8900a4de2cf7 Benchmark}
 			 */
-			// eslint-disable-next-line unicorn/prefer-dom-node-text-content
-			return element.innerText;
+			return element.textContent ?? "";
 		},
 		getHydrationInput() {
 			const source = element.dataset.coulisCache;
@@ -86,7 +86,7 @@ const createWebStyleSheetTarget: CreateStyleSheet = (id) => {
 		},
 		insert(rule) {
 			/**
-			 * `insertAdjacentText` is the most performant API for our text insertion case .
+			 * `insertAdjacentText` is the most performant API for appending text.
 			 * @see {@link https://esbench.com/bench/680c1080545f8900a4de2ce6 Benchmark}
 			 */
 			// eslint-disable-next-line unicorn/prefer-modern-dom-apis

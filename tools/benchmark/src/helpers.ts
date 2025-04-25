@@ -16,8 +16,6 @@ export const createBenchmark = (cases: Case[]) => {
 		run() {
 			benchmark.runSync();
 
-			console.table(benchmark.table());
-
 			const fastestCase = cases[
 				benchmark.results.reduce(
 					(fastestResult, currentResult, index) => {
@@ -37,6 +35,7 @@ export const createBenchmark = (cases: Case[]) => {
 			] as Case;
 
 			console.log("Fastest is", fastestCase.name, "✨");
+			console.table(benchmark.table());
 
 			process.exit(0);
 		},

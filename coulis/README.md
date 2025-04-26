@@ -1,6 +1,7 @@
 <div align="center">
     <h1>🍩 Coulis</h1>
     <strong>Atomic CSS-in-JS library with a tiny runtime</strong>
+	<p><img src="https://deno.bundlejs.com/?q=coulis&badge" alt="Package size" /></p>
 </div>
 <br>
 <br>
@@ -12,6 +13,8 @@ With the emergence of design systems, style reusability is key. Atomic CSS is a 
 In parallel, CSS-in-JS libraries enable (but not only) huge developer experience improvements by integrating transparently into the JavaScript ecosystem and letting a developer share/consume CSS-in-JS dependencies without extra specific CSS bundle steps.
 
 Coulis leverages these two approaches to create a great developer experience while maximizing the reusability of your styles.
+
+<br>
 
 ## 🚀 Quickstart
 
@@ -125,6 +128,8 @@ if (container) {
 	);
 }
 ```
+
+<br>
 
 ## 👨‍💻 Usage
 
@@ -414,3 +419,5 @@ export const App = () => {
 	);
 };
 ```
+
+<br>

@@ -1,5 +1,61 @@
 # Change Log
 
+## 0.13.0
+
+### Minor Changes
+
+- [`c039e8b`](https://github.com/adbayb/coulis/commit/c039e8bc8c471d612465a2ea3b418ed5740ec0c4) Thanks [@adbayb](https://github.com/adbayb)! - Improve rule retrieval performance browser side.
+
+- [`96128fc`](https://github.com/adbayb/coulis/commit/96128fc9e68f1f1c9ca630aab65ad700bf31c445) Thanks [@adbayb](https://github.com/adbayb)! - Make dev and prod-like environment logic iso by removing `insertRule` implementation (no performance gain).
+
+- [`47c6643`](https://github.com/adbayb/coulis/commit/47c66432f8024ca71360a15aed7a272cf236992c) Thanks [@adbayb](https://github.com/adbayb)! - Improve rule insertion performance browser side.
+
+- [`6d564ae`](https://github.com/adbayb/coulis/commit/6d564aef12a85e136a1b65c973bf83af91c4fe5d) Thanks [@adbayb](https://github.com/adbayb)! - Rename `globalStyles` to `setGlobalStyles` to make its setter nature more explicit (not a getter returning a value).
+
+- [#30](https://github.com/adbayb/coulis/pull/30) [`e10c238`](https://github.com/adbayb/coulis/commit/e10c23880f9cff85150b7d99e553d478fb3978d2) Thanks [@renovate](https://github.com/apps/renovate)! - Updated dependency `@types/node` to `20.16.2`.
+
+- [#22](https://github.com/adbayb/coulis/pull/22) [`0a20e13`](https://github.com/adbayb/coulis/commit/0a20e13cf9baa630affc7467ba3d0f1ffa7fee49) Thanks [@renovate](https://github.com/apps/renovate)! - Updated dependency `@emotion/css` to `^11.12.0`.
+  Updated dependency `styled-components` to `^6.1.12`.
+  Updated dependency `@babel/preset-react` to `7.24.7`.
+  Updated dependency `@types/react` to `18.3.3`.
+  Updated dependency `@vitejs/plugin-react` to `4.3.1`.
+  Updated dependency `vite` to `5.3.4`.
+  Updated dependency `next` to `^14.2.5`.
+  Updated dependency `vitest` to `1.6.0`.
+
+- [#19](https://github.com/adbayb/coulis/pull/19) [`a2db2fb`](https://github.com/adbayb/coulis/commit/a2db2fbdbe52d240b5ab7dc6a6de33df2dcd8ebf) Thanks [@renovate](https://github.com/apps/renovate)! - Updated dependency `@types/node` to `20.12.13`.
+
+- [#32](https://github.com/adbayb/coulis/pull/32) [`844c4ae`](https://github.com/adbayb/coulis/commit/844c4aed6f6218ccf118a5df97cf8672159fb100) Thanks [@renovate](https://github.com/apps/renovate)! - Updated dependency `@types/node` to `20.16.10`.
+
+- [#23](https://github.com/adbayb/coulis/pull/23) [`dead6cf`](https://github.com/adbayb/coulis/commit/dead6cf5481015b1e63311d277cf05569f25e684) Thanks [@renovate](https://github.com/apps/renovate)! - Updated dependency `@types/node` to `20.14.10`.
+
+- [#34](https://github.com/adbayb/coulis/pull/34) [`52a01f0`](https://github.com/adbayb/coulis/commit/52a01f0bdd6a16bd9685e178050513f173d111c6) Thanks [@renovate](https://github.com/apps/renovate)! - Updated dependency `@babel/preset-react` to `7.25.9`.
+  Updated dependency `@types/react` to `18.3.12`.
+  Updated dependency `@vitejs/plugin-react` to `4.3.3`.
+  Updated dependency `vite` to `5.4.10`.
+  Updated dependency `next` to `^14.2.16`.
+  Updated dependency `quickbundle` to `2.6.0`.
+  Updated dependency `vitest` to `2.1.4`.
+
+- [#33](https://github.com/adbayb/coulis/pull/33) [`351a2f9`](https://github.com/adbayb/coulis/commit/351a2f95b952f16ea7358af7b4b4978aa3fdaa45) Thanks [@renovate](https://github.com/apps/renovate)! - Updated dependency `@emotion/css` to `^11.13.4`.
+  Updated dependency `styled-components` to `^6.1.13`.
+  Updated dependency `@babel/preset-react` to `7.25.7`.
+  Updated dependency `@types/react` to `18.3.11`.
+  Updated dependency `@vitejs/plugin-react` to `4.3.2`.
+  Updated dependency `vite` to `5.4.8`.
+  Updated dependency `next` to `^14.2.14`.
+  Updated dependency `vitest` to `2.1.2`.
+
+- [#27](https://github.com/adbayb/coulis/pull/27) [`1f359ba`](https://github.com/adbayb/coulis/commit/1f359ba5233378fc164309083d3bcb4b1d112601) Thanks [@renovate](https://github.com/apps/renovate)! - Updated dependency `vitest` to `2.0.5`.
+
+- [#25](https://github.com/adbayb/coulis/pull/25) [`d72277d`](https://github.com/adbayb/coulis/commit/d72277d909c4e1ea98b160da31b40b038cbf3cb8) Thanks [@renovate](https://github.com/apps/renovate)! - Updated dependency `@types/node` to `20.14.13`.
+
+- [`3a3e2e0`](https://github.com/adbayb/coulis/commit/3a3e2e02aa7d881a06ecbd8f19e7609285983625) Thanks [@adbayb](https://github.com/adbayb)! - Rename `extract` to `extractStyles` to bring consistency.
+
+### Patch Changes
+
+- [`4909579`](https://github.com/adbayb/coulis/commit/490957922b4e94d15fbc37d93086497517f7f6e1) Thanks [@adbayb](https://github.com/adbayb)! - Check if `process` is defined before using it (to prevent issues when the library is used without a build step with variable replacement).
+
 ## 0.12.0
 
 ### Minor Changes

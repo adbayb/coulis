@@ -1,6 +1,6 @@
 import type { RecordLike } from "../types";
 import { isObject } from "../helpers";
-import { STYLESHEETS } from "../entities/stylesheet";
+import { coulis } from "../entities/coulis";
 
 type CustomProperty = {
 	name: string;
@@ -44,7 +44,7 @@ export const createCustomProperties = <const P extends Properties>(
 	const { collectedProperties, nodes } =
 		createCustomPropertiesWithoutSideEffects(properties);
 
-	STYLESHEETS.global.commit({
+	coulis.getStyleSheet("global").commit({
 		key: JSON.stringify(collectedProperties),
 		createRules() {
 			const variables = collectedProperties.reduce(

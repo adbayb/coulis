@@ -1,7 +1,7 @@
 import type { UngreedyString } from "../../types";
-import { STYLESHEETS } from "../../entities/stylesheet";
 import { createDeclarations } from "../../entities/style";
 import type { LooseStyleProperties } from "../../entities/style";
+import { coulis } from "../../entities/coulis";
 
 /**
  * Apply style rules globally.
@@ -10,7 +10,7 @@ import type { LooseStyleProperties } from "../../entities/style";
  * 	setGlobalStyles({ "html": { "background-color": "red" } });
  */
 export const setGlobalStyles = (properties: GlobalStyleProperties) => {
-	STYLESHEETS.global.commit({
+	coulis.getStyleSheet("global").commit({
 		key: JSON.stringify(properties),
 		createRules() {
 			const rules: string[] = [];

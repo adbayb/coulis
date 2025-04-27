@@ -5,7 +5,7 @@ import type { ClassName } from "./style";
 import { createCache } from "./cache";
 import type { Cache, CacheKey } from "./cache";
 
-type StyleSheetIdentifier =
+export type StyleSheetIdentifier =
 	| "atLonghand"
 	| "atShorthand"
 	| "global"
@@ -26,11 +26,72 @@ export type StyleSheet = {
 	getContent: () => string;
 };
 
-export type StyleSheetTarget = {
+type StyleSheetTarget = {
 	flush: () => void;
 	getContent: () => string;
 	getHydrationInput: () => string[];
 	insert: (rule: string) => void;
+};
+
+/**
+ * Factory to create a style sheet instance depending on the running platform (browser vs. Server).
+ * @param id - The identifier representing the targetted style.
+ * @returns Cache, stylesheet instances and methods.
+ * @example
+ *  createStyleSheet("global");
+ */
+export const createStyleSheet = (id: StyleSheetIdentifier): StyleSheet => {
+	const styleSheetTarget: StyleSheetTarget = (
+		IS_BROWSER_ENVIRONMENT
+			? createWebStyleSheetTarget
+			: createVirtualStyleSheetTarget
+	)(id);
+
+	const hydrationInput = styleSheetTarget.getHydrationInput();
+	const cache = createCache();
+
+	return {
+		id,
+		cache,
+		commit(parameters) {
+			let className = cache.get(parameters.key);
+
+			if (className) return className;
+
+			className = createClassName(parameters.key);
+
+			cache.add(parameters.key, className);
+
+			if (hydrationInput.includes(className)) {
+				return className;
+			}
+
+			const rules = parameters.createRules(className);
+
+			if (typeof rules === "string") {
+				styleSheetTarget.insert(rules);
+			} else {
+				for (const rule of rules) {
+					styleSheetTarget.insert(rule);
+				}
+			}
+
+			return className;
+		},
+		flush() {
+			cache.flush();
+			styleSheetTarget.flush();
+		},
+		getAttributes() {
+			return {
+				"data-coulis-cache": cache.getAll().join(","),
+				"data-coulis-id": id,
+			};
+		},
+		getContent() {
+			return styleSheetTarget.getContent();
+		},
+	};
 };
 
 type CreateStyleSheet = (id: StyleSheetIdentifier) => StyleSheetTarget;
@@ -94,99 +155,3 @@ const createWebStyleSheetTarget: CreateStyleSheet = (id) => {
 		},
 	};
 };
-
-/**
- * Aggregate to scope and manage invariants for a given stylesheet instance.
- * @param id - The identifier representing the targetted style.
- * @returns Cache, stylesheet instances and methods.
- * @example
- *  createStyleSheet("global");
- */
-export const createStyleSheet = (id: StyleSheetIdentifier): StyleSheet => {
-	const styleSheetTarget = (
-		IS_BROWSER_ENVIRONMENT
-			? createWebStyleSheetTarget
-			: createVirtualStyleSheetTarget
-	)(id);
-
-	const hydrationInput = styleSheetTarget.getHydrationInput();
-	const cache = createCache();
-
-	return {
-		id,
-		cache,
-		commit(parameters) {
-			let className = cache.get(parameters.key);
-
-			if (className) return className;
-
-			className = createClassName(parameters.key);
-
-			cache.add(parameters.key, className);
-
-			if (hydrationInput.includes(className)) {
-				return className;
-			}
-
-			const rules = parameters.createRules(className);
-
-			if (typeof rules === "string") {
-				styleSheetTarget.insert(rules);
-			} else {
-				for (const rule of rules) {
-					styleSheetTarget.insert(rule);
-				}
-			}
-
-			return className;
-		},
-		flush() {
-			cache.flush();
-			styleSheetTarget.flush();
-		},
-		getAttributes() {
-			return {
-				"data-coulis-cache": cache.getAll().join(","),
-				"data-coulis-id": id,
-			};
-		},
-		getContent() {
-			return styleSheetTarget.getContent();
-		},
-	};
-};
-
-export const createStyleSheets = (): Record<
-	StyleSheetIdentifier,
-	StyleSheet
-> => {
-	// eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-	const styleSheets = {} as Record<StyleSheetIdentifier, StyleSheet>;
-
-	/**
-	 * The insertion order is important to enforce the more precise properties take precedence over less precise ones.
-	 * Global properties has a lesser specificity than (<) shorthand ones:
-	 * global (e.g div { background-color }) < shorthand (e.g background) < longhand (e.g background-color) < conditional-shorthand (e.g @media { background }) < conditional-longhand (e.g @media { background-color }) properties.
-	 */
-	const INSERTION_ORDER_BY_ID = Object.freeze({
-		atLonghand: 4,
-		atShorthand: 3,
-		global: 0,
-		longhand: 2,
-		shorthand: 1,
-	});
-
-	const ids = (
-		Object.keys(INSERTION_ORDER_BY_ID) as StyleSheetIdentifier[]
-	).sort((a, b) => {
-		return INSERTION_ORDER_BY_ID[a] - INSERTION_ORDER_BY_ID[b];
-	});
-
-	for (const id of ids) {
-		styleSheets[id] = createStyleSheet(id);
-	}
-
-	return styleSheets;
-};
-
-export const STYLESHEETS = createStyleSheets();

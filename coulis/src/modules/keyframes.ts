@@ -1,7 +1,7 @@
 import { isNumber } from "../helpers";
-import { STYLESHEETS } from "../entities/stylesheet";
 import { createDeclarations } from "../entities/style";
 import type { StyleProperties } from "../entities/style";
+import { coulis } from "../entities/coulis";
 
 /**
  * Create a `keyframes` rule set globally scoped that describes the animation to apply to an element.
@@ -13,7 +13,7 @@ import type { StyleProperties } from "../entities/style";
  * 	document.getElementById("my-element-id").className = className;
  */
 export const createKeyframes = (properties: KeyframesStyleProperties) => {
-	return STYLESHEETS.global.commit({
+	return coulis.getStyleSheet("global").commit({
 		key: JSON.stringify(properties),
 		createRules(className) {
 			let rule = "";

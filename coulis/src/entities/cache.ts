@@ -11,6 +11,13 @@ export type Cache = {
 	toString: () => string;
 };
 
+/**
+ * Factory to create a cache instance to manage caching operations.
+ * @returns The cache instance.
+ * @example
+ * 	const cache = createCache();
+ * 	cache.add("key", "value");
+ */
 export const createCache = (): Cache => {
 	const cache = new Map<CacheKey, string>();
 

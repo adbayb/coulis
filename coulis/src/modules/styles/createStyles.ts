@@ -1,8 +1,8 @@
 import type { Exactify, Greedify } from "../../types";
 import { createError, isObject } from "../../helpers";
-import { STYLESHEETS } from "../../entities/stylesheet";
 import { createDeclaration, isShorthandProperty } from "../../entities/style";
 import type { StyleProperties } from "../../entities/style";
+import { coulis } from "../../entities/coulis";
 
 /**
  * A factory to configure and create type-safe `styles` method.
@@ -80,8 +80,8 @@ export const createStyles = <
 		const isNativeShorthandProperty = isShorthandProperty(name);
 
 		let styleSheet = isNativeShorthandProperty
-			? STYLESHEETS.shorthand
-			: STYLESHEETS.longhand;
+			? coulis.getStyleSheet("shorthand")
+			: coulis.getStyleSheet("longhand");
 
 		if (!isObject(value)) {
 			const declaration = getDeclaration({
@@ -139,8 +139,8 @@ export const createStyles = <
 
 			if (preComputedRule.startsWith("@")) {
 				styleSheet = isNativeShorthandProperty
-					? STYLESHEETS.atShorthand
-					: STYLESHEETS.atLonghand;
+					? coulis.getStyleSheet("atShorthand")
+					: coulis.getStyleSheet("atLonghand");
 			}
 
 			classNames.push(

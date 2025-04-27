@@ -1,4 +1,4 @@
-import { STYLESHEETS } from "../entities/stylesheet";
+import { coulis } from "../entities/coulis";
 
 /**
  * Collect the generated styles including global ones.
@@ -19,10 +19,10 @@ export const extractStyles = (options?: {
 }) => {
 	const { flush: flushOption = true } = options ?? {};
 	let stringifiedStyles = "";
-	const ids = Object.keys(STYLESHEETS) as (keyof typeof STYLESHEETS)[];
+	const ids = coulis.getStyleSheetIds();
 
 	const output = ids.map((id) => {
-		const { flush, getAttributes, getContent } = STYLESHEETS[id];
+		const { flush, getAttributes, getContent } = coulis.getStyleSheet(id);
 		const content = getContent();
 		const attributes = getAttributes();
 

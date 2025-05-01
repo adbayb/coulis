@@ -6,6 +6,12 @@ type Coulis = {
 	getStyleSheetIds: () => StyleSheetIdentifier[];
 };
 
+/*
+ * TODO: lazy factory of coulis (remove createServerContext and rely exclusively on createCoulis to expose createRenderer (runnable only server side with an error throwing browser side) + getMetadata).
+ * Make sure for global api to add a queue of pending items to enqueue them (but persist them for future requests server side) only when createCoulis is called.
+ * No more cache comparison to preserve shared global cache needed since the queue is persisted and replayable for future requests.
+ */
+
 /**
  * Factory to create an aggregate instance to manage invariants for all style operations.
  * @returns The coulis instance.

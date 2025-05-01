@@ -12,8 +12,8 @@ import { coulis } from "../../entities/coulis";
 export const setGlobalStyles = (properties: GlobalStyleProperties) => {
 	coulis.getStyleSheet("global").commit({
 		key: JSON.stringify(properties),
-		createRules() {
-			const rules: string[] = [];
+		createRule() {
+			let rule = "";
 			const selectors = Object.keys(properties);
 
 			for (const selector of selectors) {
@@ -21,14 +21,13 @@ export const setGlobalStyles = (properties: GlobalStyleProperties) => {
 
 				if (style === undefined) continue;
 
-				if (typeof style === "string") {
-					rules.push(`${selector} ${style};`);
-				} else {
-					rules.push(`${selector}{${createDeclarations(style)}}`);
-				}
+				rule +=
+					typeof style === "string"
+						? `${selector} ${style};`
+						: `${selector}{${createDeclarations(style)}}`;
 			}
 
-			return rules;
+			return rule;
 		},
 	});
 };

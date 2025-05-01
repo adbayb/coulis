@@ -1,42 +1,14 @@
-import { beforeAll, describe, expect, test } from "vitest";
+import { describe, expect, test } from "vitest";
 
 import {
 	createKeyframes,
+	createServerContext,
 	createStyles,
 	createVariants,
-	extractStyles,
 	setGlobalStyles,
 } from "../src";
 
 describe("coulis", () => {
-	beforeAll(() => {
-		setGlobalStyles({
-			"*,*::before,*::after": {
-				boxSizing: "inherit",
-			},
-			".globalClass+.otherGlobalClass": {
-				border: "1px solid black",
-				borderRadius: 4,
-			},
-			"@charset": '"utf-8"',
-			"@font-face": {
-				fontFamily: "'AliasedHelvetica'",
-				src: "local(Helvetica)",
-			},
-			"@import":
-				"url('https://fonts.googleapis.com/css?family=Open+Sans&display=swap')",
-			"html": {
-				boxSizing: "border-box",
-			},
-			"html,body": {
-				backgroundColor: "lightcoral",
-				fontFamily: "Open Sans, AliasedHelvetica",
-				margin: 0,
-				padding: 0,
-			},
-		});
-	});
-
 	test("should generate classNames", () => {
 		expect(animationName).toBe("c77e20e50");
 		expect(buttonVariants({ color: "brand", size: "large" })).toBe(
@@ -56,13 +28,42 @@ describe("coulis", () => {
 		);
 	});
 
-	test("should extract styles given object format", () => {
-		expect(extractStyles()).toMatchSnapshot();
-	});
+	test("should extract styles", () => {
+		const { createRenderer, getMetadata } = createServerContext();
 
-	test("should extract styles given string format", () => {
+		const render = createRenderer(() => {
+			setGlobalStyles({
+				"*,*::before,*::after": {
+					boxSizing: "inherit",
+				},
+				".globalClass+.otherGlobalClass": {
+					border: "1px solid black",
+					borderRadius: 4,
+				},
+				"@charset": '"utf-8"',
+				"@font-face": {
+					fontFamily: "'AliasedHelvetica'",
+					src: "local(Helvetica)",
+				},
+				"@import":
+					"url('https://fonts.googleapis.com/css?family=Open+Sans&display=swap')",
+				"html": {
+					boxSizing: "border-box",
+				},
+				"html,body": {
+					backgroundColor: "lightcoral",
+					fontFamily: "Open Sans, AliasedHelvetica",
+					margin: 0,
+					padding: 0,
+				},
+			});
+		});
+
+		render();
+
+		expect(getMetadata()).toMatchSnapshot();
 		// eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-		expect(`${extractStyles()}`).toMatchSnapshot();
+		expect(`${getMetadata()}`).toMatchSnapshot();
 	});
 
 	test("should type `createStyles` in a safe manner", () => {

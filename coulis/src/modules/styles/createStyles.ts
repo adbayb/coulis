@@ -67,7 +67,7 @@ export const createStyles = <
 		});
 	};
 
-	const createRules = (
+	const createClassNames = (
 		name: keyof StyleProperties,
 		value:
 			| Record<string, number | string | undefined>
@@ -94,7 +94,7 @@ export const createStyles = <
 			classNames.push(
 				styleSheet.commit({
 					key: declaration,
-					createRules(className) {
+					createRule(className) {
 						return `.${className}{${declaration}}`;
 					},
 				}),
@@ -151,7 +151,7 @@ export const createStyles = <
 						 * This exclusion will allow to recycle cache if the style value has been already defined unconditionally.
 						 */
 						isBaseState ? declaration : `${key}${declaration}`,
-					createRules(className) {
+					createRule(className) {
 						return preComputedRule.replace(
 							"{{className}}",
 							className,
@@ -187,7 +187,7 @@ export const createStyles = <
 
 		for (const propertyName of Object.keys(input)) {
 			const value = (
-				input as Record<string, Parameters<typeof createRules>[1]>
+				input as Record<string, Parameters<typeof createClassNames>[1]>
 			)[propertyName];
 
 			if (isShorthandKey(propertyName)) {
@@ -196,11 +196,11 @@ export const createStyles = <
 				] as (keyof StyleProperties)[];
 
 				for (const shorthandName of shorthandConfig) {
-					classNames.push(...createRules(shorthandName, value));
+					classNames.push(...createClassNames(shorthandName, value));
 				}
 			} else {
 				classNames.push(
-					...createRules(
+					...createClassNames(
 						propertyName as keyof StyleProperties,
 						value,
 					),

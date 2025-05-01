@@ -1,12 +1,11 @@
 export type CacheKey = string;
 
-type CacheValue = string;
-
-export type Cache = {
-	add: (key: CacheKey, value: CacheValue) => void;
-	flush: () => void;
-	get: (key: CacheKey) => CacheValue | undefined;
-	getAll: () => CacheValue[];
+export type Cache<Value> = {
+	add: (key: CacheKey, value: Value) => void;
+	delete: (key: CacheKey) => void;
+	deleteAll: () => void;
+	get: (key: CacheKey) => Value | undefined;
+	getAll: () => Value[];
 	has: (key: CacheKey) => boolean;
 	toString: () => string;
 };
@@ -18,8 +17,8 @@ export type Cache = {
  * 	const cache = createCache();
  * 	cache.add("key", "value");
  */
-export const createCache = (): Cache => {
-	const cache = new Map<CacheKey, string>();
+export const createCache = <Value = string>(): Cache<Value> => {
+	const cache = new Map<CacheKey, Value>();
 
 	const getAll = () => {
 		return [...cache.values()];
@@ -29,7 +28,10 @@ export const createCache = (): Cache => {
 		add(key, value) {
 			cache.set(key, value);
 		},
-		flush() {
+		delete(key) {
+			cache.delete(key);
+		},
+		deleteAll() {
 			cache.clear();
 		},
 		get(key) {

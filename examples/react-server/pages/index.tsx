@@ -197,17 +197,17 @@ const App = () => {
 					className={styles({
 						backgroundColor: "surfacePrimary",
 						borderRadius: "large",
-						color: "neutralLight",
+						color: {
+							base: "neutralLight",
+							hover: "neutralDark",
+						},
 						colorScheme: {
 							base: "white",
 							hover: "black",
 						},
 						fontSize: "body",
 						fontWeight: "body",
-						padding: {
-							base: 1,
-							hover: 1.5,
-						},
+						padding: 1,
 						transitionProperty: {
 							base: ["color", "background-color"],
 							hover: ["color"],

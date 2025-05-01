@@ -1,10 +1,13 @@
 import { renderToString } from "react-dom/server";
-import { extractStyles } from "coulis";
+import { createServerContext } from "coulis";
 
 import { CoulisComponent } from "./Component";
 
 export const CoulisCase = () => {
-	renderToString(<CoulisComponent />);
+	const { createRenderer, getMetadata } = createServerContext();
+	const render = createRenderer(renderToString);
 
-	return extractStyles();
+	render(<CoulisComponent />);
+
+	return getMetadata();
 };

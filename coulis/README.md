@@ -389,34 +389,29 @@ export const App = () => {
 };
 ```
 
-### extractStyles
+### createServerContext
 
-A helper to extract all styles (including global ones) to be injected in the HTML.  
-It allows preventing "Flash Of Unstyled Content" browser side:
+A factory to initialize a server context and expose helpers (including getting stringified styles to be injected in the HTML to prevent FOUC "Flash Of Unstyled Content" browser side):
 
 ```tsx
-import { extractStyles } from "coulis";
+import { renderToString } from "react";
+import { createServerContext } from "coulis";
+import { App } from "./App"; // Main component entry point (depending on your project specificities).
 
-setGlobalStyles({
-	html: {
-		boxSizing: "border-box",
-	},
-});
+export const renderHtml = () => {
+	const serverContext = createServerContext();
+	const render = serverContext.createRenderer(renderToString);
+	const bodyContent = render(<App />);
+	const headContent = serverContext.getMetadata();
 
-const localStyles = createStyles({
-	alignItems: true,
-})({ alignItems: true });
-
-// `extractStyles` must be called after creating all styles:
-const extractedStyles = extractStyles();
-
-export const App = () => {
-	return (
-		<>
-			<style dangerously={{ __html: extractedStyles }} />
-			<span className={localStyles}>Hello 🤗</span>
-		</>
-	);
+	return `<html>
+		<head>
+			${headContent}
+		</head>
+		<body>
+			<div id="root>${bodyContent}</div>
+		</body>
+	</html>`;
 };
 ```
 

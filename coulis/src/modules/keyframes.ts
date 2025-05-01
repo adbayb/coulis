@@ -15,7 +15,7 @@ import { coulis } from "../entities/coulis";
 export const createKeyframes = (properties: KeyframesStyleProperties) => {
 	return coulis.getStyleSheet("global").commit({
 		key: JSON.stringify(properties),
-		createRules(className) {
+		createRule(className) {
 			let rule = "";
 
 			const selectors = Object.keys(

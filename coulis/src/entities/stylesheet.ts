@@ -3,7 +3,7 @@ import { IS_BROWSER_ENVIRONMENT } from "../constants";
 import { createClassName } from "./style";
 import type { ClassName } from "./style";
 import { createCache } from "./cache";
-import type { Cache, CacheKey } from "./cache";
+import type { CacheKey } from "./cache";
 
 export type StyleSheetIdentifier =
 	| "atLonghand"
@@ -14,12 +14,11 @@ export type StyleSheetIdentifier =
 
 export type StyleSheet = {
 	id: StyleSheetIdentifier;
-	cache: Cache;
 	commit: (parameters: {
 		key: CacheKey;
-		createRules: (className: string) => string[] | string;
+		createRule: (className: string) => string;
 	}) => ClassName;
-	flush: () => void;
+	delete: () => void;
 	getAttributes: (
 		cachedKeys?: string,
 	) => Record<"data-coulis-cache" | "data-coulis-id", string>;
@@ -27,7 +26,7 @@ export type StyleSheet = {
 };
 
 type StyleSheetTarget = {
-	flush: () => void;
+	delete: () => void;
 	getContent: () => string;
 	getHydrationInput: () => string[];
 	insert: (rule: string) => void;
@@ -36,7 +35,7 @@ type StyleSheetTarget = {
 /**
  * Factory to create a style sheet instance depending on the running platform (browser vs. Server).
  * @param id - The identifier representing the targetted style.
- * @returns Cache, stylesheet instances and methods.
+ * @returns StyleSheet instance.
  * @example
  *  createStyleSheet("global");
  */
@@ -52,35 +51,24 @@ export const createStyleSheet = (id: StyleSheetIdentifier): StyleSheet => {
 
 	return {
 		id,
-		cache,
-		commit(parameters) {
-			let className = cache.get(parameters.key);
+		commit({ key, createRule }) {
+			let className = cache.get(key);
 
 			if (className) return className;
 
-			className = createClassName(parameters.key);
+			className = createClassName(key);
 
-			cache.add(parameters.key, className);
+			cache.add(key, className);
 
-			if (hydrationInput.includes(className)) {
-				return className;
-			}
+			if (hydrationInput.includes(className)) return className;
 
-			const rules = parameters.createRules(className);
-
-			if (typeof rules === "string") {
-				styleSheetTarget.insert(rules);
-			} else {
-				for (const rule of rules) {
-					styleSheetTarget.insert(rule);
-				}
-			}
+			styleSheetTarget.insert(createRule(className));
 
 			return className;
 		},
-		flush() {
-			cache.flush();
-			styleSheetTarget.flush();
+		delete() {
+			cache.deleteAll();
+			styleSheetTarget.delete();
 		},
 		getAttributes() {
 			return {
@@ -94,13 +82,13 @@ export const createStyleSheet = (id: StyleSheetIdentifier): StyleSheet => {
 	};
 };
 
-type CreateStyleSheet = (id: StyleSheetIdentifier) => StyleSheetTarget;
+type CreateStyleSheetTarget = (id: StyleSheetIdentifier) => StyleSheetTarget;
 
-const createVirtualStyleSheetTarget: CreateStyleSheet = () => {
+const createVirtualStyleSheetTarget: CreateStyleSheetTarget = () => {
 	let rules: string[] = [];
 
 	return {
-		flush() {
+		delete() {
 			rules = [];
 		},
 		getContent() {
@@ -115,7 +103,7 @@ const createVirtualStyleSheetTarget: CreateStyleSheet = () => {
 	};
 };
 
-const createWebStyleSheetTarget: CreateStyleSheet = (id) => {
+const createWebStyleSheetTarget: CreateStyleSheetTarget = (id) => {
 	let element = document.querySelector<HTMLStyleElement>(
 		`style[data-coulis-id="${id}"]`,
 	);
@@ -128,7 +116,7 @@ const createWebStyleSheetTarget: CreateStyleSheet = (id) => {
 	}
 
 	return {
-		flush() {
+		delete() {
 			element.remove();
 		},
 		getContent() {

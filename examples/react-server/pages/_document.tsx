@@ -1,11 +1,15 @@
 import Document, { Head, Html, Main, NextScript } from "next/document";
 import type { DocumentContext } from "next/document";
-import { extractStyles } from "coulis";
+import { createServerContext } from "coulis";
 
 class MyDocument extends Document {
 	public static override async getInitialProps(context: DocumentContext) {
+		const { createRenderer, getMetadata } = createServerContext();
+
+		context.renderPage = createRenderer(context.renderPage);
+
 		const initialProps = await Document.getInitialProps(context);
-		const styles = extractStyles();
+		const styles = getMetadata();
 
 		return {
 			...initialProps,
@@ -16,7 +20,9 @@ class MyDocument extends Document {
 						return (
 							<style
 								{...attributes}
-								dangerouslySetInnerHTML={{ __html: content }}
+								dangerouslySetInnerHTML={{
+									__html: content,
+								}}
 								key={attributes["data-coulis-id"]}
 							/>
 						);

@@ -92,11 +92,8 @@ export const createStyles = <
 			if (!declaration) return classNames;
 
 			classNames.push(
-				styleSheet.commit({
-					key: declaration,
-					createRule(className) {
-						return `.${className}{${declaration}}`;
-					},
+				styleSheet.commit(declaration, (className) => {
+					return `.${className}{${declaration}}`;
 				}),
 			);
 
@@ -144,20 +141,19 @@ export const createStyles = <
 			}
 
 			classNames.push(
-				styleSheet.commit({
-					key:
-						/*
-						 * The key is not included to compute the className when `key` equals to "base" as base is equivalent to an unconditional value.
-						 * This exclusion will allow to recycle cache if the style value has been already defined unconditionally.
-						 */
-						isBaseState ? declaration : `${key}${declaration}`,
-					createRule(className) {
+				styleSheet.commit(
+					/*
+					 * The key is not included to compute the className when `key` equals to "base" as base is equivalent to an unconditional value.
+					 * This exclusion will allow to recycle cache if the style value has been already defined unconditionally.
+					 */
+					isBaseState ? declaration : `${key}${declaration}`,
+					(className) => {
 						return preComputedRule.replace(
 							"{{className}}",
 							className,
 						);
 					},
-				}),
+				),
 			);
 		}
 

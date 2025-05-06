@@ -13,9 +13,9 @@ import { coulis } from "../entities/coulis";
  * 	document.getElementById("my-element-id").className = className;
  */
 export const createKeyframes = (properties: KeyframesStyleProperties) => {
-	return coulis.getStyleSheet("global").commit({
-		key: JSON.stringify(properties),
-		createRule(className) {
+	return coulis
+		.getStyleSheet("global")
+		.commit(JSON.stringify(properties), (className) => {
 			let rule = "";
 
 			const selectors = Object.keys(
@@ -33,8 +33,7 @@ export const createKeyframes = (properties: KeyframesStyleProperties) => {
 			}
 
 			return `@keyframes ${className}{${rule}}`;
-		},
-	});
+		});
 };
 
 type KeyframesStyleProperties = Partial<

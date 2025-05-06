@@ -5,6 +5,8 @@ import type { ClassName } from "./style";
 import { createCache } from "./cache";
 import type { CacheKey } from "./cache";
 
+type Rule = string;
+
 export type StyleSheetIdentifier =
 	| "atLonghand"
 	| "atShorthand"
@@ -14,10 +16,10 @@ export type StyleSheetIdentifier =
 
 export type StyleSheet = {
 	id: StyleSheetIdentifier;
-	commit: (parameters: {
-		key: CacheKey;
-		createRule: (className: string) => string;
-	}) => ClassName;
+	commit: (
+		key: CacheKey,
+		createRule: (className: string) => Rule,
+	) => ClassName;
 	delete: () => void;
 	getAttributes: (
 		cachedKeys?: string,
@@ -28,8 +30,8 @@ export type StyleSheet = {
 type StyleSheetTarget = {
 	delete: () => void;
 	getContent: () => string;
-	getHydrationInput: () => string[];
-	insert: (rule: string) => void;
+	getHydratedClassNames: () => CacheKey[];
+	insert: (className: ClassName, rule: Rule) => void;
 };
 
 /**
@@ -46,12 +48,12 @@ export const createStyleSheet = (id: StyleSheetIdentifier): StyleSheet => {
 			: createVirtualStyleSheetTarget
 	)(id);
 
-	const hydrationInput = styleSheetTarget.getHydrationInput();
+	const hydratedClassNames = styleSheetTarget.getHydratedClassNames();
 	const cache = createCache();
 
 	return {
 		id,
-		commit({ key, createRule }) {
+		commit(key, createRule) {
 			let className = cache.get(key);
 
 			if (className) return className;
@@ -60,9 +62,9 @@ export const createStyleSheet = (id: StyleSheetIdentifier): StyleSheet => {
 
 			cache.add(key, className);
 
-			if (hydrationInput.includes(className)) return className;
+			if (hydratedClassNames.includes(className)) return className;
 
-			styleSheetTarget.insert(createRule(className));
+			styleSheetTarget.insert(className, createRule(className));
 
 			return className;
 		},
@@ -85,20 +87,20 @@ export const createStyleSheet = (id: StyleSheetIdentifier): StyleSheet => {
 type CreateStyleSheetTarget = (id: StyleSheetIdentifier) => StyleSheetTarget;
 
 const createVirtualStyleSheetTarget: CreateStyleSheetTarget = () => {
-	let rules: string[] = [];
+	let rules: Record<ClassName, Rule> = {};
 
 	return {
 		delete() {
-			rules = [];
+			rules = {};
 		},
 		getContent() {
-			return minify(rules.join(""));
+			return minify(Object.values(rules).join(""));
 		},
-		getHydrationInput() {
+		getHydratedClassNames() {
 			return [];
 		},
-		insert(rule) {
-			rules.push(rule);
+		insert(className, rule) {
+			rules[className] = rule;
 		},
 	};
 };
@@ -126,14 +128,14 @@ const createWebStyleSheetTarget: CreateStyleSheetTarget = (id) => {
 			 */
 			return element.textContent ?? "";
 		},
-		getHydrationInput() {
+		getHydratedClassNames() {
 			const source = element.dataset.coulisCache;
 
 			if (!source) return [];
 
 			return source.split(",");
 		},
-		insert(rule) {
+		insert(_, rule) {
 			/**
 			 * `insertAdjacentText` is the most performant API for appending text.
 			 * @see {@link https://esbench.com/bench/680c1080545f8900a4de2ce6 Benchmark}

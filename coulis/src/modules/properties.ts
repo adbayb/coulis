@@ -44,9 +44,9 @@ export const createCustomProperties = <const P extends Properties>(
 	const { collectedProperties, nodes } =
 		createCustomPropertiesWithoutSideEffects(properties);
 
-	coulis.getStyleSheet("global").commit({
-		key: JSON.stringify(collectedProperties),
-		createRule() {
+	coulis
+		.getStyleSheet("global")
+		.commit(JSON.stringify(collectedProperties), () => {
 			const variables = collectedProperties.reduce(
 				(output, property) =>
 					`${output}--${property.name}:${property.value};`,
@@ -54,8 +54,7 @@ export const createCustomProperties = <const P extends Properties>(
 			);
 
 			return `:root{${variables}}`;
-		},
-	});
+		});
 
 	return nodes;
 };

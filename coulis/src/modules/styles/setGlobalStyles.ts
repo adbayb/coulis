@@ -10,25 +10,22 @@ import { coulis } from "../../entities/coulis";
  * 	setGlobalStyles({ "html": { "background-color": "red" } });
  */
 export const setGlobalStyles = (properties: GlobalStyleProperties) => {
-	coulis.getStyleSheet("global").commit({
-		key: JSON.stringify(properties),
-		createRule() {
-			let rule = "";
-			const selectors = Object.keys(properties);
+	coulis.getStyleSheet("global").commit(JSON.stringify(properties), () => {
+		let rule = "";
+		const selectors = Object.keys(properties);
 
-			for (const selector of selectors) {
-				const style = properties[selector];
+		for (const selector of selectors) {
+			const style = properties[selector];
 
-				if (style === undefined) continue;
+			if (style === undefined) continue;
 
-				rule +=
-					typeof style === "string"
-						? `${selector} ${style};`
-						: `${selector}{${createDeclarations(style)}}`;
-			}
+			rule +=
+				typeof style === "string"
+					? `${selector} ${style};`
+					: `${selector}{${createDeclarations(style)}}`;
+		}
 
-			return rule;
-		},
+		return rule;
 	});
 };
 

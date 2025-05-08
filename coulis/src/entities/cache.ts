@@ -2,11 +2,13 @@ export type CacheKey = string;
 
 export type Cache<Value> = {
 	add: (key: CacheKey, value: Value) => void;
-	delete: (key: CacheKey) => void;
-	deleteAll: () => void;
 	get: (key: CacheKey) => Value | undefined;
-	getAll: () => Value[];
+	getKeys: () => CacheKey[];
+	getValues: () => Value[];
 	has: (key: CacheKey) => boolean;
+	remove: (key: CacheKey) => void;
+	removeAll: () => void;
+	removeAllExcept: (keys: CacheKey[]) => void;
 	toString: () => string;
 };
 
@@ -20,29 +22,43 @@ export type Cache<Value> = {
 export const createCache = <Value = string>(): Cache<Value> => {
 	const cache = new Map<CacheKey, Value>();
 
-	const getAll = () => {
+	const getKeys: Cache<Value>["getKeys"] = () => {
+		return [...cache.keys()];
+	};
+
+	const getValues: Cache<Value>["getValues"] = () => {
 		return [...cache.values()];
+	};
+
+	const remove: Cache<Value>["remove"] = (key) => {
+		cache.delete(key);
 	};
 
 	return {
 		add(key, value) {
 			cache.set(key, value);
 		},
-		delete(key) {
-			cache.delete(key);
-		},
-		deleteAll() {
-			cache.clear();
-		},
 		get(key) {
 			return cache.get(key);
 		},
-		getAll,
+		getKeys,
+		getValues,
 		has(key) {
 			return cache.has(key);
 		},
+		remove,
+		removeAll() {
+			cache.clear();
+		},
+		removeAllExcept(keys: CacheKey[]) {
+			getKeys()
+				.filter((key) => !keys.includes(key))
+				.forEach((key) => {
+					remove(key);
+				});
+		},
 		toString() {
-			return getAll().join(",");
+			return getValues().join(",");
 		},
 	};
 };

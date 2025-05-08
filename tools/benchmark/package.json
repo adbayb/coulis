@@ -19,9 +19,9 @@
 		"playwright-test": "14.1.9",
 		"react": "19.1.0",
 		"react-dom": "19.1.0",
-		"styled-components": "6.1.17",
+		"styled-components": "6.1.18",
 		"tinybench": "4.0.1",
-		"tsx": "4.19.3",
+		"tsx": "4.19.4",
 		"typescript": "5.8.3"
 	}
 }

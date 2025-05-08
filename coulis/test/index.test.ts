@@ -62,6 +62,41 @@ describe("coulis", () => {
 		render();
 
 		expect(getMetadata()).toMatchSnapshot();
+	});
+
+	test("should extract styles given stringified styles", () => {
+		const { createRenderer, getMetadata } = createServerContext();
+
+		const render = createRenderer(() => {
+			setGlobalStyles({
+				"*,*::before,*::after": {
+					boxSizing: "inherit",
+				},
+				".globalClass+.otherGlobalClass": {
+					border: "1px solid black",
+					borderRadius: 4,
+				},
+				"@charset": '"utf-8"',
+				"@font-face": {
+					fontFamily: "'AliasedHelvetica'",
+					src: "local(Helvetica)",
+				},
+				"@import":
+					"url('https://fonts.googleapis.com/css?family=Open+Sans&display=swap')",
+				"html": {
+					boxSizing: "border-box",
+				},
+				"html,body": {
+					backgroundColor: "lightcoral",
+					fontFamily: "Open Sans, AliasedHelvetica",
+					margin: 0,
+					padding: 0,
+				},
+			});
+		});
+
+		render();
+
 		// eslint-disable-next-line @typescript-eslint/restrict-template-expressions
 		expect(`${getMetadata()}`).toMatchSnapshot();
 	});

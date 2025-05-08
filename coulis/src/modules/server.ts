@@ -1,4 +1,5 @@
 import { coulis } from "../entities/coulis";
+import type { CacheKey } from "../entities/cache";
 
 type ServerContext = {
 	/**
@@ -25,17 +26,17 @@ type ServerContext = {
 
 export const createServerContext = (): ServerContext => {
 	let hasRenderBeenCalled = false;
-	const staticCacheIds: string[] = [];
-
-	// eslint-disable-next-line @typescript-eslint/no-unused-expressions
-	staticCacheIds;
+	const globalCacheKeys: CacheKey[] = [];
 
 	return {
 		createRenderer(initialRender) {
 			return ((...arguments_) => {
-				/**
-				 * Console.log(coulis.getCache().getAll());. // TODO.
-				 */
+				for (const styleSheetId of coulis.getStyleSheetIds()) {
+					const styleSheet = coulis.getStyleSheet(styleSheetId);
+
+					// Global cache keys are keys defined outside the rendering step (so, before rendering the component).
+					globalCacheKeys.push(...styleSheet.getCacheKeys());
+				}
 
 				const output = initialRender(
 					...(arguments_ as Parameters<typeof initialRender>),
@@ -58,7 +59,7 @@ export const createServerContext = (): ServerContext => {
 			const ids = coulis.getStyleSheetIds();
 
 			const output = ids.map((id) => {
-				const { /* flush, */ getAttributes, getContent } =
+				const { getAttributes, getContent, remove } =
 					coulis.getStyleSheet(id);
 
 				const content = getContent();
@@ -80,13 +81,8 @@ export const createServerContext = (): ServerContext => {
 
 				stringifiedStyles += toString();
 
-				/*
-				 * // TODO: flush cache selectively
-				 * if (flushOption && id !== "global") {
-				 * 	// Flush only local styles to preserve styles defined globally as they're not re-rendered:
-				 * 	flush();
-				 * }
-				 */
+				// To prevent [cross-request state pollution](https://vuejs.org/guide/scaling-up/ssr.html#cross-request-state-pollution), flush styles generated dynamically while preserving, via the `globalCacheKeys` input, the ones shared/defined globally (at file/module scope):
+				remove(globalCacheKeys);
 
 				return {
 					attributes,

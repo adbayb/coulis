@@ -7,12 +7,20 @@ import type { CacheKey } from "./cache";
 
 type Rule = string;
 
-export type StyleSheetIdentifier =
-	| "atLonghand"
-	| "atShorthand"
-	| "global"
-	| "longhand"
-	| "shorthand";
+/**
+ * The insertion order is important to enforce the more precise properties take precedence over less precise ones.
+ * Global properties has a lesser specificity than (<) shorthand ones:
+ * global (e.g div { background-color }) < shorthand (e.g background) < longhand (e.g background-color) < conditional-shorthand (e.g @media { background }) < conditional-longhand (e.g @media { background-color }) properties.
+ */
+export const ORDERED_STYLESHEET_IDS = Object.freeze([
+	"global",
+	"shorthand",
+	"longhand",
+	"atShorthand",
+	"atLonghand",
+] as const);
+
+export type StyleSheetIdentifier = (typeof ORDERED_STYLESHEET_IDS)[number];
 
 export type StyleSheet = {
 	id: StyleSheetIdentifier;
@@ -20,18 +28,17 @@ export type StyleSheet = {
 		key: CacheKey,
 		createRule: (className: string) => Rule,
 	) => ClassName;
-	delete: () => void;
-	getAttributes: (
-		cachedKeys?: string,
-	) => Record<"data-coulis-cache" | "data-coulis-id", string>;
+	getAttributes: () => Record<"data-coulis-cache" | "data-coulis-id", string>;
+	getCacheKeys: () => CacheKey[];
 	getContent: () => string;
+	remove: (preservableCacheKeys: CacheKey[]) => void;
 };
 
 type StyleSheetTarget = {
-	delete: () => void;
 	getContent: () => string;
 	getHydratedClassNames: () => CacheKey[];
 	insert: (className: ClassName, rule: Rule) => void;
+	remove: (preservableCacheKeys: CacheKey[]) => void;
 };
 
 /**
@@ -48,38 +55,41 @@ export const createStyleSheet = (id: StyleSheetIdentifier): StyleSheet => {
 			: createVirtualStyleSheetTarget
 	)(id);
 
+	const classNameCache = createCache<ClassName>();
 	const hydratedClassNames = styleSheetTarget.getHydratedClassNames();
-	const cache = createCache();
 
 	return {
 		id,
 		commit(key, createRule) {
-			let className = cache.get(key);
+			let className = classNameCache.get(key);
 
 			if (className) return className;
 
 			className = createClassName(key);
 
-			cache.add(key, className);
+			classNameCache.add(key, className);
 
 			if (hydratedClassNames.includes(className)) return className;
 
-			styleSheetTarget.insert(className, createRule(className));
+			styleSheetTarget.insert(key, createRule(className));
 
 			return className;
 		},
-		delete() {
-			cache.deleteAll();
-			styleSheetTarget.delete();
-		},
 		getAttributes() {
 			return {
-				"data-coulis-cache": cache.getAll().join(","),
+				"data-coulis-cache": classNameCache.getValues().join(","),
 				"data-coulis-id": id,
 			};
 		},
+		getCacheKeys() {
+			return classNameCache.getKeys();
+		},
 		getContent() {
 			return styleSheetTarget.getContent();
+		},
+		remove(preservableCacheKeys) {
+			classNameCache.removeAllExcept(preservableCacheKeys);
+			styleSheetTarget.remove(preservableCacheKeys);
 		},
 	};
 };
@@ -87,20 +97,20 @@ export const createStyleSheet = (id: StyleSheetIdentifier): StyleSheet => {
 type CreateStyleSheetTarget = (id: StyleSheetIdentifier) => StyleSheetTarget;
 
 const createVirtualStyleSheetTarget: CreateStyleSheetTarget = () => {
-	let rules: Record<ClassName, Rule> = {};
+	const ruleCache = createCache<Rule>();
 
 	return {
-		delete() {
-			rules = {};
-		},
 		getContent() {
-			return minify(Object.values(rules).join(""));
+			return minify(ruleCache.getValues().join(""));
 		},
 		getHydratedClassNames() {
 			return [];
 		},
-		insert(className, rule) {
-			rules[className] = rule;
+		insert(key, rule) {
+			ruleCache.add(key, rule);
+		},
+		remove(preservableCacheKeys) {
+			ruleCache.removeAllExcept(preservableCacheKeys);
 		},
 	};
 };
@@ -118,9 +128,6 @@ const createWebStyleSheetTarget: CreateStyleSheetTarget = (id) => {
 	}
 
 	return {
-		delete() {
-			element.remove();
-		},
 		getContent() {
 			/**
 			 * `textContent` is more performant than `innerText` (no layout reflow).
@@ -142,6 +149,9 @@ const createWebStyleSheetTarget: CreateStyleSheetTarget = (id) => {
 			 */
 			// eslint-disable-next-line unicorn/prefer-modern-dom-apis
 			element.insertAdjacentText("beforeend", rule);
+		},
+		remove() {
+			element.remove();
 		},
 	};
 };

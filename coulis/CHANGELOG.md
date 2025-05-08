@@ -1,5 +1,13 @@
 # Change Log
 
+## 0.14.0
+
+### Minor Changes
+
+- [`11483fb`](https://github.com/adbayb/coulis/commit/11483fb860231f4edef58000a6f957d8ececcdc6) Thanks [@adbayb](https://github.com/adbayb)! - Improve cache clearing to prevent cross-request state pollution.
+
+- [`3c2225e`](https://github.com/adbayb/coulis/commit/3c2225e87044b391381d49fa0745ab9acd99107c) Thanks [@adbayb](https://github.com/adbayb)! - New `createServerContext` to better encapsulate server-side logic. It replaces `extractStyles` interface (breaking change).
+
 ## 0.13.0
 
 ### Minor Changes

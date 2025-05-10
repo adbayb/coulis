@@ -1,5 +1,5 @@
 {
-	"name": "@coulis/example-react-browser",
+	"name": "@coulis/example-vite-csr-react",
 	"version": "0.0.0",
 	"private": true,
 	"scripts": {

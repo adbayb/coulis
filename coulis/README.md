@@ -394,7 +394,7 @@ export const App = () => {
 A factory to initialize a server context and expose helpers (including getting stringified styles to be injected in the HTML to prevent FOUC "Flash Of Unstyled Content" browser side):
 
 ```tsx
-import { renderToString } from "react";
+import { renderToString } from "react-dom/server";
 import { createServerContext } from "coulis";
 import { App } from "./App"; // Main component entry point (depending on your project specificities).
 

@@ -4,8 +4,8 @@
 	"private": true,
 	"scripts": {
 		"build": "next build --no-lint",
-		"dev": "next dev --turbopack",
-		"start": "next start"
+		"serve": "next start --port 3001",
+		"start": "next dev --turbopack --port 3001"
 	},
 	"dependencies": {
 		"coulis": "workspace:^",

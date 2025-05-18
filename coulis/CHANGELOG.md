@@ -1,5 +1,11 @@
 # Change Log
 
+## 0.15.0
+
+### Minor Changes
+
+- [`4bae590`](https://github.com/adbayb/coulis/commit/4bae5902058f4b5195d67034113266396e179bad) Thanks [@adbayb](https://github.com/adbayb)! - Make `initialRender` parameter optional for `createServerContext.createRenderer` method.
+
 ## 0.14.0
 
 ### Minor Changes

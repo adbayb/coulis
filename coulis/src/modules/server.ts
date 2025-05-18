@@ -15,7 +15,7 @@ type ServerContext = {
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		DecoratedRender extends (...arguments_: any[]) => any,
 	>(
-		initialRender: DecoratedRender,
+		initialRender?: DecoratedRender,
 	) => DecoratedRender;
 	getMetadata: () => {
 		attributes: Record<"data-coulis-cache" | "data-coulis-id", string>;
@@ -25,11 +25,16 @@ type ServerContext = {
 };
 
 export const createServerContext = (): ServerContext => {
-	let hasRenderBeenCalled = false;
 	const globalCacheKeys: CacheKey[] = [];
+	let hasRenderBeenCalled = false;
 
 	return {
 		createRenderer(initialRender) {
+			const renderFunction = (initialRender ??
+				(() => {
+					// No-op method
+				})) as NonNullable<typeof initialRender>;
+
 			return ((...arguments_) => {
 				for (const styleSheetId of coulis.getStyleSheetIds()) {
 					const styleSheet = coulis.getStyleSheet(styleSheetId);
@@ -38,15 +43,13 @@ export const createServerContext = (): ServerContext => {
 					globalCacheKeys.push(...styleSheet.getCacheKeys());
 				}
 
-				const output = initialRender(
-					...(arguments_ as Parameters<typeof initialRender>),
-				) as ReturnType<typeof initialRender>;
-
 				hasRenderBeenCalled = true;
 
 				// eslint-disable-next-line @typescript-eslint/no-unsafe-return
-				return output;
-			}) as typeof initialRender;
+				return renderFunction(
+					...(arguments_ as Parameters<typeof renderFunction>),
+				);
+			}) as typeof renderFunction;
 		},
 		getMetadata() {
 			if (!hasRenderBeenCalled) {

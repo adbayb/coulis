@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 
+import { CoulisRegistry } from "../components/CoulisRegistry";
+
 export const metadata: Metadata = {
 	title: "Coulis",
 };
@@ -11,7 +13,9 @@ export default function RootLayout({
 }>) {
 	return (
 		<html lang="en">
-			<body>{children}</body>
+			<body>
+				<CoulisRegistry>{children}</CoulisRegistry>
+			</body>
 		</html>
 	);
 }

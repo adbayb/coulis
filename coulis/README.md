@@ -415,4 +415,9 @@ export const renderHtml = () => {
 };
 ```
 
+## ☑️ TODO
+
+- [ ] Split `createServerContext` section into two parts (one for classical server-side setup and one for server component with Next.js App Router).
+- [ ] Make `toString` method more explicit for `createServerContext.getMetadata` (dedicated method `getMetadataAsString`?)
+
 <br>

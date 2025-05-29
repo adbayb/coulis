@@ -4,9 +4,9 @@ import { createServerContext } from "coulis";
 import { CoulisComponent } from "./Component";
 
 export const CoulisCase = () => {
-	const { getMetadata } = createServerContext();
+	const { getMetadataAsString } = createServerContext();
 
 	renderToString(<CoulisComponent />);
 
-	return getMetadata();
+	return getMetadataAsString();
 };

@@ -5,7 +5,7 @@ import { createServerContext } from "coulis";
 import App from "./App";
 
 export const renderHtml = (_url: string) => {
-	const { getMetadata } = createServerContext();
+	const { getMetadataAsString } = createServerContext();
 
 	const bodyContent = renderToString(
 		<StrictMode>
@@ -13,7 +13,7 @@ export const renderHtml = (_url: string) => {
 		</StrictMode>,
 	);
 
-	const headContent = getMetadata();
+	const headContent = getMetadataAsString();
 
 	return { html: bodyContent, head: headContent };
 };

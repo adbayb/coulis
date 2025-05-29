@@ -29,16 +29,11 @@ describe("coulis", () => {
 	});
 
 	test("should extract styles", () => {
-		const { getMetadata } = createServerContext();
-
-		expect(getMetadata()).toMatchSnapshot();
+		expect(createServerContext().getMetadata()).toMatchSnapshot();
 	});
 
 	test("should extract styles given stringified styles", () => {
-		const { getMetadata } = createServerContext();
-
-		// eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-		expect(`${getMetadata()}`).toMatchSnapshot();
+		expect(createServerContext().getMetadataAsString()).toMatchSnapshot();
 	});
 
 	test("should type `createStyles` in a safe manner", () => {

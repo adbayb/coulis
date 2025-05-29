@@ -8,7 +8,6 @@ exports[`coulis > should extract styles 1`] = `
       "data-coulis-id": "global",
     },
     "content": "@keyframes c77e20e50{25%{transform:scale(1.25);}50%{transform:scale(1.5);}from{transform:scale(1);}to{transform:scale(1);}}*,*::before,*::after{box-sizing:inherit;}.globalClass+.otherGlobalClass{border:1px solid black;border-radius:4px;}@charset "utf-8";@font-face{font-family:'AliasedHelvetica';src:local(Helvetica);}@import url('https://fonts.googleapis.com/css?family=Open+Sans&display=swap');html{box-sizing:border-box;}html,body{background-color:lightcoral;font-family:Open Sans, AliasedHelvetica;}",
-    "toString": [Function],
   },
   {
     "attributes": {
@@ -16,7 +15,6 @@ exports[`coulis > should extract styles 1`] = `
       "data-coulis-id": "shorthand",
     },
     "content": ".c2a100aa4{padding:6px;}.c6a0088d1{padding:18px;}.ccadc8a20{padding:12px;}",
-    "toString": [Function],
   },
   {
     "attributes": {
@@ -24,7 +22,6 @@ exports[`coulis > should extract styles 1`] = `
       "data-coulis-id": "longhand",
     },
     "content": ".cdd299de8[alt]{background-color:lightgray;}.cbb3938{background-color:lightcoral;}.ce31a3799{background-color:lightcyan;}.c18a19c73{color:lightblue;}.c72f7daf8{background-color:lightseagreen;}.c5ea183e8{background-color:lightgrey;}",
-    "toString": [Function],
   },
   {
     "attributes": {
@@ -32,7 +29,6 @@ exports[`coulis > should extract styles 1`] = `
       "data-coulis-id": "atShorthand",
     },
     "content": "",
-    "toString": [Function],
   },
   {
     "attributes": {
@@ -40,7 +36,6 @@ exports[`coulis > should extract styles 1`] = `
       "data-coulis-id": "atLonghand",
     },
     "content": "",
-    "toString": [Function],
   },
 ]
 `;

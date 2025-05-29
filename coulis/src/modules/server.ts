@@ -5,8 +5,8 @@ type ServerContext = {
 	getMetadata: () => {
 		attributes: Record<"data-coulis-cache" | "data-coulis-id", string>;
 		content: string;
-		toString: () => string;
 	}[];
+	getMetadataAsString: () => string;
 };
 
 export const createServerContext = (): ServerContext => {
@@ -19,49 +19,41 @@ export const createServerContext = (): ServerContext => {
 		globalCacheKeys.push(...styleSheet.getCacheKeys());
 	}
 
-	return {
-		getMetadata() {
-			let stringifiedStyles = "";
-			const ids = coulis.getStyleSheetIds();
+	const getMetadata: ServerContext["getMetadata"] = () => {
+		return coulis.getStyleSheetIds().map((id) => {
+			const { getAttributes, getContent, remove } =
+				coulis.getStyleSheet(id);
 
-			const output = ids.map((id) => {
-				const { getAttributes, getContent, remove } =
-					coulis.getStyleSheet(id);
+			const content = getContent();
+			const attributes = getAttributes();
 
-				const content = getContent();
-				const attributes = getAttributes();
+			// To prevent [cross-request state pollution](https://vuejs.org/guide/scaling-up/ssr.html#cross-request-state-pollution), flush styles generated dynamically while preserving, via the `globalCacheKeys` input, the ones shared/defined globally (at file/module scope):
+			remove(globalCacheKeys);
 
-				const toString = () => {
-					const stringifiedAttributes = (
-						Object.keys(attributes) as (keyof typeof attributes)[]
-					)
-						.map(
-							// eslint-disable-next-line sonarjs/no-nested-functions
-							(attributeKey) =>
-								`${attributeKey}="${attributes[attributeKey]}"`,
-						)
-						.join(" ");
-
-					return `<style ${stringifiedAttributes}>${content}</style>`;
-				};
-
-				stringifiedStyles += toString();
-
-				// To prevent [cross-request state pollution](https://vuejs.org/guide/scaling-up/ssr.html#cross-request-state-pollution), flush styles generated dynamically while preserving, via the `globalCacheKeys` input, the ones shared/defined globally (at file/module scope):
-				remove(globalCacheKeys);
-
-				return {
-					attributes,
-					content,
-					toString,
-				};
-			});
-
-			output.toString = () => {
-				return stringifiedStyles;
+			return {
+				attributes,
+				content,
 			};
+		});
+	};
 
-			return output;
+	return {
+		getMetadata,
+		getMetadataAsString() {
+			return getMetadata().reduce((output, { attributes, content }) => {
+				const stringifiedAttributes = (
+					Object.keys(attributes) as (keyof typeof attributes)[]
+				)
+					.map(
+						(attributeKey) =>
+							`${attributeKey}="${attributes[attributeKey]}"`,
+					)
+					.join(" ");
+
+				output += `<style ${stringifiedAttributes}>${content}</style>`;
+
+				return output;
+			}, "");
 		},
 	};
 };

@@ -133,7 +133,7 @@ if (container) {
 
 ## 👨‍💻 Usage
 
-This section aims to deep dive into each public API with focused examples:
+This section aims to deep dive into each interface with code examples:
 
 ### createStyles
 
@@ -391,7 +391,9 @@ export const App = () => {
 
 ### createServerContext
 
-A factory to initialize a server context and expose helpers (including getting stringified styles to be injected in the HTML to prevent FOUC "Flash Of Unstyled Content" browser side):
+A factory to initialize a server context and expose helpers to enable server-side rendering. It helps prevent what is known as FOUC (Flash Of Unstyled Content) on the browser side.
+
+Here's a vanilla React integration example generating HTML content:
 
 ```tsx
 import { renderToString } from "react-dom/server";
@@ -399,9 +401,9 @@ import { createServerContext } from "coulis";
 import { App } from "./App"; // Main component entry point (depending on your project specificities).
 
 export const renderHtml = () => {
-	const serverContext = createServerContext();
+	const serverContext = createServerContext(); // Must be called before `renderToString` to initialize the server context beforehand.
 	const bodyContent = renderToString(<App />);
-	const headContent = serverContext.getMetadataAsString();
+	const headContent = serverContext.getMetadataAsString(); // Must be called after initial rendering to retrieve generated styles after the `renderToString` traversal.
 
 	return `<html>
 		<head>
@@ -414,9 +416,17 @@ export const renderHtml = () => {
 };
 ```
 
-## ☑️ TODO
+For more server-side integration recipes, the following examples can be checked:
 
-- [ ] Split `createServerContext` section into two parts (one for classical server-side setup and one for server component with Next.js App Router).
-- [ ] Make `toString` method more explicit for `createServerContext.getMetadata` (dedicated method `getMetadataAsString`?)
+- **React**
+    - [Next.js with the app router](./examples/nextjs-app-router/), more specifically, [this snippet](./examples/nextjs-app-router/src/components/CoulisRegistry.tsx).
+    - [Next.js with the pages router](./examples/nextjs-pages-router/), more specifically, [this snippet](examples/nextjs-pages-router/src/pages/_document.tsx).
+    - [Vite.js with server-side rendering](./examples/vite-ssr-react/), more specifically, [this snippet](examples/vite-ssr-react/src/entry-server.tsx).
+- **Angular**
+    - Welcome to any contribution.
+- **Vue**
+    - Welcome to any contribution.
+- **...**
+    - Welcome to any contribution.
 
 <br>

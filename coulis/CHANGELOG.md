@@ -1,5 +1,13 @@
 # Change Log
 
+## 0.15.0
+
+### Minor Changes
+
+- [`93d5309`](https://github.com/adbayb/coulis/commit/93d5309d541f938c2785fa4b09f40438b0d8e9f7) Thanks [@adbayb](https://github.com/adbayb)! - Add `getMetadataAsString` method to `createServerContext` factory.
+
+- [`6c1f2b2`](https://github.com/adbayb/coulis/commit/6c1f2b2aa0925bbfd19f4b25012ef02469fd7b58) Thanks [@adbayb](https://github.com/adbayb)! - Simplify `createServerContext` interface by removing `createRenderer` method.
+
 ## 0.14.0
 
 ### Minor Changes

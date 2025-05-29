@@ -27,12 +27,7 @@ export const CoulisRegistry = ({ children }: PropsWithChildren) => {
 	const hasBeenInserted = useRef(false);
 
 	const context = useMemo(() => {
-		const serverContext = createServerContext();
-		const render = serverContext.createRenderer();
-
-		render();
-
-		return serverContext;
+		return createServerContext();
 	}, []);
 
 	useServerInsertedHTML(() => {

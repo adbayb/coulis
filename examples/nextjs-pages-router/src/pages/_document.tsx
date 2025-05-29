@@ -4,12 +4,9 @@ import { createServerContext } from "coulis";
 
 class MyDocument extends Document {
 	public static override async getInitialProps(context: DocumentContext) {
-		const { createRenderer, getMetadata } = createServerContext();
-
-		context.renderPage = createRenderer(context.renderPage);
-
+		const coulisServerContext = createServerContext();
+		const styles = coulisServerContext.getMetadata();
 		const initialProps = await Document.getInitialProps(context);
-		const styles = getMetadata();
 
 		return {
 			...initialProps,

@@ -400,8 +400,7 @@ import { App } from "./App"; // Main component entry point (depending on your pr
 
 export const renderHtml = () => {
 	const serverContext = createServerContext();
-	const render = serverContext.createRenderer(renderToString);
-	const bodyContent = render(<App />);
+	const bodyContent = renderToString(<App />);
 	const headContent = serverContext.getMetadata();
 
 	return `<html>

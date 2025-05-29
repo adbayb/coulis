@@ -5,10 +5,9 @@ import { createServerContext } from "coulis";
 import App from "./App";
 
 export const renderHtml = (_url: string) => {
-	const { createRenderer, getMetadata } = createServerContext();
-	const render = createRenderer(renderToString);
+	const { getMetadata } = createServerContext();
 
-	const bodyContent = render(
+	const bodyContent = renderToString(
 		<StrictMode>
 			<App />
 		</StrictMode>,

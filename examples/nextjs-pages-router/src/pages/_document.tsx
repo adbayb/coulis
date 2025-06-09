@@ -8,6 +8,10 @@ class MyDocument extends Document {
 		const styles = coulisServerContext.getMetadata();
 		const initialProps = await Document.getInitialProps(context);
 
+		styles.forEach(({ attributes, content }) => {
+			console.log("MyDocument", { attributes, content });
+		});
+
 		return {
 			...initialProps,
 			styles: (

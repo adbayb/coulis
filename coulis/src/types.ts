@@ -1,3 +1,5 @@
+export type Rule = string;
+
 export type RecordLike = Record<number | string | symbol, unknown>;
 
 export type UngreedyString = Ungreedify<string>;

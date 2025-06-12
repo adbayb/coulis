@@ -4,22 +4,22 @@ import type {
 	RecordLike,
 	SetGlobalStylesInput,
 } from "../types";
-import type { CreateCoulis } from "../createCoulis";
+import type { CreateStyle } from "../entities/style";
 
 /**
  * Platform adapter interface.
  */
-export type Platform<Styles> = {
+export type Adapter<Output> = {
 	createCustomProperties: <const Input extends CreateCustomPropertiesInput>(
 		input: Input,
 	) => Input; // TODO: CreateCustomPropertiesOutput<Input>?
 	createKeyframes: <Input extends CreateKeyframesInput>(
 		input: Input,
-	) => Styles;
-	createStyles: <Input extends RecordLike>(input: Input) => Styles;
+	) => Output;
+	createStyles: <Input extends RecordLike>(input: Input) => Output; // TODO: update type.
 	createVariants: <Input extends RecordLike>(
 		input: Input,
-	) => (query: RecordLike) => Styles; // TODO: update type.
+	) => (query: RecordLike) => Output;
 	getMetadata: () => {
 		attributes: Record<"data-coulis-cache" | "data-coulis-type", string>;
 		content: string;
@@ -28,6 +28,6 @@ export type Platform<Styles> = {
 	setGlobalStyles: <Input extends SetGlobalStylesInput>(input: Input) => void;
 };
 
-export type WithPlatform<Styles> = (
-	coulisFactory: CreateCoulis,
-) => () => Platform<Styles>;
+export type CreateAdapter<Output> = (input: {
+	createStyle: CreateStyle;
+}) => Adapter<Output>;

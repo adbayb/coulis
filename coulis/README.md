@@ -430,20 +430,3 @@ For more server-side integration recipes, the following examples can be checked:
     - Welcome to any contribution.
 
 <br>
-
-### Specification v2
-
-```tsx
-import { createCoulis } from "coulis";
-import { withWebAdapter } from "coulis/web";
-import { withReactNativeAdapter } from "coulis/react-native";
-
-const coulisWeb =
-	withWebAdapter(
-		createCoulis(),
-	)(/* args from createCoulis (higher order function) */);
-const coulisReactNative = withReactNativeAdapter(createCoulis());
-
-const style = coulisWeb.createStyles({})(); // returns string
-const style = coulisReactNative.createStyles({})(); // returns Record<string, unknown>
-```

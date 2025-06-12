@@ -1,115 +1,116 @@
 /* eslint-disable sort-keys-custom-order/object-keys */
-import type { StyleProperties } from "../types";
-import { TYPES } from "../createCoulis";
-import type { Type } from "../createCoulis";
-import type { WithPlatform } from "./types";
+import type { RecordLike, StyleProperties } from "../core/types";
+import type { CreateAdapter } from "../core/ports/adapter";
+import { STYLE_TYPES } from "../core/entities/style";
+import type { Style } from "../core/entities/style";
 
 type ClassName = string;
 
 type Rule = string;
 
-export const withWebAdapter: WithPlatform<ClassName> = (createCoulis) => {
-	return () => {
-		const coulis = createCoulis((input) => {
-			return createClassName(JSON.stringify(input));
-		});
+const createId = (input: RecordLike) => {
+	return createClassName(JSON.stringify(input));
+};
 
-		const createStyleSheet = IS_SERVER_ENVIRONMENT
-			? createVirtualStyleSheet
-			: createDomStyleSheet;
+export const createWebAdapter: CreateAdapter<ClassName> = ({ createStyle }) => {
+	const createStyleSheet = IS_SERVER_ENVIRONMENT
+		? createVirtualStyleSheet
+		: createDomStyleSheet;
 
-		const styleSheetByTypeAdaptee = TYPES.reduce(
-			(output, type) => {
-				output[type] = createStyleSheet(type);
+	const styleSheetByTypeAdaptee = STYLE_TYPES.reduce(
+		(output, type) => {
+			output[type] = createStyleSheet(type);
 
-				return output;
-			},
-			{} as Record<Type, StyleSheet>,
-		);
+			return output;
+		},
+		{} as Record<Style["type"], StyleSheet>,
+	);
 
-		const hydratedClassNames = new Set(
-			Object.values(styleSheetByTypeAdaptee).flatMap((styleSheet) =>
-				styleSheet.getHydratedClassNames(),
-			),
-		);
+	const hydratedClassNames = new Set(
+		Object.values(styleSheetByTypeAdaptee).flatMap((styleSheet) =>
+			styleSheet.getHydratedClassNames(),
+		),
+	);
 
-		return {
-			createCustomProperties(input) {
-				return input;
-			},
-			createKeyframes(input) {
-				const { id, payload, isCached } =
-					coulis.createIntermediateRepresentation("global", input);
+	return {
+		createCustomProperties(input) {
+			return input;
+		},
+		createKeyframes(input) {
+			const { id, payload, isCached } = createStyle({
+				id: createId(input),
+				type: "global",
+				payload: input,
+			});
 
-				if (isCached || hydratedClassNames.has(id)) return id;
+			if (isCached || hydratedClassNames.has(id)) return id;
 
-				let rule = "";
+			let rule = "";
+			const selectors = Object.keys(payload) as (keyof typeof payload)[];
 
-				const selectors = Object.keys(
-					payload,
-				) as (keyof typeof payload)[];
+			for (const selector of selectors) {
+				const style = payload[selector];
 
-				for (const selector of selectors) {
-					const style = payload[selector];
+				if (!style) continue;
 
-					if (!style) continue;
+				const ruleSelector = isNumber(selector)
+					? `${selector}%`
+					: String(selector);
 
-					const ruleSelector = isNumber(selector)
-						? `${selector}%`
-						: String(selector);
+				rule += `${ruleSelector}{${createDeclarations(style)}}`;
+			}
 
-					rule += `${ruleSelector}{${createDeclarations(style)}}`;
-				}
+			styleSheetByTypeAdaptee.global.insert(id, rule);
 
-				styleSheetByTypeAdaptee.global.insert(id, rule);
+			return id;
+		},
+		createStyles() {
+			return "todo";
+		},
+		setGlobalStyles(input) {
+			const { id, payload, isCached } = createStyle({
+				id: createId(input),
+				type: "global",
+				payload: input,
+			});
 
-				return id;
-			},
-			createStyles() {
+			if (isCached || hydratedClassNames.has(id)) return;
+
+			let rule = "";
+			const selectors = Object.keys(payload);
+
+			for (const selector of selectors) {
+				const style = payload[selector];
+
+				if (style === undefined) continue;
+
+				rule +=
+					typeof style === "string"
+						? `${selector} ${style};`
+						: `${selector}{${createDeclarations(style)}}`;
+			}
+
+			styleSheetByTypeAdaptee.global.insert(id, rule);
+		},
+		createVariants() {
+			return () => {
 				return "todo";
-			},
-			setGlobalStyles(input) {
-				const { id, payload, isCached } =
-					coulis.createIntermediateRepresentation("global", input);
-
-				if (isCached || hydratedClassNames.has(id)) return;
-
-				let rule = "";
-				const selectors = Object.keys(payload);
-
-				for (const selector of selectors) {
-					const style = payload[selector];
-
-					if (style === undefined) continue;
-
-					rule +=
-						typeof style === "string"
-							? `${selector} ${style};`
-							: `${selector}{${createDeclarations(style)}}`;
-				}
-
-				styleSheetByTypeAdaptee.global.insert(id, rule);
-			},
-			createVariants() {
-				return () => {
-					return "todo";
-				};
-			},
-			getMetadataAsString() {
-				return "todo";
-			},
-			getMetadata() {
-				return [
-					{
-						attributes: {
-							"data-coulis-cache": "todo",
-							"data-coulis-type": "todo",
-						},
-						content: "todo",
+			};
+		},
+		getMetadataAsString() {
+			return "todo";
+		},
+		getMetadata() {
+			return [
+				{
+					attributes: {
+						"data-coulis-cache": "todo",
+						"data-coulis-type": "todo",
 					},
-				];
-			},
-		};
+					content: "todo",
+				},
+			];
+		},
 	};
 };
 
@@ -120,7 +121,7 @@ type StyleSheet = {
 	remove: () => void;
 };
 
-type CreateStyleSheet = (type: Type) => StyleSheet;
+type CreateStyleSheet = (type: Style["type"]) => StyleSheet;
 
 const createVirtualStyleSheet: CreateStyleSheet = () => {
 	const ruleCache = new Map<ClassName, Rule>();

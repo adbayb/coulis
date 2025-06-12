@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import type { PropsWithChildren, ReactNode } from "react";
-import { createCoulis, withWebAdapter } from "coulis";
+import { createCoulis, createWebAdapter } from "coulis";
 
-const coulis = withWebAdapter(createCoulis)();
+const coulis = createCoulis(createWebAdapter);
 const px = (value: number) => `${value}px`;
 
 const tokens = Object.freeze({

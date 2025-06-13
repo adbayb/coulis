@@ -1,22 +1,18 @@
-import type {
-	CreateCustomPropertiesInput,
-	CreateKeyframesInput,
-	RecordLike,
-	SetGlobalStylesInput,
-} from "../types";
-import type { CreateStyle } from "../entities/style";
+import type { RecordLike } from "../entities/primitive";
+import type { Keyframes } from "../entities/keyframe";
+import type { GlobalStyles } from "../entities/globalStyle";
+import type { CustomProperties } from "../entities/customProperty";
+import type { CreateIntermediateRepresentation } from "../entities/coulis";
 
 /**
  * Platform adapter interface.
  */
 export type Adapter<Output> = {
-	createCustomProperties: <const Input extends CreateCustomPropertiesInput>(
+	createCustomProperties: <const Input extends CustomProperties>(
 		input: Input,
-	) => Input; // TODO: CreateCustomPropertiesOutput<Input>?
-	createKeyframes: <Input extends CreateKeyframesInput>(
-		input: Input,
-	) => Output;
-	createStyles: <Input extends RecordLike>(input: Input) => Output; // TODO: update type.
+	) => Input;
+	createKeyframes: <Input extends Keyframes>(input: Input) => Output;
+	createStyles: <Input extends RecordLike>(input: Input) => Output;
 	createVariants: <Input extends RecordLike>(
 		input: Input,
 	) => (query: RecordLike) => Output;
@@ -25,9 +21,9 @@ export type Adapter<Output> = {
 		content: string;
 	}[];
 	getMetadataAsString: () => string;
-	setGlobalStyles: <Input extends SetGlobalStylesInput>(input: Input) => void;
+	setGlobalStyles: <Input extends GlobalStyles>(input: Input) => void;
 };
 
-export type CreateAdapter<Output> = (input: {
-	createStyle: CreateStyle;
-}) => Adapter<Output>;
+export type CreateAdapter<Output> = (
+	createIntermediateRepresentation: CreateIntermediateRepresentation,
+) => Adapter<Output>;

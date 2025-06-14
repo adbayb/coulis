@@ -1,5 +1,5 @@
 import type { StyleProperties } from "../../core/entities/style";
-import type { RecordLike } from "../../core/entities/base";
+import type { RecordLike } from "../../core/entities/primitive";
 import { UNITLESS_PROPERTIES } from "./constants";
 
 export const createId = (input: RecordLike) => {

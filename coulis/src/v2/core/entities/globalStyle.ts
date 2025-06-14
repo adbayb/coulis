@@ -1,4 +1,5 @@
-import type { StyleProperties, UngreedyString } from "./style";
+import type { StyleProperties } from "./style";
+import type { UngreedyString } from "./primitive";
 
 export type GlobalStyles =
 	/**

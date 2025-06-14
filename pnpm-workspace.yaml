@@ -1,6 +1,6 @@
 packages:
     - coulis
-    - examples/*
+    - examples/vite-csr-react
     - tools/*
 onlyBuiltDependencies:
     - puppeteer

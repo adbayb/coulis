@@ -430,3 +430,70 @@ For more server-side integration recipes, the following examples can be checked:
     - Welcome to any contribution.
 
 <br>
+
+## Road to v2
+
+```tsx
+import { createCoulis } from "coulis";
+import { createWebAdapter } from "coulis/web";
+
+const coulis = createCoulis(createWebAdapter)(
+	{
+		accentColor: true,
+		animation: true,
+		backgroundColor: theme.colors,
+		borderRadius: theme.radii,
+		color: theme.colors,
+		colorScheme(input: "black" | "white") {
+			return input === "black" ? "dark" : "light";
+		},
+		display: true,
+		flex: true,
+		flexDirection: true,
+		fontSize: theme.fontSizes,
+		fontWeight: theme.fontWeights,
+		gap: true,
+		height: true,
+		margin: theme.spacings,
+		marginBottom: theme.spacings,
+		marginLeft: theme.spacings,
+		marginRight: theme.spacings,
+		marginTop: theme.spacings,
+		padding: theme.spacings,
+		paddingBottom: theme.spacings,
+		paddingLeft: theme.spacings,
+		paddingRight: theme.spacings,
+		paddingTop: theme.spacings,
+		transitionProperty(input: ("background-color" | "color")[]) {
+			return input.join(",");
+		},
+		width: [50, 100],
+	},
+	{
+		loose: ["backgroundColor", "borderRadius"], // To remove (value must be explicit)
+		shorthands: {
+			marginHorizontal: ["marginLeft", "marginRight"],
+			marginVertical: ["marginTop", "marginBottom"],
+			paddingHorizontal: ["paddingLeft", "paddingRight"],
+			paddingVertical: ["paddingTop", "paddingBottom"],
+		},
+		states: {
+			hover: ({ className, declaration }) =>
+				`${className}:hover{${declaration}}`,
+			large: ({ className, declaration }) =>
+				`@media (min-width: 1024px){${className}{${declaration}}}`,
+			medium: ({ className, declaration }) =>
+				`@media (min-width: 768px){${className}{${declaration}}}`,
+			small: ({ className, declaration }) =>
+				`@media (min-width: 360px){${className}{${declaration}}}`,
+			smallWithHover: ({ className, declaration }) =>
+				`@media (min-width: 360px){${className}:hover{${declaration}}}`,
+		},
+	},
+);
+
+coulis.styles();
+coulis.keyframes();
+coulis.globalStyles();
+coulis.metadata(); // object + toString();
+```

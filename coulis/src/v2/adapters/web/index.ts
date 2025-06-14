@@ -1,0 +1,1 @@
+export { createWebAdapter } from "./adapter";

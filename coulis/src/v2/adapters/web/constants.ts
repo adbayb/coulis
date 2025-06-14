@@ -1,0 +1,86 @@
+import type { StyleProperties } from "../../core/entities/style";
+
+type Indexable = Partial<Record<keyof StyleProperties, boolean>>;
+
+// Taken from https://raw.githubusercontent.com/facebook/react/b98adb648a27640db8467064e537b238b8c306ce/packages/react-dom/src/shared/CSSProperty.js
+export const UNITLESS_PROPERTIES: Indexable = {
+	animationIterationCount: true,
+	borderImageOutset: true,
+	borderImageSlice: true,
+	borderImageWidth: true,
+	boxFlex: true,
+	boxFlexGroup: true,
+	boxOrdinalGroup: true,
+	columnCount: true,
+	columns: true,
+	// SVG properties
+	fillOpacity: true,
+	flex: true,
+	flexGrow: true,
+	flexShrink: true,
+	floodOpacity: true,
+	fontWeight: true,
+	gridArea: true,
+	gridColumn: true,
+	gridColumnEnd: true,
+	gridColumnStart: true,
+	gridRow: true,
+	gridRowEnd: true,
+	gridRowStart: true,
+	lineClamp: true,
+	lineHeight: true,
+	opacity: true,
+	order: true,
+	orphans: true,
+	stopOpacity: true,
+	strokeDasharray: true,
+	strokeDashoffset: true,
+	strokeMiterlimit: true,
+	strokeOpacity: true,
+	strokeWidth: true,
+	tabSize: true,
+	// Property prefixes
+	WebkitLineClamp: true,
+	widows: true,
+	zIndex: true,
+	zoom: true,
+};
+
+/*
+ * From PREACT:
+ * export const IS_NON_DIMENSIONAL = /acit|ex(?:s|g|n|p|$)|rph|grid|ows|mnc|ntw|ine[ch]|zoo|^ord/i;
+ */
+export const SHORTHAND_PROPERTIES: Indexable = {
+	animation: true,
+	background: true,
+	border: true,
+	borderBottom: true,
+	borderColor: true,
+	borderLeft: true,
+	borderRadius: true,
+	borderRight: true,
+	borderStyle: true,
+	borderTop: true,
+	borderWidth: true,
+	columnRule: true,
+	columns: true,
+	flex: true,
+	flexFlow: true,
+	font: true,
+	grid: true,
+	gridArea: true,
+	gridColumn: true,
+	gridRow: true,
+	gridTemplate: true,
+	listStyle: true,
+	margin: true,
+	offset: true,
+	outline: true,
+	overflow: true,
+	padding: true,
+	placeContent: true,
+	placeItems: true,
+	placeSelf: true,
+	textDecoration: true,
+	transition: true,
+};

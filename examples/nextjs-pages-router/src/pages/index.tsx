@@ -1,12 +1,13 @@
 import { useEffect, useState } from "react";
 import type { PropsWithChildren, ReactNode } from "react";
+
 import {
 	createCustomProperties,
 	createKeyframes,
 	createStyles,
 	createVariants,
 	setGlobalStyles,
-} from "coulis";
+} from "../helpers/coulis";
 
 const px = (value: number) => `${value}px`;
 

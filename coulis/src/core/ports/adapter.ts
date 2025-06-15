@@ -8,7 +8,6 @@ import type {
 	RecordLike,
 	UngreedyString,
 } from "../entities/primitive";
-import type { CreateIntermediateRepresentation } from "../entities/intermediateRepresentation";
 
 export type Adapter<Output> = {
 	createCustomProperties: <const P extends CustomProperties>(
@@ -57,9 +56,7 @@ export type Adapter<Output> = {
 	setGlobalStyles: (properties: GlobalStyleProperties) => void;
 };
 
-export type CreateAdapter<Output> = (
-	input: CreateIntermediateRepresentation,
-) => Adapter<Output>;
+export type CreateAdapter<Output> = () => Adapter<Output>;
 
 type KeyframesStyleProperties = Partial<
 	Record<number | "from" | "to" | `${number}%`, StyleProperties>

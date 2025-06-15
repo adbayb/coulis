@@ -1,6 +1,6 @@
 "use client";
 
-import { createCustomProperties, createStyles } from "coulis";
+import { createCustomProperties, createStyles } from "../helpers/coulis";
 
 const tokens = Object.freeze({
 	colors: {

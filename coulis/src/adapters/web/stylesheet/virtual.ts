@@ -1,20 +1,20 @@
 import type { ClassName, CreateStyleSheet, Rule } from "../types";
 
 export const createVirtualStyleSheet: CreateStyleSheet = () => {
-	const ruleCache = new Map<ClassName, Rule>();
+	const ruleByClassName = new Map<ClassName, Rule>();
 
 	return {
 		getContent() {
-			return minify([...ruleCache.values()].join(""));
+			return minify([...ruleByClassName.values()].join(""));
 		},
 		getHydratedClassNames() {
 			return [];
 		},
 		insert(key, rule) {
-			ruleCache.set(key, rule);
+			ruleByClassName.set(key, rule);
 		},
 		remove() {
-			ruleCache.clear();
+			ruleByClassName.clear();
 		},
 	};
 };

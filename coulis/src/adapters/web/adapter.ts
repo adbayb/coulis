@@ -1,5 +1,4 @@
 /* eslint-disable sonarjs/no-invariant-returns, sonarjs/max-lines-per-function */
-
 import type {
 	Adapter,
 	CreateAdapter,
@@ -32,9 +31,7 @@ export const createId = (input: RecordLike) => {
 	return createClassName(JSON.stringify(input));
 };
 
-export const createWebAdapter: CreateAdapter<ClassName> = (
-	createIntermediateRepresentation,
-) => {
+export const createWebAdapter: CreateAdapter<ClassName> = () => {
 	const createStyleSheet = IS_SERVER_ENVIRONMENT
 		? createVirtualStyleSheet
 		: createDomStyleSheet;
@@ -126,19 +123,15 @@ export const createWebAdapter: CreateAdapter<ClassName> = (
 			return nodes;
 		},
 		createKeyframes(input) {
-			const { id, isCached, payload } = createIntermediateRepresentation({
-				id: createId(input),
-				payload: input,
-				type: "global",
-			});
+			const id = createId(input);
 
-			if (isCached || hydratedClassNameCache.has(id)) return id;
+			if (hydratedClassNameCache.has(id)) return id;
 
 			let rule = "";
-			const selectors = Object.keys(payload) as (keyof typeof payload)[];
+			const selectors = Object.keys(input) as (keyof typeof input)[];
 
 			for (const selector of selectors) {
-				const style = payload[selector];
+				const style = input[selector];
 
 				if (!style) continue;
 
@@ -151,7 +144,7 @@ export const createWebAdapter: CreateAdapter<ClassName> = (
 
 			insert({
 				id,
-				rule,
+				rule: `@keyframes ${id}{${rule}}`,
 				type: "global",
 			});
 
@@ -379,19 +372,15 @@ export const createWebAdapter: CreateAdapter<ClassName> = (
 			}, "");
 		},
 		setGlobalStyles(input) {
-			const { id, isCached, payload } = createIntermediateRepresentation({
-				id: createId(input),
-				payload: input,
-				type: "global",
-			});
+			const id = createId(input);
 
-			if (isCached || hydratedClassNameCache.has(id)) return;
+			if (hydratedClassNameCache.has(id)) return;
 
 			let rule = "";
-			const selectors = Object.keys(payload);
+			const selectors = Object.keys(input);
 
 			for (const selector of selectors) {
-				const style = payload[selector];
+				const style = input[selector];
 
 				if (style === undefined) continue;
 

@@ -2,7 +2,14 @@ import { useEffect, useState } from "react";
 import type { PropsWithChildren, ReactNode } from "react";
 import { createCoulis, createWebAdapter } from "coulis";
 
-const coulis = createCoulis(createWebAdapter);
+const {
+	createCustomProperties,
+	createKeyframes,
+	createStyles,
+	createVariants,
+	setGlobalStyles,
+} = createCoulis(createWebAdapter);
+
 const px = (value: number) => `${value}px`;
 
 const tokens = Object.freeze({
@@ -39,7 +46,7 @@ const tokens = Object.freeze({
 	},
 } as const);
 
-const theme = coulis.createCustomProperties({
+const theme = createCustomProperties({
 	colors: {
 		neutralDark: tokens.colors.black,
 		neutralLight: tokens.colors.white,
@@ -63,7 +70,7 @@ const theme = coulis.createCustomProperties({
 	spacings: tokens.spacings,
 });
 
-coulis.setGlobalStyles({
+setGlobalStyles({
 	"@import":
 		"url('https://fonts.googleapis.com/css?family=Open+Sans&display=swap')",
 	"@font-face": {
@@ -87,7 +94,7 @@ coulis.setGlobalStyles({
 	},
 });
 
-const animationName = coulis.createKeyframes({
+const animationName = createKeyframes({
 	50: {
 		transform: "scale(1.5)",
 	},
@@ -99,7 +106,7 @@ const animationName = coulis.createKeyframes({
 	},
 });
 
-const styles = coulis.createStyles(
+const styles = createStyles(
 	{
 		accentColor: true,
 		animation: true,
@@ -154,7 +161,7 @@ const styles = coulis.createStyles(
 	},
 );
 
-const buttonVariants = coulis.createVariants(styles, {
+const buttonVariants = createVariants(styles, {
 	color: {
 		accent: { backgroundColor: "surfaceSecondary" },
 		brand: { backgroundColor: "surfacePrimary" },

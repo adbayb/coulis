@@ -1,12 +1,15 @@
 import { describe, expect, test } from "vitest";
 
-import {
+import { createCoulis, createWebAdapter } from "../src";
+
+const {
 	createKeyframes,
-	createServerContext,
 	createStyles,
 	createVariants,
+	getMetadata,
+	getMetadataAsString,
 	setGlobalStyles,
-} from "../src";
+} = createCoulis(createWebAdapter);
 
 describe("coulis", () => {
 	test("should generate classNames", () => {
@@ -29,11 +32,11 @@ describe("coulis", () => {
 	});
 
 	test("should extract styles", () => {
-		expect(createServerContext().getMetadata()).toMatchSnapshot();
+		expect(getMetadata()).toMatchSnapshot();
 	});
 
 	test("should extract styles given stringified styles", () => {
-		expect(createServerContext().getMetadataAsString()).toMatchSnapshot();
+		expect(getMetadataAsString()).toMatchSnapshot();
 	});
 
 	test("should type `createStyles` in a safe manner", () => {

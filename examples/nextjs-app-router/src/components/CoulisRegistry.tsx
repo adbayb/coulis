@@ -1,10 +1,11 @@
-/* eslint-disable react/jsx-no-useless-fragment, react-hooks-extra/no-unnecessary-use-memo */
+/* eslint-disable react/jsx-no-useless-fragment */
 "use client";
 
-import { useMemo, useRef } from "react";
+import { useRef } from "react";
 import type { PropsWithChildren } from "react";
 import { useServerInsertedHTML } from "next/navigation";
-import { createServerContext, setGlobalStyles } from "coulis";
+
+import { getMetadata, setGlobalStyles } from "../helpers/coulis";
 
 setGlobalStyles({
 	"*,*::before,*::after": {
@@ -26,10 +27,6 @@ setGlobalStyles({
 export const CoulisRegistry = ({ children }: PropsWithChildren) => {
 	const hasBeenInserted = useRef(false);
 
-	const context = useMemo(() => {
-		return createServerContext();
-	}, []);
-
 	useServerInsertedHTML(() => {
 		/**
 		 * Prevent inserting multiple times stylesheets if already done.
@@ -39,14 +36,14 @@ export const CoulisRegistry = ({ children }: PropsWithChildren) => {
 
 		hasBeenInserted.current = true;
 
-		return context.getMetadata().map(({ attributes, content }) => {
+		return getMetadata().map(({ attributes, content }) => {
 			return (
 				<style
 					{...attributes}
 					dangerouslySetInnerHTML={{
 						__html: content,
 					}}
-					key={attributes["data-coulis-id"]}
+					key={attributes["data-coulis-type"]}
 				/>
 			);
 		});

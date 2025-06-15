@@ -1,6 +1,5 @@
-import { createStyles } from "coulis";
-
 import { NUMBER_OF_DATA } from "../../constants";
+import { createStyles } from "./helpers";
 
 const styles = createStyles(
 	{

@@ -91,12 +91,10 @@ export const createWebAdapter: CreateAdapter<ClassName> = () => {
 			classNameByTypeCache.set(type, cache);
 		}
 
-		if (cache.has(id)) return id;
+		if (cache.has(id)) return;
 
 		styleSheetByTypeAdaptee[type].insert(id, rule);
 		cache.add(id);
-
-		return id;
 	};
 
 	return {
@@ -226,13 +224,16 @@ export const createWebAdapter: CreateAdapter<ClassName> = () => {
 
 					const className = createClassName(declaration);
 
-					classNames.push(
-						insert({
-							id: className,
-							rule: `.${className}{${declaration}}`,
-							type,
-						}),
-					);
+					classNames.push(className);
+
+					if (hydratedClassNameCache.has(className))
+						return classNames;
+
+					insert({
+						id: className,
+						rule: `.${className}{${declaration}}`,
+						type,
+					});
 
 					return classNames;
 				}
@@ -285,16 +286,18 @@ export const createWebAdapter: CreateAdapter<ClassName> = () => {
 						isBaseState ? declaration : `${key}${declaration}`,
 					);
 
-					classNames.push(
-						insert({
-							id: className,
-							rule: preComputedRule.replace(
-								"{{className}}",
-								className,
-							),
-							type,
-						}),
-					);
+					classNames.push(className);
+
+					if (hydratedClassNameCache.has(className)) continue;
+
+					insert({
+						id: className,
+						rule: preComputedRule.replace(
+							"{{className}}",
+							className,
+						),
+						type,
+					});
 				}
 
 				return classNames;

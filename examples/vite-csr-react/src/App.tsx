@@ -112,6 +112,7 @@ const styles = createStyles(
 		animation: true,
 		backgroundColor: theme.colors,
 		borderRadius: theme.radii,
+		borderStyle: true,
 		color: theme.colors,
 		colorScheme(input: "black" | "white") {
 			return input === "black" ? "dark" : "light";
@@ -139,7 +140,6 @@ const styles = createStyles(
 		width: [50, 100],
 	},
 	{
-		loose: ["backgroundColor", "borderRadius"],
 		shorthands: {
 			marginHorizontal: ["marginLeft", "marginRight"],
 			marginVertical: ["marginTop", "marginBottom"],
@@ -247,8 +247,8 @@ const App = () => {
 			<Example title="With custom properties">
 				<p
 					className={styles({
-						backgroundColor: theme.colors.neutralLight,
-						borderRadius: theme.radii.large,
+						borderRadius: "small",
+						borderStyle: "solid",
 					})}
 				>
 					{TEXT}
@@ -270,7 +270,7 @@ const App = () => {
 					className={styles({
 						animation: `${animationName} 2000ms linear infinite`,
 						backgroundColor: "surfacePrimary",
-						borderRadius: 4,
+						borderRadius: "medium",
 						height: 50,
 						marginHorizontal: 1.5,
 						width: 50,

@@ -1,8 +1,4 @@
-import type {
-	GreedyStyleProperty,
-	LooseStyleProperties,
-	StyleProperties,
-} from "../entities/style";
+import type { LooseStyleProperties, StyleProperties } from "../entities/style";
 import type {
 	Exactify,
 	RecordLike,
@@ -15,10 +11,10 @@ export type Adapter<Output> = {
 	) => WithNewLeafNodes<P, string>;
 	createKeyframes: (properties: KeyframesStyleProperties) => Output;
 	createStyles: <
-		const Properties extends CreateStylesProperties,
-		const Options extends CreateStylesOptions<Properties>,
+		const Properties extends ContractProperties,
+		const Options extends ContractOptions<Properties>,
 	>(
-		properties: Exactify<Properties, keyof CreateStylesProperties>,
+		properties: Exactify<Properties, keyof ContractProperties>,
 		options?: Options,
 	) => (
 		input: {
@@ -130,61 +126,37 @@ export type CustomProperties = {
 };
 
 type PropertyValue<
-	Properties extends CreateStylesProperties,
+	Properties extends ContractProperties,
 	PropertyName extends keyof Properties,
-	Options extends CreateStylesOptions<Properties>,
+	Options extends ContractOptions<Properties>,
 > = Properties[PropertyName] extends NativePropertyValue | undefined
 	? PropertyName extends keyof StyleProperties
 		? CreatePropertyValue<
 				Properties,
 				Options,
-				PropertyName,
-				GreedyStyleProperty<PropertyName>
+				StyleProperties[PropertyName]
 			>
 		: never
 	: Properties[PropertyName] extends CustomPropertyValue<unknown>
 		? Properties[PropertyName] extends (input: infer Value) => unknown
-			? CreatePropertyValue<Properties, Options, PropertyName, Value>
+			? CreatePropertyValue<Properties, Options, Value>
 			: Properties[PropertyName] extends
 						| (infer Value)[]
 						| Record<infer Value, unknown>
-				? CreatePropertyValue<Properties, Options, PropertyName, Value>
+				? CreatePropertyValue<Properties, Options, Value>
 				: never
 		: never;
 
 type CreatePropertyValue<
-	Properties extends CreateStylesProperties,
-	Options extends CreateStylesOptions<Properties>,
-	PropertyName extends keyof Properties,
+	Properties extends ContractProperties,
+	Options extends ContractOptions<Properties>,
 	Value,
 > =
-	| WithLooseValue<Properties, Options, PropertyName, Value>
+	| Value
 	| (Options["states"] extends Record<infer State, unknown>
-			? Partial<
-					Record<
-						State,
-						WithLooseValue<Properties, Options, PropertyName, Value>
-					>
-				> &
-					Record<
-						"base",
-						WithLooseValue<Properties, Options, PropertyName, Value>
-					>
+			? Partial<Record<State, Value>> & Record<"base", Value>
 			: never)
 	| undefined;
-
-type WithLooseValue<
-	Properties extends CreateStylesProperties,
-	Options extends CreateStylesOptions<Properties>,
-	PropertyName extends keyof Properties,
-	Value,
-> = Options["loose"] extends unknown[]
-	? PropertyName extends Options["loose"][number]
-		? PropertyName extends keyof StyleProperties
-			? GreedyStyleProperty<PropertyName> | Value
-			: Value
-		: Value
-	: Value;
 
 type CustomPropertyValue<Value> =
 	| Record<string, Value>
@@ -194,14 +166,13 @@ type CustomPropertyValue<Value> =
 
 type NativePropertyValue = true;
 
-type CreateStylesProperties = {
+type ContractProperties = {
 	[K in keyof StyleProperties]?:
 		| CustomPropertyValue<StyleProperties[K]>
 		| NativePropertyValue;
 };
 
-type CreateStylesOptions<Properties extends CreateStylesProperties> = {
-	loose?: (keyof Properties)[];
+type ContractOptions<Properties extends ContractProperties> = {
 	shorthands?: Record<string, (keyof Properties)[]>;
 	states?: Record<
 		string,

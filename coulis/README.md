@@ -437,63 +437,55 @@ For more server-side integration recipes, the following examples can be checked:
 import { createCoulis } from "coulis";
 import { createWebAdapter } from "coulis/web";
 
-const coulis = createCoulis(createWebAdapter)(
-	{
-		accentColor: true,
-		animation: true,
-		backgroundColor: theme.colors,
-		borderRadius: theme.radii,
-		color: theme.colors,
-		colorScheme(input: "black" | "white") {
-			return input === "black" ? "dark" : "light";
-		},
-		display: true,
-		flex: true,
-		flexDirection: true,
-		fontSize: theme.fontSizes,
-		fontWeight: theme.fontWeights,
-		gap: true,
-		height: true,
-		margin: theme.spacings,
-		marginBottom: theme.spacings,
-		marginLeft: theme.spacings,
-		marginRight: theme.spacings,
-		marginTop: theme.spacings,
-		padding: theme.spacings,
-		paddingBottom: theme.spacings,
-		paddingLeft: theme.spacings,
-		paddingRight: theme.spacings,
-		paddingTop: theme.spacings,
-		transitionProperty(input: ("background-color" | "color")[]) {
-			return input.join(",");
-		},
-		width: [50, 100],
+const coulis = createCoulis({
+	adapter: createWebAdapter(),
+	contract: (theme) => {
+		return {
+			properties: {
+				animation: true,
+				backgroundColor: theme.colors,
+				colorScheme(input: "black" | "white") {
+					return input === "black" ? "dark" : "light";
+				},
+				width: [50, 100],
+			},
+			shorthands: {
+				marginHorizontal: ["marginLeft", "marginRight"],
+				marginVertical: ["marginTop", "marginBottom"],
+				paddingHorizontal: ["paddingLeft", "paddingRight"],
+				paddingVertical: ["paddingTop", "paddingBottom"],
+			},
+			states: {
+				hover: ({ className, declaration }) =>
+					`${className}:hover{${declaration}}`,
+				large: ({ className, declaration }) =>
+					`@media (min-width: 1024px){${className}{${declaration}}}`,
+				medium: ({ className, declaration }) =>
+					`@media (min-width: 768px){${className}{${declaration}}}`,
+				small: ({ className, declaration }) =>
+					`@media (min-width: 360px){${className}{${declaration}}}`,
+				smallWithHover: ({ className, declaration }) =>
+					`@media (min-width: 360px){${className}:hover{${declaration}}}`,
+			},
+		};
 	},
-	{
-		loose: ["backgroundColor", "borderRadius"], // To remove (value must be explicit)
-		shorthands: {
-			marginHorizontal: ["marginLeft", "marginRight"],
-			marginVertical: ["marginTop", "marginBottom"],
-			paddingHorizontal: ["paddingLeft", "paddingRight"],
-			paddingVertical: ["paddingTop", "paddingBottom"],
+	theme: {
+		colors: {
+			neutralDark: tokens.colors.black,
+			neutralLight: tokens.colors.white,
+			neutralTransparent: tokens.colors.transparent,
+			surfacePrimary: tokens.colors.blue[4],
+			surfaceSecondary: tokens.colors.blue[2],
 		},
-		states: {
-			hover: ({ className, declaration }) =>
-				`${className}:hover{${declaration}}`,
-			large: ({ className, declaration }) =>
-				`@media (min-width: 1024px){${className}{${declaration}}}`,
-			medium: ({ className, declaration }) =>
-				`@media (min-width: 768px){${className}{${declaration}}}`,
-			small: ({ className, declaration }) =>
-				`@media (min-width: 360px){${className}{${declaration}}}`,
-			smallWithHover: ({ className, declaration }) =>
-				`@media (min-width: 360px){${className}:hover{${declaration}}}`,
+		fontSizes: {
+			body: tokens.fontSizes[2],
 		},
 	},
-);
+});
 
 coulis.styles();
 coulis.keyframes();
 coulis.globalStyles();
+coulis.customProperties(); // Allow setting global variables (same logic is used inside the createCoulis factory in case value are passed (a variable is automatically created))
 coulis.metadata(); // object + toString();
 ```

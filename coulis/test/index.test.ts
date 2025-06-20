@@ -54,7 +54,6 @@ describe("coulis", () => {
 				width: true,
 			},
 			{
-				loose: ["color"],
 				shorthands: {
 					size: ["width"],
 				},
@@ -120,7 +119,7 @@ describe("coulis", () => {
 					accent: { color: "warning" },
 					// @ts-expect-error property value does not exist
 					brand: { backgroundColor: "surfacePrimary" },
-					neutral: { backgroundColor: "red", color: "lightgrey" },
+					neutral: { backgroundColor: "red", color: "danger" },
 				},
 				size: {
 					// @ts-expect-error property key does not exist
@@ -132,7 +131,7 @@ describe("coulis", () => {
 
 		expect(
 			styles({
-				color: "red",
+				color: "warning",
 				height: "100%",
 				size: {
 					base: "auto",

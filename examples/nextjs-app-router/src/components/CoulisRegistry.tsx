@@ -1,8 +1,7 @@
-/* eslint-disable react/jsx-no-useless-fragment */
 "use client";
 
 import { useRef } from "react";
-import type { PropsWithChildren } from "react";
+import type { ReactNode } from "react";
 import { useServerInsertedHTML } from "next/navigation";
 
 import { getMetadata, setGlobalStyles } from "../helpers/coulis";
@@ -24,7 +23,11 @@ setGlobalStyles({
 	},
 });
 
-export const CoulisRegistry = ({ children }: PropsWithChildren) => {
+type CoulisRegistryProps = {
+	readonly children: ReactNode;
+};
+
+export const CoulisRegistry = ({ children }: CoulisRegistryProps) => {
 	const hasBeenInserted = useRef(false);
 
 	useServerInsertedHTML(() => {
@@ -40,6 +43,7 @@ export const CoulisRegistry = ({ children }: PropsWithChildren) => {
 			return (
 				<style
 					{...attributes}
+					// eslint-disable-next-line react/dom/no-dangerously-set-innerhtml
 					dangerouslySetInnerHTML={{
 						__html: content,
 					}}

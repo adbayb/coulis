@@ -17,6 +17,7 @@ class MyDocument extends Document {
 						return (
 							<style
 								{...attributes}
+								// eslint-disable-next-line react/dom/no-dangerously-set-innerhtml
 								dangerouslySetInnerHTML={{
 									__html: content,
 								}}

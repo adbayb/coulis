@@ -9,7 +9,7 @@
 		"build": {
 			"dependsOn": ["^build"],
 			"cache": true,
-			"outputs": ["dist/**"]
+			"outputs": ["dist/**", ".next/**"]
 		},
 		"start": {
 			"dependsOn": ["build"],

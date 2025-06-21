@@ -435,11 +435,11 @@ For more server-side integration recipes, the following examples can be checked:
 
 ```tsx
 import { createCoulis } from "coulis";
-import { createWebAdapter } from "coulis/web";
+import { webAdapter } from "coulis/web";
 
 const coulis = createCoulis({
-	adapter: createWebAdapter(),
-	contract: (theme) => {
+	adapter: webAdapter,
+	contract(theme) {
 		return {
 			properties: {
 				animation: true,

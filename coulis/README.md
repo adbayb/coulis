@@ -434,40 +434,36 @@ For more server-side integration recipes, the following examples can be checked:
 ## Road to v2
 
 ```tsx
-import { createCoulis } from "coulis";
-import { webAdapter } from "coulis/web";
+import { createCoulis } from "coulis/web"; // or via "coulis";
 
 const coulis = createCoulis({
-	adapter: webAdapter,
-	contract(theme) {
+	properties(theme) {
 		return {
-			properties: {
-				animation: true,
-				backgroundColor: theme.colors,
-				colorScheme(input: "black" | "white") {
-					return input === "black" ? "dark" : "light";
-				},
-				width: [50, 100],
+			animation: true,
+			backgroundColor: theme.colors,
+			colorScheme(input: "black" | "white") {
+				return input === "black" ? "dark" : "light";
 			},
-			shorthands: {
-				marginHorizontal: ["marginLeft", "marginRight"],
-				marginVertical: ["marginTop", "marginBottom"],
-				paddingHorizontal: ["paddingLeft", "paddingRight"],
-				paddingVertical: ["paddingTop", "paddingBottom"],
-			},
-			states: {
-				hover: ({ className, declaration }) =>
-					`${className}:hover{${declaration}}`,
-				large: ({ className, declaration }) =>
-					`@media (min-width: 1024px){${className}{${declaration}}}`,
-				medium: ({ className, declaration }) =>
-					`@media (min-width: 768px){${className}{${declaration}}}`,
-				small: ({ className, declaration }) =>
-					`@media (min-width: 360px){${className}{${declaration}}}`,
-				smallWithHover: ({ className, declaration }) =>
-					`@media (min-width: 360px){${className}:hover{${declaration}}}`,
-			},
+			width: [50, 100],
 		};
+	},
+	shorthands: {
+		marginHorizontal: ["marginLeft", "marginRight"],
+		marginVertical: ["marginTop", "marginBottom"],
+		paddingHorizontal: ["paddingLeft", "paddingRight"],
+		paddingVertical: ["paddingTop", "paddingBottom"],
+	},
+	states: {
+		hover: ({ className, declaration }) =>
+			`${className}:hover{${declaration}}`,
+		large: ({ className, declaration }) =>
+			`@media (min-width: 1024px){${className}{${declaration}}}`,
+		medium: ({ className, declaration }) =>
+			`@media (min-width: 768px){${className}{${declaration}}}`,
+		small: ({ className, declaration }) =>
+			`@media (min-width: 360px){${className}{${declaration}}}`,
+		smallWithHover: ({ className, declaration }) =>
+			`@media (min-width: 360px){${className}:hover{${declaration}}}`,
 	},
 	theme: {
 		colors: {
@@ -483,9 +479,8 @@ const coulis = createCoulis({
 	},
 });
 
-coulis.styles();
-coulis.keyframes();
-coulis.globalStyles();
-coulis.customProperties(); // Allow setting global variables (same logic is used inside the createCoulis factory in case value are passed (a variable is automatically created))
-coulis.metadata(); // object + toString();
+coulis.createStyles();
+coulis.createKeyframes();
+coulis.setGlobalStyles();
+coulis.getMetadata(); // object + toString();
 ```

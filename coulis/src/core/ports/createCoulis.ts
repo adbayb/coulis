@@ -1,38 +1,21 @@
-import type { StyleProperties } from "../entities/style";
+import type { StatesLike } from "../entities/state";
+import type { ShortandsLike } from "../entities/shorthand";
+import type { PropertiesLike, PropertyValue } from "../entities/property";
+import type { RecordLike } from "../entities/primitive";
+import type { Keyframes } from "../entities/keyframe";
 import type { GlobalStyles } from "../entities/globalStyle";
 
-type CoulisProperties = {
-	[K in keyof StyleProperties]?:
-		| CustomPropertyValue<StyleProperties[K]>
-		| NativePropertyValue;
-};
-
-type CoulisShorthands<Properties extends CoulisProperties> = Record<
-	string,
-	(keyof Properties)[]
->;
-
-type CoulisStates = Record<
-	string,
-	(input: { className: string; declaration: string }) => string
-> & {
-	// The `base` state cannot be overwritten consumer-side
-	base?: never;
-};
-
-type CoulisTheme = Record<string, unknown>;
-
-type CreateCoulisPort<Output> = <
+export type CreateCoulis<Output> = <
 	// `const` needed to not widen strict type (for example, to avoid `width: [50, 100]` being inferred as `width: number`).
-	const Properties extends CoulisProperties,
-	Shorthands extends CoulisShorthands<Properties>,
-	States extends CoulisStates,
-	Theme extends CoulisTheme,
->(input: {
+	const Properties extends PropertiesLike,
+	Shorthands extends ShortandsLike<Properties>,
+	States extends StatesLike,
+	Theme extends RecordLike,
+>(contract: {
 	properties: (theme: Theme) => Properties;
 	shorthands?: Shorthands;
 	states?: States;
-	theme: Theme;
+	theme?: Theme;
 }) => {
 	createKeyframes: (input: Keyframes<Properties>) => Output;
 	createStyles: (
@@ -55,14 +38,19 @@ type CreateCoulisPort<Output> = <
 		},
 	) => Output;
 	getMetadata: () => {
-		attributes: Record<"data-coulis-cache" | "data-coulis-type", string>;
-		content: string;
-	}[];
-	getMetadataAsString: () => string;
-	setGlobalStyles: (input: GlobalStyles) => void;
+		toString: () => string;
+		value: {
+			attributes: Record<
+				"data-coulis-cache" | "data-coulis-type",
+				string
+			>;
+			content: string;
+		}[];
+	};
+	setGlobalStyles: (input: GlobalStyles<Properties>) => void;
 };
 
-const createCoulisWeb: CreateCoulisPort<string> = (_input) => {
+const createCoulisWeb: CreateCoulis<string> = (_input) => {
 	return {
 		createKeyframes() {
 			return "todo";
@@ -76,10 +64,12 @@ const createCoulisWeb: CreateCoulisPort<string> = (_input) => {
 			};
 		},
 		getMetadata() {
-			return [];
-		},
-		getMetadataAsString() {
-			return "todo";
+			return {
+				toString() {
+					return "";
+				},
+				value: [],
+			};
 		},
 		setGlobalStyles() {
 			// No op
@@ -87,9 +77,7 @@ const createCoulisWeb: CreateCoulisPort<string> = (_input) => {
 	};
 };
 
-const createCoulisNative: CreateCoulisPort<Record<string, unknown>> = (
-	_input,
-) => {
+const createCoulisNative: CreateCoulis<Record<string, unknown>> = (_input) => {
 	return {
 		createKeyframes() {
 			return {};
@@ -103,10 +91,12 @@ const createCoulisNative: CreateCoulisPort<Record<string, unknown>> = (
 			};
 		},
 		getMetadata() {
-			return [];
-		},
-		getMetadataAsString() {
-			return "todo";
+			return {
+				toString() {
+					return "";
+				},
+				value: [],
+			};
 		},
 		setGlobalStyles() {
 			// No op
@@ -178,7 +168,7 @@ const coulis = createCoulis({
 coulis.createStyles({
 	backgroundColor: "neutralDark",
 	display: {
-		base: "-ms-flexbox",
+		base: "block",
 	},
 	marginHorizontal: 1,
 	width: {
@@ -197,50 +187,8 @@ coulis.createKeyframes({
 	},
 });
 
-type Keyframes<Properties extends CoulisProperties> = Partial<
-	Record<
-		number | "from" | "to" | `${number}%`,
-		{
-			[PropertyName in keyof Properties]?: PropertyValue<
-				PropertyName,
-				Properties
-			>;
-		}
-	>
->;
-
-type PropertyValue<
-	PropertyName extends keyof Properties,
-	Properties extends CoulisProperties,
-	States extends CoulisStates | undefined = undefined,
-> = Properties[PropertyName] extends NativePropertyValue | undefined
-	? PropertyName extends keyof StyleProperties
-		? CreatePropertyValue<StyleProperties[PropertyName], States>
-		: never
-	: Properties[PropertyName] extends CustomPropertyValue<unknown>
-		? Properties[PropertyName] extends (input: infer Value) => unknown
-			? CreatePropertyValue<Value, States>
-			: Properties[PropertyName] extends
-						| (infer Value)[]
-						| Record<infer Value, unknown>
-				? CreatePropertyValue<Value, States>
-				: never
-		: never;
-
-type CreatePropertyValue<
-	Value,
-	States extends CoulisStates | undefined = undefined,
-> =
-	| Value
-	| (States extends Record<infer State, unknown>
-			? Partial<Record<State, Value>> & Record<"base", Value>
-			: never)
-	| undefined;
-
-type CustomPropertyValue<Value> =
-	| Record<string, Value>
-	| Value[]
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	| ((input: any) => Value);
-
-type NativePropertyValue = true;
+coulis.setGlobalStyles({
+	html: {
+		backgroundColor: "neutralDark",
+	},
+});

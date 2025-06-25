@@ -1,16 +1,16 @@
-import type { StyleProperties } from "../../core/entities/style";
+import type { RecordLike } from "../../core/entities/primitive";
 import { SHORTHAND_PROPERTIES, UNITLESS_PROPERTIES } from "./constants";
 
 /**
  * Escape invalid CSS characters to generate usable property names.
- * @param name - The property name to escape with potentially some unsafe characters.
- * @returns The escaped property name.
+ * @param input - The input to escape with potentially some unsafe characters.
+ * @returns The escaped input.
  * @see https://mathiasbynens.be/notes/css-escapes
  * @example
  * const safeCssVariable = escape("--spacings-1.5"); // Will generate `--spacings-1\5`
  */
-export const escape = (name: string) => {
-	return name.replaceAll(/[!"#$%&'()*+,./:;<=>?@[\]^`{|}~]/g, "\\");
+export const escape = (input: string) => {
+	return input.replaceAll(/[!"#$%&'()*+,./:;<=>?@[\]^`{|}~]/g, "\\");
 };
 
 export const createClassName = (input: string) => {
@@ -45,8 +45,8 @@ export const createDeclaration = ({
 	name,
 	value,
 }: {
-	name: keyof StyleProperties;
-	value: StyleProperties[keyof StyleProperties];
+	name: keyof RecordLike;
+	value: RecordLike[keyof RecordLike];
 }) => {
 	// From JS camelCase to CSS kebeb-case
 	const transformedPropertyName = name.replaceAll(
@@ -56,65 +56,35 @@ export const createDeclaration = ({
 
 	// Format value to follow CSS specs (unitless number)
 	const transformedPropertyValue =
-		typeof value === "string" || UNITLESS_PROPERTIES[name]
+		typeof value === "string" || UNITLESS_PROPERTIES.has(name)
 			? String(value)
 			: `${String(value)}px`;
 
 	return `${transformedPropertyName}:${transformedPropertyValue};`;
 };
 
-export const createDeclarations = <Properties extends StyleProperties>(
-	properties: Properties,
-) => {
+export const createDeclarationBlock = (properties: RecordLike) => {
 	let declarationBlock = "";
-	const propertyNames = Object.keys(properties) as (keyof StyleProperties)[];
+	const propertyNames = Object.keys(properties);
 
 	for (const propertyName of propertyNames) {
 		const value = properties[propertyName];
 
-		if (value) {
-			declarationBlock += createDeclaration({
-				name: propertyName,
-				value,
-			});
-		}
+		if (value === undefined) continue;
+
+		declarationBlock += createDeclaration({
+			name: propertyName,
+			value,
+		});
 	}
 
 	return declarationBlock;
 };
 
-export const isShorthandProperty = (name: keyof StyleProperties) => {
-	return Boolean(SHORTHAND_PROPERTIES[name]);
+export const isShorthandProperty = (input: string) => {
+	return SHORTHAND_PROPERTIES.has(input);
 };
 
-/**
- * Compose multiple class names together.
- * @param classNames - A collection of string-based class names.
- * @returns The composed class names.
- * @example
- * const classNames = compose(styles({ backgroundColor: "red" }), styles({ color: "red" }));
- * document.getElementById("my-element-id").className = classNames;
- */
-export const compose = (...classNames: string[]) => {
-	return classNames.join(" ");
-};
-
-export const isNumber = (value: unknown): value is number => {
-	return typeof value === "number" || !Number.isNaN(Number(value));
-};
-
-export const isObject = (value: unknown): value is Record<string, unknown> => {
-	return typeof value === "object" && value !== null && !Array.isArray(value);
-};
-
-export const minify = (value: string) => {
-	return value.replaceAll(/\s{2,}|\s+(?={)|\r?\n/gm, "");
-};
-
-export const createError = (parameters: {
-	api: string;
-	cause: string;
-	solution: string;
-}) => {
-	return `\`${parameters.api}\`: ${parameters.cause}. ${parameters.solution}.`;
+export const minify = (input: string) => {
+	return input.replaceAll(/\s{2,}|\s+(?={)|\r?\n/gm, "");
 };

@@ -1,7 +1,7 @@
-import type { StyleProperties } from "./style";
+import type { PropertiesLike, PropertyValue } from "./property";
 import type { UngreedyString } from "./primitive";
 
-export type GlobalStyles =
+export type GlobalStyles<P extends PropertiesLike> =
 	/**
 	 * A union type is used instead of one with conditional typing
 	 * since we're using a string index signature (via Ungreedy string) and, by design, TypeScript
@@ -24,20 +24,16 @@ export type GlobalStyles =
 			| AtGroupingRule
 			| AtTextualRule
 			| UngreedyString
-			| keyof HTMLElementTagNameMap]?: GlobalStyle<Selector>;
+			| keyof HTMLElementTagNameMap]?: Selector extends AtTextualRule
+			? string
+			: Selector extends AtGroupingRule | keyof HTMLElementTagNameMap
+				? Properties<P>
+				: Properties<P> | string;
 	};
 
-type GlobalStyle<Selector> = Selector extends AtTextualRule
-	? string
-	: Selector extends AtGroupingRule | keyof HTMLElementTagNameMap
-		? LooseStyleProperties
-		: LooseStyleProperties | string;
-
-type LooseStyleProperties = Record<
-	UngreedyString,
-	number | string | undefined
-> &
-	StyleProperties;
+type Properties<P extends PropertiesLike> = {
+	[PropertyName in keyof P]?: PropertyValue<PropertyName, P>;
+};
 
 type AtTextualRule = "@charset" | "@import" | "@layer" | "@namespace";
 

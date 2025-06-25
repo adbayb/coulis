@@ -1,14 +1,6 @@
 import { useEffect, useState } from "react";
 import type { PropsWithChildren, ReactNode } from "react";
-import { createCoulis, createWebAdapter } from "coulis";
-
-const {
-	createCustomProperties,
-	createKeyframes,
-	createStyles,
-	createVariants,
-	setGlobalStyles,
-} = createCoulis(createWebAdapter);
+import { createCoulis } from "coulis/web";
 
 const px = (value: number) => `${value}px`;
 
@@ -46,28 +38,86 @@ const tokens = Object.freeze({
 	},
 } as const);
 
-const theme = createCustomProperties({
-	colors: {
-		neutralDark: tokens.colors.black,
-		neutralLight: tokens.colors.white,
-		neutralTransparent: tokens.colors.transparent,
-		surfacePrimary: tokens.colors.blue[4],
-		surfaceSecondary: tokens.colors.blue[2],
+const { createKeyframes, createStyles, setGlobalStyles } = createCoulis({
+	properties(theme) {
+		return {
+			accentColor: true,
+			animation: true,
+			backgroundColor: theme.colors,
+			borderRadius: theme.radii,
+			borderStyle: true,
+			color: theme.colors,
+			colorScheme(input: "black" | "white") {
+				return input === "black" ? "dark" : "light";
+			},
+			display: true,
+			flex: true,
+			flexDirection: true,
+			boxSizing: true,
+			fontFamily: true,
+			fontSize: theme.fontSizes,
+			fontWeight: theme.fontWeights,
+			gap: true,
+			height: true,
+			margin: theme.spacings,
+			marginBottom: theme.spacings,
+			marginLeft: theme.spacings,
+			marginRight: theme.spacings,
+			marginTop: theme.spacings,
+			padding: theme.spacings,
+			paddingBottom: theme.spacings,
+			paddingLeft: theme.spacings,
+			paddingRight: theme.spacings,
+			paddingTop: theme.spacings,
+			src: true,
+			transform: true,
+			transitionProperty(input: ("background-color" | "color")[]) {
+				return input.join(",");
+			},
+			width: [50, 100],
+		};
 	},
-	fontSizes: {
-		body: tokens.fontSizes[2],
+	shorthands: {
+		marginHorizontal: ["marginLeft", "marginRight"],
+		marginVertical: ["marginTop", "marginBottom"],
+		paddingHorizontal: ["paddingLeft", "paddingRight"],
+		paddingVertical: ["paddingTop", "paddingBottom"],
 	},
-	fontWeights: {
-		body: tokens.fontWeights[1],
+	states: {
+		hover: ({ className, declaration }) =>
+			`${className}:hover{${declaration}}`,
+		large: ({ className, declaration }) =>
+			`@media (min-width: 1024px){${className}{${declaration}}}`,
+		medium: ({ className, declaration }) =>
+			`@media (min-width: 768px){${className}{${declaration}}}`,
+		small: ({ className, declaration }) =>
+			`@media (min-width: 360px){${className}{${declaration}}}`,
+		smallWithHover: ({ className, declaration }) =>
+			`@media (min-width: 360px){${className}:hover{${declaration}}}`,
 	},
-	radii: {
-		full: tokens.radii[4],
-		large: tokens.radii[3],
-		medium: tokens.radii[2],
-		none: tokens.radii[0],
-		small: tokens.radii[1],
+	theme: {
+		colors: {
+			neutralDark: tokens.colors.black,
+			neutralLight: tokens.colors.white,
+			neutralTransparent: tokens.colors.transparent,
+			surfacePrimary: tokens.colors.blue[4],
+			surfaceSecondary: tokens.colors.blue[2],
+		},
+		fontSizes: {
+			body: tokens.fontSizes[2],
+		},
+		fontWeights: {
+			body: tokens.fontWeights[1],
+		},
+		radii: {
+			full: tokens.radii[4],
+			large: tokens.radii[3],
+			medium: tokens.radii[2],
+			none: tokens.radii[0],
+			small: tokens.radii[1],
+		},
+		spacings: tokens.spacings,
 	},
-	spacings: tokens.spacings,
 });
 
 setGlobalStyles({
@@ -81,8 +131,7 @@ setGlobalStyles({
 		boxSizing: "inherit",
 	},
 	".globalClass": {
-		border: "1px solid black",
-		borderRadius: 4,
+		borderRadius: "large",
 	},
 	"html": {
 		boxSizing: "border-box",
@@ -103,74 +152,6 @@ const animationName = createKeyframes({
 	},
 	to: {
 		transform: "scale(1)",
-	},
-});
-
-const styles = createStyles(
-	{
-		accentColor: true,
-		animation: true,
-		backgroundColor: theme.colors,
-		borderRadius: theme.radii,
-		borderStyle: true,
-		color: theme.colors,
-		colorScheme(input: "black" | "white") {
-			return input === "black" ? "dark" : "light";
-		},
-		display: true,
-		flex: true,
-		flexDirection: true,
-		fontSize: theme.fontSizes,
-		fontWeight: theme.fontWeights,
-		gap: true,
-		height: true,
-		margin: theme.spacings,
-		marginBottom: theme.spacings,
-		marginLeft: theme.spacings,
-		marginRight: theme.spacings,
-		marginTop: theme.spacings,
-		padding: theme.spacings,
-		paddingBottom: theme.spacings,
-		paddingLeft: theme.spacings,
-		paddingRight: theme.spacings,
-		paddingTop: theme.spacings,
-		transitionProperty(input: ("background-color" | "color")[]) {
-			return input.join(",");
-		},
-		width: [50, 100],
-	},
-	{
-		shorthands: {
-			marginHorizontal: ["marginLeft", "marginRight"],
-			marginVertical: ["marginTop", "marginBottom"],
-			paddingHorizontal: ["paddingLeft", "paddingRight"],
-			paddingVertical: ["paddingTop", "paddingBottom"],
-		},
-		states: {
-			hover: ({ className, declaration }) =>
-				`${className}:hover{${declaration}}`,
-			large: ({ className, declaration }) =>
-				`@media (min-width: 1024px){${className}{${declaration}}}`,
-			medium: ({ className, declaration }) =>
-				`@media (min-width: 768px){${className}{${declaration}}}`,
-			small: ({ className, declaration }) =>
-				`@media (min-width: 360px){${className}{${declaration}}}`,
-			smallWithHover: ({ className, declaration }) =>
-				`@media (min-width: 360px){${className}:hover{${declaration}}}`,
-		},
-	},
-);
-
-const buttonVariants = createVariants(styles, {
-	color: {
-		accent: { backgroundColor: "surfaceSecondary" },
-		brand: { backgroundColor: "surfacePrimary" },
-		neutral: { backgroundColor: "neutralDark" },
-	},
-	size: {
-		large: { padding: 1.5 },
-		medium: { padding: 1 },
-		small: { padding: 0.5 },
 	},
 });
 
@@ -196,7 +177,7 @@ const App = () => {
 			</Example>
 			<Example title="With static styles">
 				<p
-					className={styles({
+					className={createStyles({
 						backgroundColor: "surfacePrimary",
 						borderRadius: "large",
 						color: {
@@ -221,7 +202,7 @@ const App = () => {
 			</Example>
 			<Example title="With dynamic styles">
 				<p
-					className={styles({
+					className={createStyles({
 						color:
 							counter % 2 === 0
 								? "surfacePrimary"
@@ -233,7 +214,7 @@ const App = () => {
 			</Example>
 			<Example title="With contextual styles">
 				<p
-					className={styles({
+					className={createStyles({
 						backgroundColor: {
 							base: "surfacePrimary",
 							medium: "surfaceSecondary",
@@ -246,7 +227,7 @@ const App = () => {
 			</Example>
 			<Example title="With custom properties">
 				<p
-					className={styles({
+					className={createStyles({
 						borderRadius: "small",
 						borderStyle: "solid",
 					})}
@@ -254,20 +235,9 @@ const App = () => {
 					{TEXT}
 				</p>
 			</Example>
-			<Example title="With variants">
-				<button
-					className={buttonVariants({
-						color: "brand",
-						size: "large",
-					})}
-					type="button"
-				>
-					{TEXT.split(" ")[0]}
-				</button>
-			</Example>
 			<Example title="With keyframes">
 				<div
-					className={styles({
+					className={createStyles({
 						animation: `${animationName} 2000ms linear infinite`,
 						backgroundColor: "surfacePrimary",
 						borderRadius: "medium",
@@ -301,10 +271,12 @@ const Example = ({ title, children }: ExampleProps) => {
 const Layout = ({ children }: PropsWithChildren) => {
 	return (
 		<main
-			className={styles({
+			className={createStyles({
 				display: "flex",
 				flexDirection: "column",
 				gap: 16,
+				paddingHorizontal: 1.5,
+				paddingVertical: 1.5,
 			})}
 		>
 			{children}

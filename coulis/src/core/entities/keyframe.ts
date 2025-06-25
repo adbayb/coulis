@@ -1,5 +1,10 @@
-import type { StyleProperties } from "./style";
+import type { PropertiesLike, PropertyValue } from "./property";
 
-export type Keyframes = Partial<
-	Record<number | "from" | "to" | `${number}%`, StyleProperties>
+export type Keyframes<P extends PropertiesLike> = Partial<
+	Record<
+		number | "from" | "to" | `${number}%`,
+		{
+			[PropertyName in keyof P]?: PropertyValue<PropertyName, P>;
+		}
+	>
 >;

@@ -1,4 +1,8 @@
-import type { RecordLike } from "../../core/entities/primitive";
+import { isObject } from "../../core/entities/primitive";
+import type {
+	RecordLike,
+	WithNewLeafNodes,
+} from "../../core/entities/primitive";
 import { SHORTHAND_PROPERTIES, UNITLESS_PROPERTIES } from "./constants";
 
 /**
@@ -10,7 +14,7 @@ import { SHORTHAND_PROPERTIES, UNITLESS_PROPERTIES } from "./constants";
  * const safeCssVariable = escape("--spacings-1.5"); // Will generate `--spacings-1\5`
  */
 export const escape = (input: string) => {
-	return input.replaceAll(/[!"#$%&'()*+,./:;<=>?@[\]^`{|}~]/g, "\\");
+	return input.replaceAll(/[!"#$%&'()*+,./:;<=>?@[\]^`{|}~]/g, "-");
 };
 
 export const createClassName = (input: string) => {
@@ -39,6 +43,45 @@ export const createClassName = (input: string) => {
 	 * and converting generated hash to hexadecimal
 	 */
 	return `c${Number(uHash).toString(16)}`;
+};
+
+export const createCustomProperties = <Theme extends RecordLike>(
+	theme: Theme,
+	onCreateProperty: (name: string, value: unknown) => void,
+	customPropertyNameParts: (keyof Theme)[] = [],
+	output: WithNewLeafNodes<Theme, string> = {} as typeof output,
+) => {
+	const tokenNames = Object.keys(theme) as (keyof typeof output)[];
+
+	for (const tokenName of tokenNames) {
+		const value = theme[tokenName];
+
+		customPropertyNameParts.push(tokenName);
+
+		// eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+		output[tokenName] = {} as (typeof output)[keyof typeof output];
+
+		if (isObject(value)) {
+			createCustomProperties(
+				value as Theme,
+				onCreateProperty,
+				customPropertyNameParts,
+				output[tokenName] as unknown as typeof output,
+			);
+			customPropertyNameParts = [];
+
+			continue;
+		}
+
+		const name = `--${escape(customPropertyNameParts.join("-"))}`;
+
+		output[tokenName] =
+			`var(${name})` as (typeof output)[keyof typeof output];
+		onCreateProperty(name, value);
+		customPropertyNameParts.pop();
+	}
+
+	return output;
 };
 
 export const createDeclaration = ({

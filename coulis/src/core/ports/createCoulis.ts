@@ -1,7 +1,7 @@
 import type { StatesLike } from "../entities/state";
 import type { ShortandsLike } from "../entities/shorthand";
 import type { PropertiesLike, PropertyValue } from "../entities/property";
-import type { RecordLike } from "../entities/primitive";
+import type { RecordLike, WithNewLeafNodes } from "../entities/primitive";
 import type { Keyframes } from "../entities/keyframe";
 import type { GlobalStyles } from "../entities/globalStyle";
 
@@ -12,7 +12,7 @@ export type CreateCoulis<Output> = <
 	States extends StatesLike,
 	Theme extends RecordLike,
 >(contract: {
-	properties: (theme: Theme) => Properties;
+	properties: (theme: WithNewLeafNodes<Theme, string>) => Properties;
 	shorthands?: Shorthands;
 	states?: States;
 	theme?: Theme;

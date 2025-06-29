@@ -8,6 +8,7 @@ import { createVirtualStyleSheet } from "./stylesheet/virtual";
 import { createDomStyleSheet } from "./stylesheet/dom";
 import {
 	createClassName,
+	createCustomProperties,
 	createDeclaration,
 	isShorthandProperty,
 } from "./helpers";
@@ -42,7 +43,13 @@ export const createCoulis: CreateCoulis<ClassName> = (contract) => {
 
 	const shorthandNames = Object.keys(shorthands);
 	const theme = (contract.theme ?? {}) as NonNullable<typeof contract.theme>;
-	const properties = contract.properties(theme);
+	let collectedCustomProperties = "";
+
+	const customProperties = createCustomProperties(theme, (name, value) => {
+		collectedCustomProperties += `${name}:${String(value)};`;
+	});
+
+	const properties = contract.properties(customProperties);
 
 	const isCustomShorthandProperty = (name: string) => {
 		return shorthandNames.includes(name);
@@ -117,6 +124,14 @@ export const createCoulis: CreateCoulis<ClassName> = (contract) => {
 
 		return className;
 	};
+
+	insert({
+		cacheInput: collectedCustomProperties,
+		onCreateRule() {
+			return `:root{${collectedCustomProperties}}`;
+		},
+		type: "global",
+	});
 
 	return {
 		createKeyframes(input) {

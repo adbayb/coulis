@@ -46,7 +46,7 @@
 	},
 	"devDependencies": {
 		"@types/node": "22.15.34",
-		"quickbundle": "2.12.0",
-		"vitest": "3.1.4"
+		"quickbundle": "2.13.0",
+		"vitest": "3.2.4"
 	}
 }

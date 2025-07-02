@@ -5,7 +5,7 @@ import { getMetadata } from "../helpers/coulis";
 
 class MyDocument extends Document {
 	public static override async getInitialProps(context: DocumentContext) {
-		const styles = getMetadata();
+		const styles = getMetadata().value;
 		const initialProps = await Document.getInitialProps(context);
 
 		return {

@@ -1,7 +1,7 @@
 import { renderToString } from "react-dom/server";
 import { StrictMode } from "react";
 
-import { getMetadataAsString } from "./helpers/coulis";
+import { getMetadata } from "./helpers/coulis";
 import App from "./App";
 
 export const renderHtml = (_url: string) => {
@@ -11,7 +11,7 @@ export const renderHtml = (_url: string) => {
 		</StrictMode>,
 	);
 
-	const headContent = getMetadataAsString();
+	const headContent = getMetadata().toString();
 
 	return { html: bodyContent, head: headContent };
 };

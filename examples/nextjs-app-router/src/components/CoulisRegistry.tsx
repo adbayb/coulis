@@ -19,7 +19,7 @@ setGlobalStyles({
 		padding: 0,
 	},
 	".globalClass": {
-		color: "lightcoral",
+		color: "surfaceSecondary",
 	},
 });
 
@@ -39,7 +39,7 @@ export const CoulisRegistry = ({ children }: CoulisRegistryProps) => {
 
 		hasBeenInserted.current = true;
 
-		return getMetadata().map(({ attributes, content }) => {
+		return getMetadata().value.map(({ attributes, content }) => {
 			return (
 				<style
 					{...attributes}

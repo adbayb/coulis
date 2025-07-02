@@ -10,7 +10,7 @@ export type PropertiesLike = {
 export type PropertyValue<
 	PropertyName extends keyof P,
 	P extends PropertiesLike,
-	S extends StatesLike | undefined = undefined,
+	S extends StatesLike,
 > = P[PropertyName] extends NativePropertyValue | undefined
 	? PropertyName extends keyof StyleProperties
 		? CreatePropertyValue<StyleProperties[PropertyName], S>
@@ -25,7 +25,7 @@ export type PropertyValue<
 				: never
 		: never;
 
-type CreatePropertyValue<Value, S extends StatesLike | undefined = undefined> =
+type CreatePropertyValue<Value, S extends StatesLike> =
 	| Value
 	| (S extends Record<infer State, unknown>
 			? Partial<Record<State, Value>> & Record<"base", Value>

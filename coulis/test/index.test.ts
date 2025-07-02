@@ -1,33 +1,12 @@
 import { describe, expect, test } from "vitest";
 
-import { createCoulis, createWebAdapter } from "../src";
-
-const {
-	createKeyframes,
-	createStyles,
-	createVariants,
-	getMetadata,
-	getMetadataAsString,
-	setGlobalStyles,
-} = createCoulis(createWebAdapter);
+import { createCoulis } from "../src/adapters/web";
 
 describe("coulis", () => {
 	test("should generate classNames", () => {
 		expect(animationName).toBe("c77e20e50");
-		expect(buttonVariants({ color: "brand", size: "large" })).toBe(
-			"c72f7daf8 c6a0088d1",
-		);
-		expect(buttonVariants({ color: "brand", size: "medium" })).toBe(
-			"c72f7daf8 ccadc8a20",
-		);
-		expect(buttonVariants({ color: "neutral", size: "medium" })).toBe(
-			"c5ea183e8 ccadc8a20",
-		);
-		expect(buttonVariants({ color: "accent", size: "small" })).toBe(
-			"cbb3938 c2a100aa4",
-		);
 		expect(classNames).toBe(
-			"cdd299de8 cbb3938 ce31a3799 c18a19c73 c2a100aa4",
+			"ce5eab527 ca4eaf829 ce899257c cdf15bb1c c8cf22ec5",
 		);
 	});
 
@@ -36,36 +15,12 @@ describe("coulis", () => {
 	});
 
 	test("should extract styles given stringified styles", () => {
-		expect(getMetadataAsString()).toMatchSnapshot();
+		expect(getMetadata().toString()).toMatchSnapshot();
 	});
 
 	test("should type `createStyles` in a safe manner", () => {
-		const styles = createStyles(
-			{
-				backgroundColor: ["red", "blue"],
-				color: {
-					danger: "red",
-					warning: "yellow",
-				},
-				height: ["100%"],
-				transitionProperty(input: ("background-color" | "color")[]) {
-					return input.join(" ");
-				},
-				width: true,
-			},
-			{
-				shorthands: {
-					size: ["width"],
-				},
-				states: {
-					hover: ({ className, declaration }) =>
-						`${className}:hover{${declaration}}`,
-				},
-			},
-		);
-
 		expect(
-			styles({
+			createStyles({
 				// @ts-expect-error property value does not exist (custom value)
 				backgroundColor: "blue2",
 				transitionProperty: ["color", "background-color"],
@@ -73,7 +28,7 @@ describe("coulis", () => {
 		).toBeTypeOf("string");
 
 		expect(
-			styles({
+			createStyles({
 				backgroundColor: {
 					// @ts-expect-error stateful property value does not exist (custom value)
 					base: "blue3",
@@ -81,67 +36,114 @@ describe("coulis", () => {
 			}),
 		).toBeTypeOf("string");
 
-		expect(() =>
-			styles({
+		expect(
+			createStyles({
 				backgroundColor: {
 					// @ts-expect-error state key does not exist
 					toto: "red",
 				},
 			}),
-		).toThrow(/No configuration found for state `toto`/);
+		).toBeTypeOf("string");
 
 		expect(
-			styles({
-				// @ts-expect-error base state key is missing
+			createStyles({
 				backgroundColor: {
+					// @ts-expect-error base state key is missing
 					hover: "red",
 				},
 			}),
 		).toBeTypeOf("string");
 
 		expect(
-			styles({
+			createStyles({
 				// @ts-expect-error property value does not exist (native value)
 				width: new Date(),
 			}),
 		).toBeTypeOf("string");
 
-		expect(() =>
-			styles({
+		expect(
+			createStyles({
 				// @ts-expect-error property key does not exist
 				nonExistingProperty: "unknownValue",
 			}),
-		).toThrow(/No configuration found for property `nonExistingProperty`/);
+		).toBeTypeOf("string");
 
 		expect(
-			createVariants(styles, {
-				color: {
-					accent: { color: "warning" },
-					// @ts-expect-error property value does not exist
-					brand: { backgroundColor: "surfacePrimary" },
-					neutral: { backgroundColor: "red", color: "danger" },
-				},
-				size: {
-					// @ts-expect-error property key does not exist
-					medium: { height: 12 },
-					small: { size: "auto", width: 100 },
-				},
-			}),
-		).toBeTypeOf("function");
-
-		expect(
-			styles({
-				color: "warning",
+			createStyles({
+				color: "neutralLight",
 				height: "100%",
 				size: {
-					base: "auto",
-					hover: "100%",
+					base: 100,
+					hover: 50,
 				},
-				width: "auto",
+				width: 100,
 			}),
 		).toBeTypeOf("string");
 	});
 });
+
+const tokens = Object.freeze({
+	colors: {
+		black: "black",
+		blue: [
+			"rgb(241,244,248)",
+			"rgb(226,232,240)",
+			"rgb(201,212,227)",
+			"rgb(168,186,211)",
+			"rgb(119,146,185)",
+		],
+		transparent: "transparent",
+		white: "white",
+	},
+	spacings: {
+		0: "0px",
+		0.5: "0.5rem",
+		1: "1rem",
+		1.5: "2rem",
+	},
+} as const);
+
+const { createKeyframes, createStyles, getMetadata, setGlobalStyles } =
+	createCoulis({
+		properties(theme) {
+			return {
+				backgroundColor: theme.colors,
+				boxSizing: true,
+				color: theme.colors,
+				colorScheme(input: "black" | "white") {
+					return input === "black" ? "dark" : "light";
+				},
+				fontFamily: true,
+				height: true,
+				margin: theme.spacings,
+				padding: theme.spacings,
+				src: true,
+				transform: true,
+				width: [50, 100],
+			};
+		},
+		shorthands: {
+			size: ["width"],
+		},
+		states: {
+			alt({ className, declaration }) {
+				return `${className}[alt]{${declaration}}`;
+			},
+			hover({ className, declaration }) {
+				return `${className}{${declaration}}`;
+			},
+		},
+		theme: {
+			colors: {
+				neutralDark: tokens.colors.black,
+				neutralLight: tokens.colors.white,
+				neutralTransparent: tokens.colors.transparent,
+				surfacePrimary: tokens.colors.blue[4],
+				surfaceSecondary: tokens.colors.blue[2],
+			},
+			spacings: tokens.spacings,
+		},
+	});
 
 const animationName = createKeyframes({
 	25: {
@@ -164,8 +166,7 @@ setGlobalStyles({
 		boxSizing: "inherit",
 	},
 	".globalClass+.otherGlobalClass": {
-		border: "1px solid black",
-		borderRadius: 4,
+		colorScheme: "black",
 	},
 	"@charset": '"utf-8"',
 	"@font-face": {
@@ -178,52 +179,21 @@ setGlobalStyles({
 		boxSizing: "border-box",
 	},
 	"html,body": {
-		backgroundColor: "lightcoral",
+		backgroundColor: "surfacePrimary",
 		fontFamily: "Open Sans, AliasedHelvetica",
 		margin: 0,
 		padding: 0,
 	},
 });
 
-const styles = createStyles(
-	{
-		backgroundColor: true,
-		color: true,
-		padding: [6, 12, 18],
-	},
-	{
-		states: {
-			alt({ className, declaration }) {
-				return `${className}[alt]{${declaration}}`;
-			},
-			hover({ className, declaration }) {
-				return `${className}{${declaration}}`;
-			},
-		},
-	},
-);
-
-const buttonVariants = createVariants(styles, {
-	color: {
-		accent: { backgroundColor: "lightcoral" },
-		brand: { backgroundColor: "lightseagreen" },
-		neutral: { backgroundColor: "lightgrey" },
-	},
-	size: {
-		large: { padding: 18 },
-		medium: { padding: 12 },
-		small: { padding: 6 },
-	},
-});
-
-const classNames = styles({
+const classNames = createStyles({
 	backgroundColor: {
-		alt: "lightgray",
-		base: "lightcoral",
-		hover: "lightcyan",
+		alt: "surfacePrimary",
+		base: "surfaceSecondary",
+		hover: "neutralTransparent",
 	},
-	color: "lightblue",
+	color: "neutralDark",
 	padding: {
-		base: 6,
+		base: 0,
 	},
 });

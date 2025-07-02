@@ -32,7 +32,7 @@ export type GlobalStyles<P extends PropertiesLike> =
 	};
 
 type Properties<P extends PropertiesLike> = {
-	[PropertyName in keyof P]?: PropertyValue<PropertyName, P>;
+	[PropertyName in keyof P]?: PropertyValue<PropertyName, P, undefined>;
 };
 
 type AtTextualRule = "@charset" | "@import" | "@layer" | "@namespace";

@@ -42,14 +42,14 @@ export const createCoulis: CreateCoulis<ClassName> = (contract) => {
 	>;
 
 	const shorthandNames = Object.keys(shorthands);
-	const theme = (contract.theme ?? {}) as NonNullable<typeof contract.theme>;
 	let collectedCustomProperties = "";
 
-	const customProperties = createCustomProperties(theme, (name, value) => {
-		collectedCustomProperties += `${name}:${String(value)};`;
-	});
-
-	const properties = contract.properties(customProperties);
+	const properties = contract.properties(
+		(contract.theme &&
+			createCustomProperties(contract.theme, (name, value) => {
+				collectedCustomProperties += `${name}:${String(value)};`;
+			})) as Parameters<typeof contract.properties>[0],
+	);
 
 	const isCustomShorthandProperty = (name: string) => {
 		return shorthandNames.includes(name);
@@ -242,7 +242,7 @@ export const createCoulis: CreateCoulis<ClassName> = (contract) => {
 			};
 
 			for (const propertyName of Object.keys(input)) {
-				const value = input[propertyName];
+				const value = input[propertyName as keyof typeof input];
 
 				if (isCustomShorthandProperty(propertyName)) {
 					const shorthandedPropertyNames = shorthands[propertyName];

@@ -4,7 +4,11 @@ export type Keyframes<P extends PropertiesLike> = Partial<
 	Record<
 		number | "from" | "to" | `${number}%`,
 		{
-			[PropertyName in keyof P]?: PropertyValue<PropertyName, P>;
+			[PropertyName in keyof P]?: PropertyValue<
+				PropertyName,
+				P,
+				undefined
+			>;
 		}
 	>
 >;

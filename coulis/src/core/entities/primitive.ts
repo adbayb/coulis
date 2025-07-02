@@ -1,6 +1,13 @@
 export type RecordLike = Record<string, unknown>;
 
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
+export type EmptyRecord = {};
+
 export type UngreedyString = Ungreedify<string>;
+
+export type Exactify<Value, AllowedKeys extends number | string | symbol> = {
+	[K in keyof Value]: K extends AllowedKeys ? Value[K] : never;
+};
 
 /**
  * A utility type to preserve the record data structure except for leaf nodes that are mutated to match the `LeafType`.

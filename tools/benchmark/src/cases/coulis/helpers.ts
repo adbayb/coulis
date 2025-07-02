@@ -1,5 +1,13 @@
-import { createCoulis, createWebAdapter } from "coulis";
+import { createCoulis } from "coulis/web";
 
-const { createStyles, getMetadataAsString } = createCoulis(createWebAdapter);
+const { createKeyframes, createStyles, getMetadata, setGlobalStyles } =
+	createCoulis({
+		properties() {
+			return {
+				backgroundColor: true,
+				border: true,
+			};
+		},
+	});
 
-export { createStyles, getMetadataAsString };
+export { createKeyframes, createStyles, getMetadata, setGlobalStyles };

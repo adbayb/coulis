@@ -1,43 +1,46 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
 exports[`coulis > should extract styles 1`] = `
-[
-  {
-    "attributes": {
-      "data-coulis-cache": "c77e20e50,c8e4ce7ac",
-      "data-coulis-type": "global",
+{
+  "toString": [Function],
+  "value": [
+    {
+      "attributes": {
+        "data-coulis-cache": "c66501570,c77e20e50,cd2b4a084",
+        "data-coulis-type": "global",
+      },
+      "content": ":root{--colors-neutralDark:black;--colors-neutralLight:white;--colors-neutralTransparent:transparent;--colors-surfacePrimary:rgb(119,146,185);--colors-surfaceSecondary:rgb(201,212,227);--spacings-0:0px;--spacings-1:1rem;--spacings-0-5:0.5rem;--spacings-1-5:2rem;}@keyframes c77e20e50{25%{transform:scale(1.25);}50%{transform:scale(1.5);}from{transform:scale(1);}to{transform:scale(1);}}*,*::before,*::after{box-sizing:inherit;}.globalClass+.otherGlobalClass{color-scheme:dark;}@charset "utf-8";@font-face{font-family:'AliasedHelvetica';src:local(Helvetica);}@import url('https://fonts.googleapis.com/css?family=Open+Sans&display=swap');html{box-sizing:border-box;}html,body{background-color:var(--colors-surfacePrimary);font-family:Open Sans, AliasedHelvetica;margin:var(--spacings-0);padding:var(--spacings-0);}",
     },
-    "content": "@keyframes c77e20e50{25%{transform:scale(1.25);}50%{transform:scale(1.5);}from{transform:scale(1);}to{transform:scale(1);}}*,*::before,*::after{box-sizing:inherit;}.globalClass+.otherGlobalClass{border:1px solid black;border-radius:4px;}@charset "utf-8";@font-face{font-family:'AliasedHelvetica';src:local(Helvetica);}@import url('https://fonts.googleapis.com/css?family=Open+Sans&display=swap');html{box-sizing:border-box;}html,body{background-color:lightcoral;font-family:Open Sans, AliasedHelvetica;}",
-  },
-  {
-    "attributes": {
-      "data-coulis-cache": "c2a100aa4,c6a0088d1,ccadc8a20",
-      "data-coulis-type": "shorthand",
+    {
+      "attributes": {
+        "data-coulis-cache": "c8cf22ec5",
+        "data-coulis-type": "shorthand",
+      },
+      "content": ".c8cf22ec5{padding:var(--spacings-0);}",
     },
-    "content": ".c2a100aa4{padding:6px;}.c6a0088d1{padding:18px;}.ccadc8a20{padding:12px;}",
-  },
-  {
-    "attributes": {
-      "data-coulis-cache": "cdd299de8,cbb3938,ce31a3799,c18a19c73,c72f7daf8,c5ea183e8",
-      "data-coulis-type": "longhand",
+    {
+      "attributes": {
+        "data-coulis-cache": "ce5eab527,ca4eaf829,ce899257c,cdf15bb1c",
+        "data-coulis-type": "longhand",
+      },
+      "content": ".ce5eab527[alt]{background-color:var(--colors-surfacePrimary);}.ca4eaf829{background-color:var(--colors-surfaceSecondary);}.ce899257c{background-color:var(--colors-neutralTransparent);}.cdf15bb1c{color:var(--colors-neutralDark);}",
     },
-    "content": ".cdd299de8[alt]{background-color:lightgray;}.cbb3938{background-color:lightcoral;}.ce31a3799{background-color:lightcyan;}.c18a19c73{color:lightblue;}.c72f7daf8{background-color:lightseagreen;}.c5ea183e8{background-color:lightgrey;}",
-  },
-  {
-    "attributes": {
-      "data-coulis-cache": "",
-      "data-coulis-type": "atShorthand",
+    {
+      "attributes": {
+        "data-coulis-cache": "",
+        "data-coulis-type": "atShorthand",
+      },
+      "content": "",
     },
-    "content": "",
-  },
-  {
-    "attributes": {
-      "data-coulis-cache": "",
-      "data-coulis-type": "atLonghand",
+    {
+      "attributes": {
+        "data-coulis-cache": "",
+        "data-coulis-type": "atLonghand",
+      },
+      "content": "",
     },
-    "content": "",
-  },
-]
+  ],
+}
 `;
 
-exports[`coulis > should extract styles given stringified styles 1`] = `"<style data-coulis-cache="c77e20e50,c8e4ce7ac" data-coulis-type="global">@keyframes c77e20e50{25%{transform:scale(1.25);}50%{transform:scale(1.5);}from{transform:scale(1);}to{transform:scale(1);}}*,*::before,*::after{box-sizing:inherit;}.globalClass+.otherGlobalClass{border:1px solid black;border-radius:4px;}@charset "utf-8";@font-face{font-family:'AliasedHelvetica';src:local(Helvetica);}@import url('https://fonts.googleapis.com/css?family=Open+Sans&display=swap');html{box-sizing:border-box;}html,body{background-color:lightcoral;font-family:Open Sans, AliasedHelvetica;}</style><style data-coulis-cache="c2a100aa4,c6a0088d1,ccadc8a20" data-coulis-type="shorthand">.c2a100aa4{padding:6px;}.c6a0088d1{padding:18px;}.ccadc8a20{padding:12px;}</style><style data-coulis-cache="cdd299de8,cbb3938,ce31a3799,c18a19c73,c72f7daf8,c5ea183e8" data-coulis-type="longhand">.cdd299de8[alt]{background-color:lightgray;}.cbb3938{background-color:lightcoral;}.ce31a3799{background-color:lightcyan;}.c18a19c73{color:lightblue;}.c72f7daf8{background-color:lightseagreen;}.c5ea183e8{background-color:lightgrey;}</style><style data-coulis-cache="" data-coulis-type="atShorthand"></style><style data-coulis-cache="" data-coulis-type="atLonghand"></style>"`;
+exports[`coulis > should extract styles given stringified styles 1`] = `"<style data-coulis-cache="c66501570,c77e20e50,cd2b4a084" data-coulis-type="global">:root{--colors-neutralDark:black;--colors-neutralLight:white;--colors-neutralTransparent:transparent;--colors-surfacePrimary:rgb(119,146,185);--colors-surfaceSecondary:rgb(201,212,227);--spacings-0:0px;--spacings-1:1rem;--spacings-0-5:0.5rem;--spacings-1-5:2rem;}@keyframes c77e20e50{25%{transform:scale(1.25);}50%{transform:scale(1.5);}from{transform:scale(1);}to{transform:scale(1);}}*,*::before,*::after{box-sizing:inherit;}.globalClass+.otherGlobalClass{color-scheme:dark;}@charset "utf-8";@font-face{font-family:'AliasedHelvetica';src:local(Helvetica);}@import url('https://fonts.googleapis.com/css?family=Open+Sans&display=swap');html{box-sizing:border-box;}html,body{background-color:var(--colors-surfacePrimary);font-family:Open Sans, AliasedHelvetica;margin:var(--spacings-0);padding:var(--spacings-0);}</style><style data-coulis-cache="c8cf22ec5" data-coulis-type="shorthand">.c8cf22ec5{padding:var(--spacings-0);}</style><style data-coulis-cache="ce5eab527,ca4eaf829,ce899257c,cdf15bb1c" data-coulis-type="longhand">.ce5eab527[alt]{background-color:var(--colors-surfacePrimary);}.ca4eaf829{background-color:var(--colors-surfaceSecondary);}.ce899257c{background-color:var(--colors-neutralTransparent);}.cdf15bb1c{color:var(--colors-neutralDark);}</style><style data-coulis-cache="" data-coulis-type="atShorthand"></style><style data-coulis-cache="" data-coulis-type="atLonghand"></style>"`;

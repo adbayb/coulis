@@ -1,5 +1,11 @@
 # Change Log
 
+## 0.16.0
+
+### Minor Changes
+
+- [#48](https://github.com/adbayb/coulis/pull/48) [`0dd0ccc`](https://github.com/adbayb/coulis/commit/0dd0ccc6c9afa9ea713792094398b7c712c00dbb) Thanks [@renovate](https://github.com/apps/renovate)! - Updated dependency `@types/node` to `22.15.34`.
+
 ## 0.15.0
 
 ### Minor Changes

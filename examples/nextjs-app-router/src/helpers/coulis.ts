@@ -25,6 +25,7 @@ const { createKeyframes, createStyles, getMetadata, setGlobalStyles } =
 				fontFamily: true,
 				margin: true,
 				padding: true,
+				fontSize: true,
 			};
 		},
 		theme: {

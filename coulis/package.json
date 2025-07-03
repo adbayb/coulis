@@ -50,7 +50,7 @@
 		"clean": "rm -rf dist",
 		"prepublishOnly": "pnpm run build",
 		"start": "pnpm watch",
-		"test": "vitest",
+		"test": "vitest --typecheck",
 		"watch": "quickbundle watch"
 	},
 	"dependencies": {

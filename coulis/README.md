@@ -235,46 +235,6 @@ export const App = () => {
 };
 ```
 
-### createVariants
-
-A factory to create one or several styling variants. The first-level field defines the variant name, the second-level field the variant value, and the third-level field the set of CSS properties applied.
-It returns a function to select the appropriate variant:
-
-```tsx
-import { createStyles, createVariants } from "coulis";
-
-const styles = createStyles({
-	backgroundColor: true,
-	padding: true,
-});
-
-const buttonVariants = createVariants(styles, {
-	color: {
-		accent: { backgroundColor: "lightcoral" },
-		brand: { backgroundColor: "lightseagreen" },
-		neutral: { backgroundColor: "lightgrey" },
-	},
-	size: {
-		large: { padding: 18 },
-		medium: { padding: 12 },
-		small: { padding: 6 },
-	},
-});
-
-export const App = () => {
-	return (
-		<button
-			className={buttonVariants({
-				color: "brand",
-				size: "large",
-			})}
-		>
-			Click me!
-		</button>
-	);
-};
-```
-
 ### createCustomProperties
 
 A factory to create one or several custom properties globally scoped.  

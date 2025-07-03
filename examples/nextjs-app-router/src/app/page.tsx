@@ -4,9 +4,9 @@ import { createStyles } from "../helpers/coulis";
 
 const className = createStyles({
 	backgroundColor: "neutralDark",
-	color: {
-		base: "neutralDark",
-	},
+	margin: 0,
+	padding: "5rem",
+	fontSize: "3rem",
 });
 
 export default function Home() {

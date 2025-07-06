@@ -1,4 +1,4 @@
-import { createCoulis } from "coulis/web";
+import { createCoulis } from "coulis";
 
 const { createKeyframes, createStyles, getMetadata, setGlobalStyles } =
 	createCoulis({

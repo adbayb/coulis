@@ -18,8 +18,6 @@ Coulis leverages these two approaches to create a great developer experience whi
 
 ## 🚀 Quickstart
 
-TODO: update README.md
-
 1️⃣ Install
 
 ```bash
@@ -34,9 +32,66 @@ yarn add coulis
 2️⃣ Play ✌️
 
 ```tsx
-import { createStyles, setGlobalStyles } from "coulis";
-import { StrictMode } from "react";
-import { createRoot } from "react-dom/client";
+import { createCoulis } from "coulis";
+
+const { createKeyframes, createStyles, setGlobalStyles } = createCoulis({
+	properties(theme) {
+		return {
+			alignItems: true,
+			animation: true,
+			backgroundColor: theme.colors,
+			boxSizing: true,
+			color: theme.colors,
+			display: ["flex"],
+			fontFamily: true,
+			fontSize: true,
+			height: theme.sizes,
+			justifyContent: true,
+			margin: theme.spacings,
+			marginLeft: theme.spacings,
+			marginRight: theme.spacings,
+			padding: theme.spacings,
+			paddingLeft: theme.spacings,
+			paddingRight: theme.spacings,
+			transitionProperty(input: ("background-color" | "color")[]) {
+				return input.join(",");
+			},
+			width: theme.sizes,
+		};
+	},
+	shorthands: {
+		marginHorizontal: ["marginLeft", "marginRight"],
+		paddingHorizontal: ["paddingLeft", "paddingRight"],
+	},
+	states: {
+		hover: "coulis[selector]:hover{coulis[declaration]}",
+	},
+	theme: {
+		colors: {
+			neutralDark: "black",
+			neutralLight: "white",
+			neutralTransparent: "transparent",
+		},
+		sizes: {
+			full: "100%",
+		},
+		spacings: {
+			none: 0,
+			small: 4,
+			medium: 8,
+			large: 12,
+		},
+	},
+});
+
+const colorAnimation = createKeyframes({
+	from: {
+		backgroundColor: "neutralLight",
+	},
+	to: {
+		backgroundColor: "neutralDark",
+	},
+});
 
 setGlobalStyles({
 	"*,*::before,*::after": {
@@ -49,51 +104,17 @@ setGlobalStyles({
 	},
 	"html,body": {
 		fontFamily: "Open Sans",
-		margin: 0,
-		padding: 0,
+		margin: "none",
+		padding: "none",
 	},
 });
 
-const styles = createStyles(
-	{
-		alignItems: true,
-		color: ["black", "lightcoral"],
-		display: ["flex"],
-		fontSize: true,
-		height: {
-			full: "100%",
-		},
-		justifyContent: true,
-		marginLeft: [0, 4, 8, 16],
-		marginRight: [0, 4, 8, 16],
-		paddingLeft: [0, 4, 8, 16],
-		paddingRight: [0, 4, 8, 16],
-		transitionProperty(input: ("color" | "background-color")[]) {
-			return input.join(",");
-		},
-		width: {
-			full: "100%",
-		},
-	},
-	{
-		loose: ["marginLeft", "marginRight"],
-		shorthands: {
-			marginHorizontal: ["marginLeft", "marginRight"],
-			paddingHorizontal: ["paddingLeft", "paddingRight"],
-		},
-		states: {
-			hover({ className, declaration }) {
-				return `${className}:hover{${declaration}}`;
-			},
-		},
-	},
-);
-
-const App = () => {
+export const App = () => {
 	return (
 		<main
-			className={styles({
+			className={createStyles({
 				alignItems: "center",
+				animation: `${colorAnimation} 2000ms linear infinite`,
 				display: "flex",
 				height: "full",
 				justifyContent: "center",
@@ -101,15 +122,15 @@ const App = () => {
 			})}
 		>
 			<p
-				className={styles({
+				className={createStyles({
 					color: {
-						base: "black",
-						hover: "lightcoral",
+						base: "neutralDark",
+						hover: "neutralLight",
 					},
 					fontSize: 26,
-					marginHorizontal: "auto",
-					paddingHorizontal: 16,
-					transitionProperty: ["color"],
+					marginHorizontal: "medium",
+					paddingHorizontal: "large",
+					transitionProperty: ["background-color", "color"],
 				})}
 			>
 				Hello 🤗
@@ -117,255 +138,27 @@ const App = () => {
 		</main>
 	);
 };
-
-const container = document.getElementById("root");
-
-if (container) {
-	const root = createRoot(container);
-
-	root.render(
-		<StrictMode>
-			<App />
-		</StrictMode>,
-	);
-}
 ```
 
 <br>
 
-## 👨‍💻 Usage
+## 👨‍🍳 Patterns
 
-This section aims to deep dive into each interface with code examples:
+### How to implement server-side rendering?
 
-### createStyles
-
-A factory to configure and create type-safe `styles` method.
-It returns a `styles` method to generate a class name from a list of type-safe CSS properties:
-
-```tsx
-import { createStyles } from "coulis";
-
-const styles = createStyles(
-	{
-		alignItems: true,
-		color: true,
-		display: true,
-		fontSize: true,
-		height: true,
-		justifyContent: true,
-		textAlign: true,
-		width: true,
-	},
-	{
-		states: {
-			hover({ className, declaration }) {
-				return `${className}:hover{${declaration}}`;
-			},
-		},
-	},
-);
-
-export const App = () => {
-	return (
-		<main
-			className={styles({
-				alignItems: "center",
-				display: "flex",
-				height: "100%",
-				justifyContent: "center",
-				width: "100%",
-			})}
-		>
-			<p
-				className={styles({
-					color: {
-						base: "black",
-						hover: "lightcoral",
-					},
-					fontSize: 26,
-					textAlign: "center",
-				})}
-			>
-				Hello 🤗
-			</p>
-		</main>
-	);
-};
-```
-
-### createKeyframes
-
-A factory to create a `keyframes` rule set globally scoped that describes the animation to apply to an element:
-
-```tsx
-import { createKeyframes, createStyles } from "coulis";
-
-const zoomIn = createKeyframes({
-	from: {
-		transform: "scale(1)",
-	},
-	50: {
-		transform: "scale(1.5)",
-	},
-	to: {
-		transform: "scale(1)",
-	},
-});
-
-const styles = createStyles({
-	animation: true,
-	backgroundColor: true,
-	borderRadius: true,
-	height: true,
-	margin: true,
-	width: true,
-});
-
-export const App = () => {
-	return (
-		<div
-			className={styles({
-				animation: `${zoomIn} 2000ms linear infinite`,
-				backgroundColor: "gray",
-				borderRadius: 4,
-				height: "50px",
-				margin: 16,
-				width: "50px",
-			})}
-		/>
-	);
-};
-```
-
-### createCustomProperties
-
-A factory to create one or several custom properties globally scoped.  
-A [custom property](https://www.w3.org/TR/css-variables-1/) is any property whose name starts with two dashes. Its main functional purpose is theming: a theme defines a set of consistent and contextual properties (aka [design tokens](https://www.designtokens.org/glossary/)):
-
-```tsx
-import { createCustomProperties, createStyles } from "coulis";
-
-const px = (value: number) => `${value}px`;
-
-const tokens = Object.freeze({
-	colors: {
-		black: "black",
-		blue: [
-			"rgb(241,244,248)",
-			"rgb(226,232,240)",
-			"rgb(201,212,227)",
-			"rgb(168,186,211)",
-			"rgb(119,146,185)",
-		],
-		transparent: "transparent",
-		white: "white",
-	},
-	fontSizes: [
-		px(12),
-		px(14),
-		px(16),
-		px(18),
-		px(20),
-		px(22),
-		px(24),
-		px(28),
-		px(30),
-	],
-	fontWeights: ["100", "400", "900"],
-	radii: [px(0), px(4), px(8), px(12), px(999)],
-});
-
-const theme = createCustomProperties({
-	colors: {
-		neutralDark: tokens.colors.black,
-		neutralLight: tokens.colors.white,
-		neutralTransparent: tokens.colors.transparent,
-		surfacePrimary: tokens.colors.blue[4],
-		surfaceSecondary: tokens.colors.blue[2],
-	},
-	fontSizes: { body: tokens.fontSizes[2] },
-	fontWeights: { body: tokens.fontWeights[1] },
-	radii: {
-		full: tokens.radii[4],
-		large: tokens.radii[3],
-		medium: tokens.radii[2],
-		none: tokens.radii[0],
-		small: tokens.radii[1],
-	},
-});
-
-const styles = createStyles({
-	backgroundColor: theme.colors,
-	borderRadius: theme.radii,
-	color: theme.colors,
-	fontSize: theme.fontSizes,
-	fontWeight: theme.fontWeights,
-});
-
-export const App = () => {
-	return (
-		<p
-			className={styles({
-				backgroundColor: "surfacePrimary",
-				borderRadius: "large",
-				color: "neutralLight",
-				fontSize: "body",
-				fontWeight: "body",
-			})}
-		>
-			Hello 👋
-		</p>
-	);
-};
-```
-
-### setGlobalStyles
-
-A helper to apply some style rules globally:
-
-```tsx
-import { setGlobalStyles } from "coulis";
-
-setGlobalStyles({
-	"@import":
-		"url('https://fonts.googleapis.com/css?family=Open+Sans&display=swap')",
-	"html": {
-		boxSizing: "border-box",
-	},
-	"html,body": {
-		padding: 0,
-		margin: 0,
-		fontFamily: "Open Sans",
-	},
-	"*,*::before,*::after": {
-		boxSizing: "inherit",
-	},
-	".text": {
-		color: "blue",
-		fontSize: 16,
-	},
-});
-
-export const App = () => {
-	return <span className="text">Hello 🤗</span>;
-};
-```
-
-### createServerContext
-
-A factory to initialize a server context and expose helpers to enable server-side rendering. It helps prevent what is known as FOUC (Flash Of Unstyled Content) on the browser side.
+Coulis provides a dedicated method called `getMetadata` that allows to collect style instructions for injecting into the `<head />` section of the web page.  
+Its primary use case is server-side rendering. The getter helps prevent the FOUC (Flash Of Unstyled Content) issue, where the user briefly sees the unstyled content before the styles are applied on the browser side.
 
 Here's a vanilla React integration example generating HTML content:
 
 ```tsx
 import { renderToString } from "react-dom/server";
-import { createServerContext } from "coulis";
+import { coulis } from "./helpers/coulis"; // Factory instance created via `createCoulis` (see quickstart guide)
 import { App } from "./App"; // Main component entry point (depending on your project specificities).
 
 export const renderHtml = () => {
-	const serverContext = createServerContext(); // Must be called before `renderToString` to initialize the server context beforehand.
 	const bodyContent = renderToString(<App />);
-	const headContent = serverContext.getMetadataAsString(); // Must be called after initial rendering to retrieve generated styles after the `renderToString` traversal.
+	const headContent = coulis.getMetadata().toString(); // Must be called after initial rendering to retrieve generated styles after the `renderToString` traversal.
 
 	return `<html>
 		<head>
@@ -392,57 +185,3 @@ For more server-side integration recipes, the following examples can be checked:
     - Welcome to any contribution.
 
 <br>
-
-## Road to v2
-
-```tsx
-import { createCoulis } from "coulis/web"; // or via "coulis";
-
-const coulis = createCoulis({
-	properties(theme) {
-		return {
-			animation: true,
-			backgroundColor: theme.colors,
-			colorScheme(input: "black" | "white") {
-				return input === "black" ? "dark" : "light";
-			},
-			width: [50, 100],
-		};
-	},
-	shorthands: {
-		marginHorizontal: ["marginLeft", "marginRight"],
-		marginVertical: ["marginTop", "marginBottom"],
-		paddingHorizontal: ["paddingLeft", "paddingRight"],
-		paddingVertical: ["paddingTop", "paddingBottom"],
-	},
-	states: {
-		hover: ({ className, declaration }) =>
-			`${className}:hover{${declaration}}`,
-		large: ({ className, declaration }) =>
-			`@media (min-width: 1024px){${className}{${declaration}}}`,
-		medium: ({ className, declaration }) =>
-			`@media (min-width: 768px){${className}{${declaration}}}`,
-		small: ({ className, declaration }) =>
-			`@media (min-width: 360px){${className}{${declaration}}}`,
-		smallWithHover: ({ className, declaration }) =>
-			`@media (min-width: 360px){${className}:hover{${declaration}}}`,
-	},
-	theme: {
-		colors: {
-			neutralDark: tokens.colors.black,
-			neutralLight: tokens.colors.white,
-			neutralTransparent: tokens.colors.transparent,
-			surfacePrimary: tokens.colors.blue[4],
-			surfaceSecondary: tokens.colors.blue[2],
-		},
-		fontSizes: {
-			body: tokens.fontSizes[2],
-		},
-	},
-});
-
-coulis.createStyles();
-coulis.createKeyframes();
-coulis.setGlobalStyles();
-coulis.getMetadata(); // object + toString();
-```

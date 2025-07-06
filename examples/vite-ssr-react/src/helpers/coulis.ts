@@ -1,4 +1,4 @@
-import { createCoulis } from "coulis/web";
+import { createCoulis } from "coulis";
 
 const px = (value: number) => `${value}px`;
 

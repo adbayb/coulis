@@ -8,18 +8,18 @@ import {
 } from "./helpers/coulis";
 
 setGlobalStyles({
-	"@import":
-		"url('https://fonts.googleapis.com/css?family=Open+Sans&display=swap')",
-	"@font-face": {
-		fontFamily: "'AliasedHelvetica'",
-		src: "local(Helvetica)",
-	},
 	"*,*::before,*::after": {
 		boxSizing: "inherit",
 	},
 	".globalClass": {
 		borderRadius: "large",
 	},
+	"@font-face": {
+		fontFamily: "'AliasedHelvetica'",
+		src: "local(Helvetica)",
+	},
+	"@import":
+		"url('https://fonts.googleapis.com/css?family=Open+Sans&display=swap')",
 	"html": {
 		boxSizing: "border-box",
 	},

@@ -13,5 +13,5 @@ export const renderHtml = (_url: string) => {
 
 	const headContent = getMetadata().toString();
 
-	return { html: bodyContent, head: headContent };
+	return { head: headContent, html: bodyContent };
 };

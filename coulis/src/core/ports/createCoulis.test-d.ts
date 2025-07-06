@@ -1,81 +1,60 @@
-import { describe, expectTypeOf, test } from "vitest";
+import { describe, expect, expectTypeOf, test } from "vitest";
 
-import type { ShortandsLike } from "../entities/shorthand";
-import type { WithNewLeafNodes } from "../entities/primitive";
 import type { CreateCoulis } from "./createCoulis";
 
 describe("createCoulis (port)", () => {
 	test("should type `createCoulis`", () => {
-		expectTypeOf(
-			createCoulisFake<
-				{
-					readonly backgroundColor: true;
-					readonly color: true;
-				},
-				Record<
-					"hover",
-					(input: {
-						className: string;
-						declaration: string;
-					}) => string
-				>,
-				ShortandsLike<{
-					readonly color: true;
-				}>,
-				{
-					color: {
+		createCoulisFake({
+			properties(theme) {
+				theme satisfies {
+					colors: {
 						neutralDark: string;
+						neutralTransparent: string;
+						neutralWhite: string;
+						surfacePrimary: string;
 					};
-				}
-			>,
-		)
-			.parameter(0)
-			.toEqualTypeOf<{
-				properties: (
-					theme: WithNewLeafNodes<
-						{ color: { neutralDark: string } },
-						string
-					>,
-				) => {
-					readonly backgroundColor: true;
-					readonly color: true;
 				};
-				shorthands?: Record<string, "color"[]>;
-				states?: Record<
-					"hover",
-					(input: {
-						className: string;
-						declaration: string;
-					}) => string
-				>;
-				theme?: { color: { neutralDark: string } };
-			}>();
 
-		expectTypeOf(
-			createCoulisFake<
-				{
-					readonly backgroundColor: true;
-				},
-				undefined,
-				undefined,
-				undefined
-			>,
-		)
-			.parameter(0)
-			.toEqualTypeOf<{
-				properties: (theme: undefined) => {
-					readonly backgroundColor: true;
+				return {
+					backgroundColor: theme.colors,
+					color: theme.colors,
+					display: true,
 				};
-				shorthands?: undefined;
-				states?: undefined;
-				theme?: undefined;
-			}>();
+			},
+			shorthands: {
+				// @ts-expect-error Should only allow '"backgroundColor" | "color" | "display"'
+				backgroundColorShorthand: ["flex"],
+			},
+			states: {
+				hover: "coulis[selector]:hover{coulis[declaration]}",
+			},
+			theme: {
+				colors: {
+					neutralDark: "black",
+					neutralTransparent: "transparent",
+					neutralWhite: "white",
+					surfacePrimary: "rgb(119,146,185)",
+				},
+			},
+		});
+
+		createCoulisFake({
+			properties(theme) {
+				theme satisfies undefined;
+
+				return {
+					display: true,
+				};
+			},
+		});
+
+		expect(true).toBe(true);
 	});
 
 	test("should type `createStyles`", () => {
 		coulis.createStyles({
 			backgroundColor: "neutralDark",
-			backgroundColorAlias: "surfacePrimary",
+			backgroundColorShorthand: "surfacePrimary",
 			display: "initial",
 		});
 
@@ -83,7 +62,7 @@ describe("createCoulis (port)", () => {
 			backgroundColor: {
 				base: "neutralDark",
 			},
-			backgroundColorAlias: {
+			backgroundColorShorthand: {
 				base: "neutralDark",
 				hover: "neutralWhite",
 			},
@@ -97,14 +76,14 @@ describe("createCoulis (port)", () => {
 			// @ts-expect-error Should not accept unknown value
 			backgroundColor: "unknownValue",
 			// @ts-expect-error Should not accept unknown value
-			backgroundColorAlias: "unknownValue",
+			backgroundColorShorthand: "unknownValue",
 			// @ts-expect-error Should not accept unknown value for native property
 			display: new Date(),
 		});
 
 		coulis.createStyles({
 			backgroundColor: "neutralDark",
-			backgroundColorAlias: "neutralTransparent",
+			backgroundColorShorthand: "neutralTransparent",
 			// @ts-expect-error Should not accept unknown property
 			unknownProperty: "blue",
 		});
@@ -115,7 +94,7 @@ describe("createCoulis (port)", () => {
 				// @ts-expect-error Should not accept unknown property
 				unknownProperty: "blue",
 			},
-			backgroundColorAlias: {
+			backgroundColorShorthand: {
 				base: "neutralDark",
 				// @ts-expect-error Should not accept unknown value
 				hover: "blue",
@@ -147,7 +126,7 @@ describe("createCoulis (port)", () => {
 		});
 
 		lightCoulis.createStyles({
-			// TODO: @ts-expect-error Should not accept stateful definition given no `states` contract defined
+			// @ts-expect-error Should not accept stateful definition given no `states` contract defined
 			backgroundColor: {
 				base: "ActiveBorder",
 			},
@@ -157,7 +136,7 @@ describe("createCoulis (port)", () => {
 
 		lightCoulis.createStyles({
 			// @ts-expect-error Should not accept unknown property
-			backgroundColorAlias: "lightcoral",
+			backgroundColorShorthand: "lightcoral",
 			color: "mistyrose",
 			display: "initial",
 		});
@@ -193,7 +172,7 @@ describe("createCoulis (port)", () => {
 			from: {
 				backgroundColor: "neutralDark",
 				// @ts-expect-error Should not accept unknown property // TODO: support shorthands
-				backgroundColorAlias: "lightcoral",
+				backgroundColorShorthand: "lightcoral",
 				color: "neutralTransparent",
 			},
 		});
@@ -262,12 +241,10 @@ const coulis = createCoulisFake({
 		};
 	},
 	shorthands: {
-		backgroundColorAlias: ["backgroundColor"],
+		backgroundColorShorthand: ["backgroundColor"],
 	},
 	states: {
-		hover({ className, declaration }) {
-			return `.${className}{${declaration}}`;
-		},
+		hover: "coulis[selector]:hover{coulis[declaration]}",
 	},
 	theme: {
 		colors: {

@@ -10,6 +10,7 @@ import {
 	createClassName,
 	createCustomProperties,
 	createDeclaration,
+	getEvaluatedTemplate,
 	isShorthandProperty,
 } from "./helpers";
 import { IS_SERVER_ENVIRONMENT } from "./constants";
@@ -164,7 +165,6 @@ export const createCoulis: CreateCoulis<ClassName> = (contract) => {
 		createStyles(input) {
 			const classNames: ClassName[] = [];
 
-			// eslint-disable-next-line sonarjs/cognitive-complexity
 			const collectClassNames = (name: string, value: unknown) => {
 				const isShorthandPropertyValue = isShorthandProperty(name);
 
@@ -203,16 +203,19 @@ export const createCoulis: CreateCoulis<ClassName> = (contract) => {
 
 					const isBaseState = stateKey === "base";
 
-					const stateBuilder = isBaseState
-						? () => `.{{className}}{${declaration}}`
+					const stateTemplate = isBaseState
+						? "coulis[selector]{coulis[declaration]}"
 						: contract.states?.[stateKey];
 
-					if (typeof stateBuilder !== "function") continue;
+					if (stateTemplate === undefined) continue;
 
-					const preComputedRule = stateBuilder({
-						className: ".{{className}}",
-						declaration,
-					});
+					const preComputedRule = getEvaluatedTemplate(
+						stateTemplate,
+						{
+							declaration,
+							selector: `.coulis[className]`,
+						},
+					);
 
 					if (preComputedRule.startsWith("@")) {
 						type = isShorthandPropertyValue
@@ -230,8 +233,8 @@ export const createCoulis: CreateCoulis<ClassName> = (contract) => {
 								? declaration
 								: `${stateKey}${declaration}`,
 							onCreateRule({ className }) {
-								return preComputedRule.replace(
-									"{{className}}",
+								return preComputedRule.replaceAll(
+									"coulis[className]",
 									className,
 								);
 							},

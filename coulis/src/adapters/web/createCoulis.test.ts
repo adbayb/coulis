@@ -91,12 +91,8 @@ const { createKeyframes, createStyles, getMetadata, setGlobalStyles } =
 			size: ["width"],
 		},
 		states: {
-			alt({ className, declaration }) {
-				return `${className}[alt]{${declaration}}`;
-			},
-			hover({ className, declaration }) {
-				return `${className}{${declaration}}`;
-			},
+			alt: "coulis[selector][alt]{coulis[declaration]}",
+			hover: "coulis[selector]{coulis[declaration]}",
 		},
 		theme: {
 			colors: {

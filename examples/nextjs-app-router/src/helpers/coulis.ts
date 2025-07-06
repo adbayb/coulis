@@ -23,9 +23,9 @@ const { createKeyframes, createStyles, getMetadata, setGlobalStyles } =
 				boxSizing: true,
 				color: theme.colors,
 				fontFamily: true,
+				fontSize: true,
 				margin: true,
 				padding: true,
-				fontSize: true,
 			};
 		},
 		theme: {

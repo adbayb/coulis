@@ -1,21 +1,16 @@
 import type { ThemeLike } from "../entities/theme";
+import type { GlobalStyles, Styles } from "../entities/style";
 import type { StatesLike } from "../entities/state";
 import type { ShortandsLike } from "../entities/shorthand";
-import type { PropertiesLike, PropertyValue } from "../entities/property";
-import type {
-	EmptyRecord,
-	RecordLike,
-	WithNewLeafNodes,
-} from "../entities/primitive";
+import type { PropertiesLike } from "../entities/property";
+import type { RecordLike, WithNewLeafNodes } from "../entities/primitive";
 import type { Keyframes } from "../entities/keyframe";
-import type { GlobalStyles } from "../entities/globalStyle";
 
 export type CreateCoulis<Output> = <
-	// `const` needed to not widen strict type (for example, to avoid `width: [50, 100]` being inferred as `width: number`).
-	const Properties extends PropertiesLike,
-	States extends StatesLike, // TODO: fix States extends StatesLike = undefined (to avoid accepting { base: value } if no states are defined
-	Shorthands extends ShortandsLike<Properties> = undefined,
-	Theme extends ThemeLike = undefined,
+	const Properties extends PropertiesLike, // `const` needed to not widen strict type (for example, to avoid `width: [50, 100]` being inferred as `width: number`).
+	Shorthands extends ShortandsLike<Properties> | undefined = undefined,
+	States extends StatesLike | undefined = undefined,
+	Theme extends ThemeLike | undefined = undefined,
 >(contract: {
 	properties: (
 		theme: Theme extends RecordLike
@@ -27,25 +22,7 @@ export type CreateCoulis<Output> = <
 	theme?: Theme;
 }) => {
 	createKeyframes: (input: Keyframes<Properties>) => Output;
-	createStyles: (
-		input: (Shorthands extends undefined
-			? EmptyRecord
-			: {
-					[PropertyName in keyof Shorthands]?: Shorthands[PropertyName] extends (keyof Properties)[]
-						? PropertyValue<
-								Shorthands[PropertyName][number],
-								Properties,
-								States
-							>
-						: never;
-				}) & {
-			[PropertyName in keyof Properties]?: PropertyValue<
-				PropertyName,
-				Properties,
-				States
-			>;
-		},
-	) => Output;
+	createStyles: (input: Styles<Properties, Shorthands, States>) => Output;
 	getMetadata: () => {
 		toString: () => string;
 		value: {
@@ -58,3 +35,48 @@ export type CreateCoulis<Output> = <
 	};
 	setGlobalStyles: (input: GlobalStyles<Properties>) => void;
 };
+
+const createCoulisFake: CreateCoulis<string> = (_input) => {
+	return {
+		createKeyframes() {
+			return "fake";
+		},
+		createStyles() {
+			return "fake";
+		},
+		getMetadata() {
+			return {
+				toString() {
+					return "";
+				},
+				value: [],
+			};
+		},
+		setGlobalStyles() {
+			// No op
+		},
+	};
+};
+
+const { createStyles } = createCoulisFake({
+	properties() {
+		return {
+			backgroundColor: {
+				blue: "blue",
+			},
+		};
+	},
+	shorthands: {
+		backgroundColorAlias: ["backgroundColor"],
+	},
+	states: {
+		hover: "coulis[selector]:hover{coulis[declaration]}",
+	},
+});
+
+createStyles({
+	backgroundColor: {
+		base: "blue",
+	},
+	backgroundColorAlias: "blue",
+});

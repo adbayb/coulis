@@ -1,3 +1,3 @@
 import type { RecordLike } from "./primitive";
 
-export type ThemeLike = RecordLike | undefined;
+export type ThemeLike = RecordLike;

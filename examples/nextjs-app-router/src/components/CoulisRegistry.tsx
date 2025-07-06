@@ -10,6 +10,9 @@ setGlobalStyles({
 	"*,*::before,*::after": {
 		boxSizing: "inherit",
 	},
+	".globalClass": {
+		color: "surfaceSecondary",
+	},
 	"html": {
 		boxSizing: "border-box",
 	},
@@ -17,9 +20,6 @@ setGlobalStyles({
 		fontFamily: "Open Sans",
 		margin: 0,
 		padding: 0,
-	},
-	".globalClass": {
-		color: "surfaceSecondary",
 	},
 });
 

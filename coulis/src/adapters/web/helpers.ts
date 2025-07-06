@@ -124,6 +124,19 @@ export const createDeclarationBlock = (properties: RecordLike) => {
 	return declarationBlock;
 };
 
+export const getEvaluatedTemplate = (
+	template: string,
+	variables: Record<"declaration" | "selector", string>,
+) => {
+	let output = template;
+
+	for (const [key, value] of Object.entries(variables)) {
+		output = output.replaceAll(`coulis[${key}]`, value);
+	}
+
+	return output;
+};
+
 export const isShorthandProperty = (input: string) => {
 	return SHORTHAND_PROPERTIES.has(input);
 };

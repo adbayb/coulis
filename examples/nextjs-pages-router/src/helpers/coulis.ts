@@ -45,6 +45,7 @@ const { createKeyframes, createStyles, getMetadata, setGlobalStyles } =
 				backgroundColor: theme.colors,
 				borderRadius: theme.radii,
 				borderStyle: true,
+				boxSizing: true,
 				color: theme.colors,
 				colorScheme(input: "black" | "white") {
 					return input === "black" ? "dark" : "light";
@@ -52,7 +53,6 @@ const { createKeyframes, createStyles, getMetadata, setGlobalStyles } =
 				display: true,
 				flex: true,
 				flexDirection: true,
-				boxSizing: true,
 				fontFamily: true,
 				fontSize: theme.fontSizes,
 				fontWeight: theme.fontWeights,
@@ -83,16 +83,12 @@ const { createKeyframes, createStyles, getMetadata, setGlobalStyles } =
 			paddingVertical: ["paddingTop", "paddingBottom"],
 		},
 		states: {
-			hover: ({ className, declaration }) =>
-				`${className}:hover{${declaration}}`,
-			large: ({ className, declaration }) =>
-				`@media (min-width: 1024px){${className}{${declaration}}}`,
-			medium: ({ className, declaration }) =>
-				`@media (min-width: 768px){${className}{${declaration}}}`,
-			small: ({ className, declaration }) =>
-				`@media (min-width: 360px){${className}{${declaration}}}`,
-			smallWithHover: ({ className, declaration }) =>
-				`@media (min-width: 360px){${className}:hover{${declaration}}}`,
+			hover: "coulis[selector]:hover{coulis[declaration]}",
+			large: "@media (min-width: 1024px){coulis[selector]{coulis[declaration]}}",
+			medium: "@media (min-width: 768px){coulis[selector]{coulis[declaration]}}",
+			small: "@media (min-width: 360px){coulis[selector]{coulis[declaration]}}",
+			smallWithHover:
+				"@media (min-width: 360px){coulis[selector]:hover{coulis[declaration]}}",
 		},
 		theme: {
 			colors: {

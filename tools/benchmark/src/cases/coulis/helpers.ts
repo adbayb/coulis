@@ -8,6 +8,9 @@ const { createKeyframes, createStyles, getMetadata, setGlobalStyles } =
 				border: true,
 			};
 		},
+		states: {
+			hover: "coulis[selector]:hover{coulis[declaration]}",
+		},
 	});
 
 export { createKeyframes, createStyles, getMetadata, setGlobalStyles };

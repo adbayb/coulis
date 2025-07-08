@@ -23,7 +23,6 @@
 	"type": "module",
 	"exports": {
 		".": {
-			"source": "./src/adapters/web/index.ts",
 			"types": "./dist/web.d.ts",
 			"require": "./dist/web.cjs",
 			"import": "./dist/web.mjs"

@@ -84,15 +84,6 @@ const { createKeyframes, createStyles, setGlobalStyles } = createCoulis({
 	},
 });
 
-const colorAnimation = createKeyframes({
-	from: {
-		backgroundColor: "neutralLight",
-	},
-	to: {
-		backgroundColor: "neutralDark",
-	},
-});
-
 setGlobalStyles({
 	"*,*::before,*::after": {
 		boxSizing: "inherit",
@@ -106,6 +97,15 @@ setGlobalStyles({
 		fontFamily: "Open Sans",
 		margin: "none",
 		padding: "none",
+	},
+});
+
+const colorAnimation = createKeyframes({
+	from: {
+		backgroundColor: "neutralLight",
+	},
+	to: {
+		backgroundColor: "neutralDark",
 	},
 });
 

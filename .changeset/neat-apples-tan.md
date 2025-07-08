@@ -12,3 +12,4 @@ The following breaking changes have been introduced:
 - `createCustomProperties` is removed (custom properties are created while defining the `theme` in `createStyles`).
 - `createVariants` is removed.
 - `createServerContext` is replaced in favor of `getMetadata` getter.
+- Bundle size reduction by 18%.

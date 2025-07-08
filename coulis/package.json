@@ -24,20 +24,23 @@
 	"exports": {
 		".": {
 			"types": "./dist/web.d.ts",
+			"import": "./dist/web.mjs",
 			"require": "./dist/web.cjs",
-			"import": "./dist/web.mjs"
+			"default": "./dist/web.mjs"
 		},
 		"./web": {
 			"source": "./src/adapters/web/index.ts",
 			"types": "./dist/web.d.ts",
+			"import": "./dist/web.mjs",
 			"require": "./dist/web.cjs",
-			"import": "./dist/web.mjs"
+			"default": "./dist/web.mjs"
 		},
 		"./react-native": {
 			"source": "./src/adapters/react-native/index.ts",
 			"types": "./dist/react-native.d.ts",
+			"import": "./dist/react-native.mjs",
 			"require": "./dist/react-native.cjs",
-			"import": "./dist/react-native.mjs"
+			"default": "./dist/react-native.mjs"
 		}
 	},
 	"files": [

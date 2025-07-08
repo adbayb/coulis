@@ -28,9 +28,9 @@ if (!isProduction) {
 	const { createServer } = await import("vite");
 
 	vite = await createServer({
-		server: { middlewareMode: true },
 		appType: "custom",
 		base,
+		server: { middlewareMode: true },
 	});
 	app.use(vite.middlewares);
 } else {

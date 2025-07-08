@@ -1,0 +1,21 @@
+import type { CreateCoulis } from "../../core/ports/createCoulis";
+
+export const createCoulis: CreateCoulis<Record<string, unknown>> = (_input) => {
+	return {
+		createKeyframes() {
+			throw new Error("Not implement yet");
+		},
+		createStyles() {
+			throw new Error("Not implement yet");
+		},
+		getMetadata() {
+			throw new Error("Not implement yet");
+		},
+		getMetadataAsString() {
+			throw new Error("Not implement yet");
+		},
+		setGlobalStyles() {
+			throw new Error("Not implement yet");
+		},
+	};
+};

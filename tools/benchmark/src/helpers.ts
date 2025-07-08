@@ -37,6 +37,7 @@ export const createBenchmark = (cases: Case[]) => {
 			console.log("Fastest is", fastestCase.name, "✨");
 			console.table(benchmark.table());
 
+			// eslint-disable-next-line unicorn/no-process-exit, n/prefer-global/process
 			process.exit(0);
 		},
 	};

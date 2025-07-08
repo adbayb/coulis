@@ -1,14 +1,17 @@
-/* eslint-disable react/jsx-no-useless-fragment, react-hooks-extra/no-unnecessary-use-memo */
 "use client";
 
-import { useMemo, useRef } from "react";
-import type { PropsWithChildren } from "react";
+import { useRef } from "react";
+import type { ReactNode } from "react";
 import { useServerInsertedHTML } from "next/navigation";
-import { createServerContext, setGlobalStyles } from "coulis";
+
+import { getMetadata, setGlobalStyles } from "../helpers/coulis";
 
 setGlobalStyles({
 	"*,*::before,*::after": {
 		boxSizing: "inherit",
+	},
+	".globalClass": {
+		color: "surfaceSecondary",
 	},
 	"html": {
 		boxSizing: "border-box",
@@ -18,17 +21,14 @@ setGlobalStyles({
 		margin: 0,
 		padding: 0,
 	},
-	".globalClass": {
-		color: "lightcoral",
-	},
 });
 
-export const CoulisRegistry = ({ children }: PropsWithChildren) => {
-	const hasBeenInserted = useRef(false);
+type CoulisRegistryProps = {
+	readonly children: ReactNode;
+};
 
-	const context = useMemo(() => {
-		return createServerContext();
-	}, []);
+export const CoulisRegistry = ({ children }: CoulisRegistryProps) => {
+	const hasBeenInserted = useRef(false);
 
 	useServerInsertedHTML(() => {
 		/**
@@ -39,14 +39,15 @@ export const CoulisRegistry = ({ children }: PropsWithChildren) => {
 
 		hasBeenInserted.current = true;
 
-		return context.getMetadata().map(({ attributes, content }) => {
+		return getMetadata().value.map(({ attributes, content }) => {
 			return (
 				<style
 					{...attributes}
+					// eslint-disable-next-line react/dom/no-dangerously-set-innerhtml
 					dangerouslySetInnerHTML={{
 						__html: content,
 					}}
-					key={attributes["data-coulis-id"]}
+					key={attributes["data-coulis-type"]}
 				/>
 			);
 		});

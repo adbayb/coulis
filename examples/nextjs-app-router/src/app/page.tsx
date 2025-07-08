@@ -1,38 +1,12 @@
 "use client";
 
-import { createCustomProperties, createStyles } from "coulis";
+import { createStyles } from "../helpers/coulis";
 
-const tokens = Object.freeze({
-	colors: {
-		black: "black",
-		blue: [
-			"rgb(241,244,248)",
-			"rgb(226,232,240)",
-			"rgb(201,212,227)",
-			"rgb(168,186,211)",
-			"rgb(119,146,185)",
-		],
-		transparent: "transparent",
-		white: "white",
-	},
-} as const);
-
-const theme = createCustomProperties({
-	colors: {
-		neutralDark: tokens.colors.black,
-		neutralLight: tokens.colors.white,
-		neutralTransparent: tokens.colors.transparent,
-		surfacePrimary: tokens.colors.blue[4],
-		surfaceSecondary: tokens.colors.blue[2],
-	},
-});
-
-const styles = createStyles({
-	backgroundColor: theme.colors,
-});
-
-const className = styles({
-	backgroundColor: "surfacePrimary",
+const className = createStyles({
+	backgroundColor: "neutralDark",
+	fontSize: "3rem",
+	margin: 0,
+	padding: "5rem",
 });
 
 export default function Home() {

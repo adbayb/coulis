@@ -1,32 +1,18 @@
-import { createStyles } from "coulis";
-
 import { NUMBER_OF_DATA } from "../../constants";
+import { createStyles } from "./helpers";
 
-const styles = createStyles(
-	{
-		backgroundColor: true,
-		border: true,
-	},
-	{
-		states: {
-			hover: ({ className, declaration }) =>
-				`${className}:hover{${declaration}}`,
-		},
-	},
-);
-
-const tableClassName = styles({
+const tableClassName = createStyles({
 	border: "1px solid black",
 });
 
-const firstTdClassName = styles({
+const firstTdClassName = createStyles({
 	backgroundColor: {
 		base: "lightcoral",
 		hover: "lightyellow",
 	},
 });
 
-const secondTdClassName = styles({
+const secondTdClassName = createStyles({
 	backgroundColor: {
 		base: "lightblue",
 		hover: "lightyellow",

@@ -1,14 +1,12 @@
-import type { PropertiesLike, PropertyValue } from "./property";
+import type { PropertiesLike, Styles } from "./style";
+import type { ShortandsLike } from "./shorthand";
 
-export type Keyframes<P extends PropertiesLike> = Partial<
+export type Keyframes<
+	Properties extends PropertiesLike,
+	Shorthands extends ShortandsLike<Properties> | undefined,
+> = Partial<
 	Record<
 		number | "from" | "to" | `${number}%`,
-		{
-			[PropertyName in keyof P]?: PropertyValue<
-				PropertyName,
-				P,
-				undefined
-			>;
-		}
+		Styles<Properties, Shorthands, undefined>
 	>
 >;

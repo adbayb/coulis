@@ -1,8 +1,7 @@
 import type { ThemeLike } from "../entities/theme";
-import type { GlobalStyles, Styles } from "../entities/style";
+import type { GlobalStyles, PropertiesLike, Styles } from "../entities/style";
 import type { StatesLike } from "../entities/state";
 import type { ShortandsLike } from "../entities/shorthand";
-import type { PropertiesLike } from "../entities/property";
 import type { RecordLike, WithNewLeafNodes } from "../entities/primitive";
 import type { Keyframes } from "../entities/keyframe";
 
@@ -21,7 +20,7 @@ export type CreateCoulis<Output> = <
 	states?: States;
 	theme?: Theme;
 }) => {
-	createKeyframes: (input: Keyframes<Properties>) => Output;
+	createKeyframes: (input: Keyframes<Properties, Shorthands>) => Output;
 	createStyles: (input: Styles<Properties, Shorthands, States>) => Output;
 	getMetadata: () => {
 		toString: () => string;
@@ -33,7 +32,7 @@ export type CreateCoulis<Output> = <
 			content: string;
 		}[];
 	};
-	setGlobalStyles: (input: GlobalStyles<Properties>) => void;
+	setGlobalStyles: (input: GlobalStyles<Properties, Shorthands>) => void;
 };
 
 const createCoulisFake: CreateCoulis<string> = (_input) => {

@@ -1,7 +1,29 @@
+import type { AtRule, Properties as CSSProperties } from "csstype";
+
 import type { StatesLike } from "./state";
 import type { ShortandsLike } from "./shorthand";
-import type { PropertiesLike, PropertyValue } from "./property";
 import type { EmptyRecord, UngreedyString } from "./primitive";
+
+/**
+ * The order is important to enforce the more precise properties take precedence over less precise ones.
+ * Global properties has a lesser specificity than (<) shorthand ones:
+ * global (e.g div { background-color }) < shorthand (e.g background) < longhand (e.g background-color) < conditional-shorthand (e.g @media { background }) < conditional-longhand (e.g @media { background-color }) properties.
+ */
+export const STYLE_TYPES = Object.freeze([
+	"global",
+	"shorthand",
+	"longhand",
+	"atShorthand",
+	"atLonghand",
+] as const);
+
+export type StyleType = (typeof STYLE_TYPES)[number];
+
+export type PropertiesLike = {
+	[K in keyof NativeProperties]?:
+		| CustomPropertyValue<NativeProperties[K]>
+		| NativePropertyValue;
+};
 
 export type Styles<
 	P extends PropertiesLike,
@@ -17,7 +39,10 @@ export type Styles<
 	[PropertyName in keyof P]?: PropertyValue<PropertyName, P, States>;
 };
 
-export type GlobalStyles<P extends PropertiesLike> =
+export type GlobalStyles<
+	P extends PropertiesLike,
+	Shorthands extends ShortandsLike<P> | undefined,
+> =
 	/**
 	 * A union type is used instead of one with conditional typing
 	 * since we're using a string index signature (via Ungreedy string) and, by design, TypeScript
@@ -43,28 +68,9 @@ export type GlobalStyles<P extends PropertiesLike> =
 			| keyof HTMLElementTagNameMap]?: Selector extends AtTextualRule
 			? string
 			: Selector extends AtGroupingRule | keyof HTMLElementTagNameMap
-				? Properties<P>
-				: Properties<P> | string;
+				? Styles<P, Shorthands, undefined>
+				: Styles<P, Shorthands, undefined> | string;
 	};
-
-/**
- * The order is important to enforce the more precise properties take precedence over less precise ones.
- * Global properties has a lesser specificity than (<) shorthand ones:
- * global (e.g div { background-color }) < shorthand (e.g background) < longhand (e.g background-color) < conditional-shorthand (e.g @media { background }) < conditional-longhand (e.g @media { background-color }) properties.
- */
-export const STYLE_TYPES = Object.freeze([
-	"global",
-	"shorthand",
-	"longhand",
-	"atShorthand",
-	"atLonghand",
-] as const);
-
-export type StyleType = (typeof STYLE_TYPES)[number];
-
-type Properties<P extends PropertiesLike> = {
-	[PropertyName in keyof P]?: PropertyValue<PropertyName, P, undefined>;
-};
 
 type AtTextualRule = "@charset" | "@import" | "@layer" | "@namespace";
 
@@ -78,3 +84,39 @@ type AtGroupingRule =
 	| "@property"
 	| "@scroll-timeline"
 	| "@viewport";
+
+type PropertyValue<
+	PropertyName extends keyof P,
+	P extends PropertiesLike,
+	S extends StatesLike | undefined,
+> = P[PropertyName] extends NativePropertyValue | undefined
+	? PropertyName extends keyof NativeProperties
+		? CreatePropertyValue<NativeProperties[PropertyName], S>
+		: never
+	: P[PropertyName] extends CustomPropertyValue<unknown>
+		? P[PropertyName] extends (input: infer Value) => unknown
+			? CreatePropertyValue<Value, S>
+			: P[PropertyName] extends
+						| (infer Value)[]
+						| Record<infer Value, unknown>
+				? CreatePropertyValue<Value, S>
+				: never
+		: never;
+
+type CreatePropertyValue<Value, S extends StatesLike | undefined> =
+	| Value
+	| (S extends Record<infer State, unknown>
+			? Partial<Record<State, Value>> & Record<"base", Value>
+			: never)
+	| undefined;
+
+type CustomPropertyValue<Value> =
+	| Record<string, Value>
+	| Value[]
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	| ((input: any) => Value);
+
+type NativePropertyValue = true;
+
+type NativeProperties = AtRule.FontFace &
+	CSSProperties<UngreedyString | number>;

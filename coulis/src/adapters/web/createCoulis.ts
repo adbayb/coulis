@@ -81,16 +81,29 @@ export const createCoulis: CreateCoulis<ClassName> = (contract) => {
 		let declarationBlock = "";
 		const propertyNames = Object.keys(input);
 
-		for (const propertyName of propertyNames) {
+		propertyNames.forEach((propertyName) => {
 			const value = input[propertyName];
 
-			if (value === undefined) continue;
+			if (value === undefined) return;
 
-			declarationBlock += getDeclaration({
-				name: propertyName,
-				value,
-			});
-		}
+			if (isCustomShorthandProperty(propertyName)) {
+				const shorthandedPropertyNames = shorthands[propertyName];
+
+				if (shorthandedPropertyNames === undefined) return;
+
+				shorthandedPropertyNames.forEach((shorthandedPropertyName) => {
+					declarationBlock += getDeclaration({
+						name: shorthandedPropertyName as string,
+						value,
+					});
+				});
+			} else {
+				declarationBlock += getDeclaration({
+					name: propertyName,
+					value,
+				});
+			}
+		});
 
 		return declarationBlock;
 	};

@@ -141,12 +141,18 @@ setGlobalStyles({
 
 const animationName = createKeyframes({
 	50: {
+		marginHorizontal: 1.5,
+		marginVertical: 1.5,
 		transform: "scale(1.5)",
 	},
 	from: {
+		marginHorizontal: 0,
+		marginVertical: 0,
 		transform: "scale(1)",
 	},
 	to: {
+		marginHorizontal: 0,
+		marginVertical: 0,
 		transform: "scale(1)",
 	},
 });

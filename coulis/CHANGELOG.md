@@ -1,5 +1,22 @@
 # Change Log
 
+## 0.16.0
+
+### Minor Changes
+
+- [#51](https://github.com/adbayb/coulis/pull/51) [`3e1132f`](https://github.com/adbayb/coulis/commit/3e1132f296ff1daf3cd76b36ea08d27ab9655ec5) Thanks [@adbayb](https://github.com/adbayb)! - API refactoring to prepare for future adapter development (currently web, later React Native).
+
+    The following breaking changes have been introduced:
+    - Remove singleton in favor of `createCoulis` factory.
+    - Move `createStyles` contract definition to `createCoulis` to make the styling contract available to all interfaces.
+    - `createStyles` does not return a function anymore, but the class name.
+    - `createCustomProperties` is removed (custom properties are created while defining the `theme` in `createStyles`).
+    - `createVariants` is removed.
+    - `createServerContext` is replaced in favor of `getMetadata` getter.
+    - Bundle size reduction by 18%.
+
+- [`7137265`](https://github.com/adbayb/coulis/commit/7137265c00b8575447661b288fbe7759557b64b5) Thanks [@adbayb](https://github.com/adbayb)! - Expose shorhands in `createKeyframes` and `setGlobalStyles` interfaces.
+
 ## 0.15.0
 
 ### Minor Changes

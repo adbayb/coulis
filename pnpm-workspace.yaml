@@ -2,5 +2,3 @@ packages:
     - coulis
     - examples/*
     - tools/*
-onlyBuiltDependencies:
-    - puppeteer

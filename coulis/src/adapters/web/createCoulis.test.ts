@@ -39,11 +39,15 @@ describe("createCoulis (web adapter)", () => {
 	});
 
 	test("should extract styles", () => {
-		expect(getMetadata()).toMatchSnapshot();
+		const metadata = createMetadata();
+
+		expect(metadata.get()).toMatchSnapshot();
 	});
 
 	test("should extract styles given stringified styles", () => {
-		expect(getMetadata().toString()).toMatchSnapshot();
+		const metadata = createMetadata();
+
+		expect(metadata.getAsString()).toMatchSnapshot();
 	});
 });
 
@@ -68,7 +72,7 @@ const tokens = Object.freeze({
 	},
 } as const);
 
-const { createKeyframes, createStyles, getMetadata, setGlobalStyles } =
+const { createKeyframes, createMetadata, createStyles, setGlobalStyles } =
 	createCoulis({
 		properties(theme) {
 			return {

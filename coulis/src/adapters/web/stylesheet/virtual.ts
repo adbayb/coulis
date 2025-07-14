@@ -1,20 +1,21 @@
 import type { ClassName, CreateStyleSheet, Rule } from "../types";
+import { createMapCache } from "../../../core/entities/cache";
 
 export const createVirtualStyleSheet: CreateStyleSheet = () => {
-	const ruleByClassName = new Map<ClassName, Rule>();
+	const ruleByClassName = createMapCache<ClassName, Rule>();
 
 	return {
 		getContent() {
-			return minify([...ruleByClassName.values()].join(""));
+			return minify([...ruleByClassName.getAll()].join(""));
 		},
 		getHydratedClassNames() {
 			return [];
 		},
 		insert(key, rule) {
-			ruleByClassName.set(key, rule);
+			ruleByClassName.add(key, rule);
 		},
-		remove() {
-			ruleByClassName.clear();
+		remove(preservableClassNames) {
+			ruleByClassName.removeAllExcept(preservableClassNames);
 		},
 	};
 };

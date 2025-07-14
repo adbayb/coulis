@@ -1,10 +1,12 @@
 import { renderToString } from "react-dom/server";
 
-import { getMetadata } from "./helpers";
+import { createMetadata } from "./helpers";
 import { CoulisComponent } from "./Component";
 
 export const CoulisCase = () => {
+	const metadata = createMetadata();
+
 	renderToString(<CoulisComponent />);
 
-	return getMetadata().toString();
+	return metadata.getAsString();
 };

@@ -21,16 +21,16 @@ export type CreateCoulis<Output> = <
 	theme?: Theme;
 }) => {
 	createKeyframes: (input: Keyframes<Properties, Shorthands>) => Output;
-	createStyles: (input: Styles<Properties, Shorthands, States>) => Output;
-	getMetadata: () => {
-		toString: () => string;
-		value: {
+	createMetadata: () => {
+		get: () => {
 			attributes: Record<
 				"data-coulis-cache" | "data-coulis-type",
 				string
 			>;
 			content: string;
 		}[];
+		getAsString: () => string;
 	};
+	createStyles: (input: Styles<Properties, Shorthands, States>) => Output;
 	setGlobalStyles: (input: GlobalStyles<Properties, Shorthands>) => void;
 };

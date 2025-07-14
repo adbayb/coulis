@@ -1,11 +1,11 @@
 import Document, { Head, Html, Main, NextScript } from "next/document";
 import type { DocumentContext } from "next/document";
 
-import { getMetadata } from "../helpers/coulis";
+import { createMetadata } from "../helpers/coulis";
 
 class MyDocument extends Document {
 	public static override async getInitialProps(context: DocumentContext) {
-		const styles = getMetadata().value;
+		const metadata = createMetadata();
 		const initialProps = await Document.getInitialProps(context);
 
 		return {
@@ -13,7 +13,7 @@ class MyDocument extends Document {
 			styles: (
 				<>
 					{initialProps.styles}
-					{styles.map(({ attributes, content }) => {
+					{metadata.get().map(({ attributes, content }) => {
 						return (
 							<style
 								{...attributes}

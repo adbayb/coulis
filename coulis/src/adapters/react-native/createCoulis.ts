@@ -5,10 +5,10 @@ export const createCoulis: CreateCoulis<Record<string, unknown>> = (_input) => {
 		createKeyframes() {
 			throw new Error("Not implement yet");
 		},
-		createStyles() {
+		createMetadata() {
 			throw new Error("Not implement yet");
 		},
-		getMetadata() {
+		createStyles() {
 			throw new Error("Not implement yet");
 		},
 		getMetadataAsString() {

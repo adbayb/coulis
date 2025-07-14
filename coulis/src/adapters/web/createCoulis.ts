@@ -3,6 +3,8 @@ import { STYLE_TYPES } from "../../core/entities/style";
 import type { StyleType } from "../../core/entities/style";
 import { isNumber, isObject } from "../../core/entities/primitive";
 import type { RecordLike } from "../../core/entities/primitive";
+import { createMapCache, createSetCache } from "../../core/entities/cache";
+import type { SetCache } from "../../core/entities/cache";
 import type { ClassName, Rule, StyleSheet } from "./types";
 import { createVirtualStyleSheet } from "./stylesheet/virtual";
 import { createDomStyleSheet } from "./stylesheet/dom";
@@ -30,7 +32,10 @@ export const createCoulis: CreateCoulis<ClassName> = (contract) => {
 		{} as Record<StyleType, StyleSheet>,
 	);
 
-	const classNameByTypeCache = new Map<StyleType, Set<ClassName>>();
+	const classNameByTypeCache = createMapCache<
+		StyleType,
+		SetCache<ClassName>
+	>();
 
 	const hydratedClassNameCache = new Set(
 		Object.values(styleSheetByTypeAdaptee).flatMap((styleSheet) =>
@@ -124,8 +129,8 @@ export const createCoulis: CreateCoulis<ClassName> = (contract) => {
 		let cache = classNameByTypeCache.get(type);
 
 		if (!cache) {
-			cache = new Set();
-			classNameByTypeCache.set(type, cache);
+			cache = createSetCache();
+			classNameByTypeCache.add(type, cache);
 		}
 
 		if (cache.has(className)) return className;
@@ -174,6 +179,63 @@ export const createCoulis: CreateCoulis<ClassName> = (contract) => {
 				},
 				type: "global",
 			});
+		},
+		createMetadata() {
+			const globallyCachedClassNames = STYLE_TYPES.flatMap((type) => {
+				return [...(classNameByTypeCache.get(type)?.getAll() ?? [])];
+			});
+
+			const get = () => {
+				return STYLE_TYPES.map((type) => {
+					const { getContent, remove } =
+						styleSheetByTypeAdaptee[type];
+
+					const cachedClassNames = classNameByTypeCache.get(type);
+					const content = getContent();
+
+					const output = {
+						attributes: {
+							"data-coulis-cache": [
+								...(cachedClassNames?.getAll() ?? []),
+							].join(","),
+							"data-coulis-type": type,
+						},
+						content,
+					};
+
+					/*
+					 * To prevent [cross-request state pollution](https://vuejs.org/guide/scaling-up/ssr.html#cross-request-state-pollution),
+					 * flush styles generated dynamically while preserving, via the `globallyCachedClassNames` input, the ones shared/defined globally (at file/module scope):
+					 */
+					cachedClassNames?.removeAllExcept(globallyCachedClassNames);
+					remove(globallyCachedClassNames);
+
+					return output;
+				});
+			};
+
+			return {
+				get,
+				getAsString() {
+					return get().reduce((output, { attributes, content }) => {
+						const stringifiedAttributes = (
+							Object.keys(
+								attributes,
+							) as (keyof typeof attributes)[]
+						)
+							.map(
+								// eslint-disable-next-line sonarjs/no-nested-functions
+								(attributeKey) =>
+									`${attributeKey}="${attributes[attributeKey]}"`,
+							)
+							.join(" ");
+
+						output += `<style ${stringifiedAttributes}>${content}</style>`;
+
+						return output;
+					}, "");
+				},
+			};
 		},
 		createStyles(input) {
 			const classNames: ClassName[] = [];
@@ -277,50 +339,6 @@ export const createCoulis: CreateCoulis<ClassName> = (contract) => {
 			}
 
 			return classNames.join(" ");
-		},
-		getMetadata() {
-			const value = STYLE_TYPES.map((type) => {
-				const { getContent } = styleSheetByTypeAdaptee[type];
-				const content = getContent();
-
-				/*
-				 * TODO: To prevent [cross-request state pollution](https://vuejs.org/guide/scaling-up/ssr.html#cross-request-state-pollution), flush styles generated dynamically while preserving, via the `globalCacheKeys` input, the ones shared/defined globally (at file/module scope):
-				 * remove(globalCacheKeys);
-				 */
-
-				return {
-					attributes: {
-						"data-coulis-cache": [
-							...(classNameByTypeCache.get(type)?.values() ?? []),
-						].join(","),
-						"data-coulis-type": type,
-					},
-					content,
-				};
-			});
-
-			return {
-				toString() {
-					return value.reduce((output, { attributes, content }) => {
-						const stringifiedAttributes = (
-							Object.keys(
-								attributes,
-							) as (keyof typeof attributes)[]
-						)
-							.map(
-								// eslint-disable-next-line sonarjs/no-nested-functions
-								(attributeKey) =>
-									`${attributeKey}="${attributes[attributeKey]}"`,
-							)
-							.join(" ");
-
-						output += `<style ${stringifiedAttributes}>${content}</style>`;
-
-						return output;
-					}, "");
-				},
-				value,
-			};
 		},
 		setGlobalStyles(input) {
 			insert({

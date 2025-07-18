@@ -186,5 +186,3 @@ For more server-side integration recipes, the following examples can be checked:
     - Welcome to any contribution.
 
 <br>
-
-TODO: getContract

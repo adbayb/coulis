@@ -49,6 +49,25 @@ describe("createCoulis (web adapter)", () => {
 
 		expect(metadata.getAsString()).toMatchSnapshot();
 	});
+
+	test("should get contract", () => {
+		expect(getContract()).toStrictEqual({
+			propertyNames: [
+				"size",
+				"backgroundColor",
+				"boxSizing",
+				"color",
+				"colorScheme",
+				"fontFamily",
+				"height",
+				"margin",
+				"padding",
+				"src",
+				"transform",
+				"width",
+			],
+		});
+	});
 });
 
 const tokens = Object.freeze({
@@ -72,43 +91,48 @@ const tokens = Object.freeze({
 	},
 } as const);
 
-const { createKeyframes, createMetadata, createStyles, setGlobalStyles } =
-	createCoulis({
-		properties(theme) {
-			return {
-				backgroundColor: theme.colors,
-				boxSizing: true,
-				color: theme.colors,
-				colorScheme(input: "black" | "white") {
-					return input === "black" ? "dark" : "light";
-				},
-				fontFamily: true,
-				height: true,
-				margin: theme.spacings,
-				padding: theme.spacings,
-				src: true,
-				transform: true,
-				width: [50, 100],
-			};
-		},
-		shorthands: {
-			size: ["width"],
-		},
-		states: {
-			alt: "coulis[selector][alt]{coulis[declaration]}",
-			hover: "coulis[selector]{coulis[declaration]}",
-		},
-		theme: {
-			colors: {
-				neutralDark: tokens.colors.black,
-				neutralLight: tokens.colors.white,
-				neutralTransparent: tokens.colors.transparent,
-				surfacePrimary: tokens.colors.blue[4],
-				surfaceSecondary: tokens.colors.blue[2],
+const {
+	createKeyframes,
+	createMetadata,
+	createStyles,
+	getContract,
+	setGlobalStyles,
+} = createCoulis({
+	properties(theme) {
+		return {
+			backgroundColor: theme.colors,
+			boxSizing: true,
+			color: theme.colors,
+			colorScheme(input: "black" | "white") {
+				return input === "black" ? "dark" : "light";
 			},
-			spacings: tokens.spacings,
+			fontFamily: true,
+			height: true,
+			margin: theme.spacings,
+			padding: theme.spacings,
+			src: true,
+			transform: true,
+			width: [50, 100],
+		};
+	},
+	shorthands: {
+		size: ["width"],
+	},
+	states: {
+		alt: "coulis[selector][alt]{coulis[declaration]}",
+		hover: "coulis[selector]{coulis[declaration]}",
+	},
+	theme: {
+		colors: {
+			neutralDark: tokens.colors.black,
+			neutralLight: tokens.colors.white,
+			neutralTransparent: tokens.colors.transparent,
+			surfacePrimary: tokens.colors.blue[4],
+			surfaceSecondary: tokens.colors.blue[2],
 		},
-	});
+		spacings: tokens.spacings,
+	},
+});
 
 // eslint-disable-next-line vitest/require-hook
 setGlobalStyles({

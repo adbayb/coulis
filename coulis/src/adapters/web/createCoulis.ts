@@ -340,6 +340,14 @@ export const createCoulis: CreateCoulis<ClassName> = (contract) => {
 
 			return classNames.join(" ");
 		},
+		getContract() {
+			return {
+				propertyNames: [
+					...shorthandNames,
+					...Object.keys(properties),
+				] as ReturnType<typeof this.getContract>["propertyNames"],
+			};
+		},
 		setGlobalStyles(input) {
 			insert({
 				cacheInput: JSON.stringify(input),

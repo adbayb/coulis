@@ -32,5 +32,8 @@ export type CreateCoulis<Output> = <
 		getAsString: () => string;
 	};
 	createStyles: (input: Styles<Properties, Shorthands, States>) => Output;
+	getContract: () => {
+		propertyNames: (keyof Properties | keyof Shorthands)[];
+	};
 	setGlobalStyles: (input: GlobalStyles<Properties, Shorthands>) => void;
 };

@@ -11,6 +11,9 @@ export const createCoulis: CreateCoulis<Record<string, unknown>> = (_input) => {
 		createStyles() {
 			throw new Error("Not implement yet");
 		},
+		getContract() {
+			throw new Error("Not implement yet");
+		},
 		getMetadataAsString() {
 			throw new Error("Not implement yet");
 		},

@@ -187,4 +187,4 @@ For more server-side integration recipes, the following examples can be checked:
 
 <br>
 
-TODO: Check request state pollution working + getContract
+TODO: getContract

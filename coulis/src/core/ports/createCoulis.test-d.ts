@@ -282,6 +282,11 @@ const createCoulisFake: CreateCoulis<string> = (_input) => {
 		createStyles() {
 			return "fake";
 		},
+		getContract() {
+			return {
+				propertyNames: [],
+			};
+		},
 		setGlobalStyles() {
 			// No op
 		},

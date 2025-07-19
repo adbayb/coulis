@@ -1,5 +1,11 @@
 # Change Log
 
+## 0.17.0
+
+### Minor Changes
+
+- [`eacc3a9`](https://github.com/adbayb/coulis/commit/eacc3a9836224fdb7be25d3a82a7776631361d1f) Thanks [@adbayb](https://github.com/adbayb)! - Flag `createKeyframes` and `setGlobalStyles` as unsupported methods for react-native platform target.
+
 ## 0.16.0
 
 ### Minor Changes

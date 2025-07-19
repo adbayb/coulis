@@ -264,7 +264,10 @@ describe("createCoulis (port)", () => {
 	});
 });
 
-const createCoulisFake: CreateCoulis<string> = (_input) => {
+const createCoulisFake: CreateCoulis<{
+	Input: { WithCSSVariables: true };
+	Output: string;
+}> = (_input) => {
 	return {
 		createKeyframes() {
 			return "fake";

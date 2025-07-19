@@ -17,8 +17,13 @@ import {
 } from "./helpers";
 import { IS_SERVER_ENVIRONMENT } from "./constants";
 
-// eslint-disable-next-line sonarjs/max-lines-per-function
-export const createCoulis: CreateCoulis<ClassName> = (contract) => {
+export const createCoulis: CreateCoulis<{
+	Input: {
+		WithCSSVariables: true;
+	};
+	Output: ClassName;
+	// eslint-disable-next-line sonarjs/max-lines-per-function
+}> = (contract) => {
 	const createStyleSheet = IS_SERVER_ENVIRONMENT
 		? createVirtualStyleSheet
 		: createDomStyleSheet;

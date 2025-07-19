@@ -2,21 +2,25 @@ import { Text, View } from "react-native";
 
 import { createStyles } from "../src/helpers/coulis";
 
-const styles = createStyles({
-	backgroundColor: "neutralDark",
-});
-
 export default function Index() {
 	return (
 		<View
-			style={{
-				...styles,
+			style={createStyles({
 				alignItems: "center",
+				display: "flex",
 				flex: 1,
 				justifyContent: "center",
-			}}
+			})}
 		>
-			<Text>Edit app/index.tsx to edit this screen.</Text>
+			<Text
+				style={createStyles({
+					backgroundColor: "surfaceSecondary",
+					borderRadius: "small",
+					color: "surfacePrimary",
+				})}
+			>
+				Edit app/index.tsx to edit this screen.
+			</Text>
 		</View>
 	);
 }

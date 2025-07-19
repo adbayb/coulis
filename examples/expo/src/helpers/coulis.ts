@@ -41,6 +41,7 @@ const { createKeyframes, createMetadata, createStyles, setGlobalStyles } =
 		properties(theme) {
 			return {
 				accentColor: true,
+				alignItems: true,
 				animation: true,
 				backgroundColor: theme.colors,
 				borderRadius: theme.radii,
@@ -58,6 +59,7 @@ const { createKeyframes, createMetadata, createStyles, setGlobalStyles } =
 				fontWeight: theme.fontWeights,
 				gap: true,
 				height: true,
+				justifyContent: true,
 				margin: theme.spacings,
 				marginBottom: theme.spacings,
 				marginLeft: theme.spacings,

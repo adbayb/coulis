@@ -1,5 +1,6 @@
 import type { CreateCoulis } from "../../core/ports/createCoulis";
 import { isObject } from "../../core/entities/primitive";
+import { translator } from "./translator";
 import { createUnsupportedLogger } from "./helpers";
 
 type CreateCoulisOutput = Record<string, unknown>;
@@ -58,12 +59,7 @@ export const createCoulis: CreateCoulis<{
 								? propertyValue[styleValue as string]
 								: styleValue;
 
-					// TODO: process with react-native value transformation
-					if (typeof output === "string" && output.endsWith("px")) {
-						return Number.parseInt(output);
-					}
-
-					return output;
+					return translator[name]?.(output) ?? output;
 				};
 
 				if (isObject(value)) {

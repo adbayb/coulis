@@ -36,85 +36,84 @@ const tokens = Object.freeze({
 	},
 } as const);
 
-const { createKeyframes, createMetadata, createStyles, setGlobalStyles } =
-	createCoulis({
-		properties(theme) {
-			return {
-				accentColor: true,
-				alignItems: true,
-				animation: true,
-				backgroundColor: theme.colors,
-				borderRadius: theme.radii,
-				borderStyle: true,
-				boxSizing: true,
-				color: theme.colors,
-				colorScheme(input: "black" | "white") {
-					return input === "black" ? "dark" : "light";
-				},
-				display: true,
-				flex: true,
-				flexDirection: true,
-				fontFamily: true,
-				fontSize: theme.fontSizes,
-				fontWeight: theme.fontWeights,
-				gap: true,
-				height: true,
-				justifyContent: true,
-				margin: theme.spacings,
-				marginBottom: theme.spacings,
-				marginLeft: theme.spacings,
-				marginRight: theme.spacings,
-				marginTop: theme.spacings,
-				padding: theme.spacings,
-				paddingBottom: theme.spacings,
-				paddingLeft: theme.spacings,
-				paddingRight: theme.spacings,
-				paddingTop: theme.spacings,
-				src: true,
-				transform: true,
-				transitionProperty(input: ("background-color" | "color")[]) {
-					return input.join(",");
-				},
-				width: [50, 100],
-			};
-		},
-		shorthands: {
-			marginHorizontal: ["marginLeft", "marginRight"],
-			marginVertical: ["marginTop", "marginBottom"],
-			paddingHorizontal: ["paddingLeft", "paddingRight"],
-			paddingVertical: ["paddingTop", "paddingBottom"],
-		},
-		states: {
-			hover: "coulis[selector]:hover{coulis[declaration]}",
-			large: "@media (min-width: 1024px){coulis[selector]{coulis[declaration]}}",
-			medium: "@media (min-width: 768px){coulis[selector]{coulis[declaration]}}",
-			small: "@media (min-width: 360px){coulis[selector]{coulis[declaration]}}",
-			smallWithHover:
-				"@media (min-width: 360px){coulis[selector]:hover{coulis[declaration]}}",
-		},
-		theme: {
-			colors: {
-				neutralDark: tokens.colors.black,
-				neutralLight: tokens.colors.white,
-				neutralTransparent: tokens.colors.transparent,
-				surfacePrimary: tokens.colors.blue[4],
-				surfaceSecondary: tokens.colors.blue[2],
+const { createStyles } = createCoulis({
+	properties(theme) {
+		return {
+			accentColor: true,
+			alignItems: true,
+			animation: true,
+			backgroundColor: theme.colors,
+			borderRadius: theme.radii,
+			borderStyle: true,
+			boxSizing: true,
+			color: theme.colors,
+			colorScheme(input: "black" | "white") {
+				return input === "black" ? "dark" : "light";
 			},
-			fontSizes: {
-				body: tokens.fontSizes[2],
+			display: true,
+			flex: true,
+			flexDirection: true,
+			fontFamily: true,
+			fontSize: theme.fontSizes,
+			fontWeight: theme.fontWeights,
+			gap: true,
+			height: true,
+			justifyContent: true,
+			margin: theme.spacings,
+			marginBottom: theme.spacings,
+			marginLeft: theme.spacings,
+			marginRight: theme.spacings,
+			marginTop: theme.spacings,
+			padding: theme.spacings,
+			paddingBottom: theme.spacings,
+			paddingLeft: theme.spacings,
+			paddingRight: theme.spacings,
+			paddingTop: theme.spacings,
+			src: true,
+			transform: true,
+			transitionProperty(input: ("background-color" | "color")[]) {
+				return input.join(",");
 			},
-			fontWeights: {
-				body: tokens.fontWeights[1],
-			},
-			radii: {
-				full: tokens.radii[4],
-				large: tokens.radii[3],
-				medium: tokens.radii[2],
-				none: tokens.radii[0],
-				small: tokens.radii[1],
-			},
-			spacings: tokens.spacings,
+			width: [50, 100, px(200), px(400)],
+		};
+	},
+	shorthands: {
+		marginHorizontal: ["marginLeft", "marginRight"],
+		marginVertical: ["marginTop", "marginBottom"],
+		paddingHorizontal: ["paddingLeft", "paddingRight"],
+		paddingVertical: ["paddingTop", "paddingBottom"],
+	},
+	states: {
+		hover: "coulis[selector]:hover{coulis[declaration]}",
+		large: "@media (min-width: 1024px){coulis[selector]{coulis[declaration]}}",
+		medium: "@media (min-width: 768px){coulis[selector]{coulis[declaration]}}",
+		small: "@media (min-width: 360px){coulis[selector]{coulis[declaration]}}",
+		smallWithHover:
+			"@media (min-width: 360px){coulis[selector]:hover{coulis[declaration]}}",
+	},
+	theme: {
+		colors: {
+			neutralDark: tokens.colors.black,
+			neutralLight: tokens.colors.white,
+			neutralTransparent: tokens.colors.transparent,
+			surfacePrimary: tokens.colors.blue[4],
+			surfaceSecondary: tokens.colors.blue[2],
 		},
-	});
+		fontSizes: {
+			body: tokens.fontSizes[2],
+		},
+		fontWeights: {
+			body: tokens.fontWeights[1],
+		},
+		radii: {
+			full: tokens.radii[4],
+			large: tokens.radii[3],
+			medium: tokens.radii[2],
+			none: tokens.radii[0],
+			small: tokens.radii[1],
+		},
+		spacings: tokens.spacings,
+	},
+});
 
-export { createKeyframes, createMetadata, createStyles, setGlobalStyles };
+export { createStyles };

@@ -7,9 +7,11 @@ export default function Index() {
 		<View
 			style={createStyles({
 				alignItems: "center",
+				backgroundColor: "neutralDark",
 				display: "flex",
 				flex: 1,
 				justifyContent: "center",
+				width: "200px",
 			})}
 		>
 			<Text

@@ -121,6 +121,7 @@ const App = () => {
 			<Example title="With custom properties">
 				<p
 					className={createStyles({
+						// TODO: why border is not displayed? Add default borderWidth if not defined?
 						borderRadius: "small",
 						borderStyle: "solid",
 					})}

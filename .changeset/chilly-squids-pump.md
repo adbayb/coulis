@@ -2,4 +2,4 @@
 "coulis": minor
 ---
 
-Add `borderRadius` support to react-native target.
+Add `borderRadius` support for react-native target.

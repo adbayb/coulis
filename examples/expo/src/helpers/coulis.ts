@@ -26,7 +26,7 @@ const tokens = Object.freeze({
 		px(28),
 		px(30),
 	],
-	fontWeights: ["100", "400", "900"],
+	fontWeights: ["100", "400", "600"],
 	radii: [px(0), px(4), px(8), px(12), px(999)],
 	spacings: {
 		0: "0px",
@@ -45,6 +45,7 @@ const { createStyles } = createCoulis({
 			backgroundColor: theme.colors,
 			borderRadius: theme.radii,
 			borderStyle: true,
+			boxShadow: true,
 			boxSizing: true,
 			color: theme.colors,
 			colorScheme(input: "black" | "white") {
@@ -74,7 +75,7 @@ const { createStyles } = createCoulis({
 			transitionProperty(input: ("background-color" | "color")[]) {
 				return input.join(",");
 			},
-			width: [50, 100, px(200), px(400)],
+			width: [50, 100],
 		};
 	},
 	shorthands: {
@@ -101,9 +102,11 @@ const { createStyles } = createCoulis({
 		},
 		fontSizes: {
 			body: tokens.fontSizes[2],
+			heading: tokens.fontSizes[5],
 		},
 		fontWeights: {
 			body: tokens.fontWeights[1],
+			heading: tokens.fontWeights[2],
 		},
 		radii: {
 			full: tokens.radii[4],

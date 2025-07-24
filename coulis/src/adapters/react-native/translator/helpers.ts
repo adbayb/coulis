@@ -16,15 +16,17 @@ export const createPropertyValue = <Output>(
 	factory: PropertyValue<Error | Output>,
 ): PropertyValue<Output> => {
 	return (input) => {
-		try {
-			return factory(input) as Output;
-		} catch (error) {
+		const output = factory(input);
+
+		if (output instanceof Error) {
 			logger.debug(
-				`The \`${name}\` property cannot be translated. The value will be returned as it's. Cause: ${(error as Error).message}.`,
+				`The \`${name}\` property cannot be translated. The value will be returned as it's. Cause: ${output.message}.`,
 			);
 
 			return input as Output;
 		}
+
+		return output;
 	};
 };
 

@@ -1,5 +1,15 @@
 # Change Log
 
+## 0.17.0
+
+### Minor Changes
+
+- [`74c50ef`](https://github.com/adbayb/coulis/commit/74c50efa19a46e53c96553b02e7cccfd8d1f8b20) Thanks [@adbayb](https://github.com/adbayb)! - Add `borderRadius` support for react-native target.
+
+- [`854c160`](https://github.com/adbayb/coulis/commit/854c1605bc486262ea997bc92b196614c6aa95aa) Thanks [@adbayb](https://github.com/adbayb)! - Add `fontSize` support for react-native target.
+
+- [`eacc3a9`](https://github.com/adbayb/coulis/commit/eacc3a9836224fdb7be25d3a82a7776631361d1f) Thanks [@adbayb](https://github.com/adbayb)! - Flag `createKeyframes` and `setGlobalStyles` as unsupported methods for react-native platform target.
+
 ## 0.16.0
 
 ### Minor Changes

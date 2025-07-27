@@ -4,7 +4,6 @@
 	"private": true,
 	"main": "expo-router/entry",
 	"scripts": {
-		"start": "pnpm start:ios",
 		"start:all": "expo start",
 		"start:android": "expo start --android",
 		"start:ios": "expo start --ios",

@@ -32,21 +32,15 @@ export type CreateCoulis<
 	createKeyframes: (
 		input: Keyframes<Properties, Shorthands>,
 	) => CreateCoulisGeneric["Output"];
-	createMetadata: () => {
-		get: () => {
-			attributes: Record<
-				"data-coulis-cache" | "data-coulis-type",
-				string
-			>;
-			content: string;
-		}[];
-		getAsString: () => string;
-	};
 	createStyles: (
 		input: Styles<Properties, Shorthands, States>,
 	) => CreateCoulisGeneric["Output"];
 	getContract: () => {
 		propertyNames: (keyof Properties | keyof Shorthands)[];
 	};
+	getMetadata: () => {
+		attributes: Record<"data-coulis-cache" | "data-coulis-type", string>;
+		content: string;
+	}[] & { toString: () => string };
 	setGlobalStyles: (input: GlobalStyles<Properties, Shorthands>) => void;
 };

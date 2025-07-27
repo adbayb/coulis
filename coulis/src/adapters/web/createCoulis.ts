@@ -185,63 +185,6 @@ export const createCoulis: CreateCoulis<{
 				type: "global",
 			});
 		},
-		createMetadata() {
-			const globallyCachedClassNames = STYLE_TYPES.flatMap((type) => {
-				return [...(classNameByTypeCache.get(type)?.getAll() ?? [])];
-			});
-
-			const get = () => {
-				return STYLE_TYPES.map((type) => {
-					const { getContent, remove } =
-						styleSheetByTypeAdaptee[type];
-
-					const cachedClassNames = classNameByTypeCache.get(type);
-					const content = getContent();
-
-					const output = {
-						attributes: {
-							"data-coulis-cache": [
-								...(cachedClassNames?.getAll() ?? []),
-							].join(","),
-							"data-coulis-type": type,
-						},
-						content,
-					};
-
-					/*
-					 * To prevent [cross-request state pollution](https://vuejs.org/guide/scaling-up/ssr.html#cross-request-state-pollution),
-					 * flush styles generated dynamically while preserving, via the `globallyCachedClassNames` input, the ones shared/defined globally (at file/module scope):
-					 */
-					cachedClassNames?.removeAllExcept(globallyCachedClassNames);
-					remove(globallyCachedClassNames);
-
-					return output;
-				});
-			};
-
-			return {
-				get,
-				getAsString() {
-					return get().reduce((output, { attributes, content }) => {
-						const stringifiedAttributes = (
-							Object.keys(
-								attributes,
-							) as (keyof typeof attributes)[]
-						)
-							.map(
-								// eslint-disable-next-line sonarjs/no-nested-functions
-								(attributeKey) =>
-									`${attributeKey}="${attributes[attributeKey]}"`,
-							)
-							.join(" ");
-
-						output += `<style ${stringifiedAttributes}>${content}</style>`;
-
-						return output;
-					}, "");
-				},
-			};
-		},
 		createStyles(input) {
 			const classNames: ClassName[] = [];
 
@@ -352,6 +295,43 @@ export const createCoulis: CreateCoulis<{
 					...Object.keys(properties),
 				] as ReturnType<typeof this.getContract>["propertyNames"],
 			};
+		},
+		getMetadata() {
+			const metadata = STYLE_TYPES.map((type) => {
+				const { getContent } = styleSheetByTypeAdaptee[type];
+				const cachedClassNames = classNameByTypeCache.get(type);
+				const content = getContent();
+
+				return {
+					attributes: {
+						"data-coulis-cache": [
+							...(cachedClassNames?.getAll() ?? []),
+						].join(","),
+						"data-coulis-type": type,
+					},
+					content,
+				};
+			});
+
+			metadata.toString = () => {
+				return metadata.reduce((output, { attributes, content }) => {
+					const stringifiedAttributes = (
+						Object.keys(attributes) as (keyof typeof attributes)[]
+					)
+						.map(
+							// eslint-disable-next-line sonarjs/no-nested-functions
+							(attributeKey) =>
+								`${attributeKey}="${attributes[attributeKey]}"`,
+						)
+						.join(" ");
+
+					output += `<style ${stringifiedAttributes}>${content}</style>`;
+
+					return output;
+				}, "");
+			};
+
+			return metadata;
 		},
 		setGlobalStyles(input) {
 			insert({

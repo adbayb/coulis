@@ -31,16 +31,6 @@ export const createCoulis: CreateCoulis<{
 
 			return {};
 		},
-		createMetadata() {
-			return {
-				get() {
-					return [];
-				},
-				getAsString() {
-					return "";
-				},
-			};
-		},
 		createStyles(input) {
 			const styles: CreateCoulisOutput = {};
 
@@ -105,6 +95,11 @@ export const createCoulis: CreateCoulis<{
 					...Object.keys(properties),
 				] as ReturnType<typeof this.getContract>["propertyNames"],
 			};
+		},
+		getMetadata() {
+			unsupportedLogger.method("getMetadata");
+
+			return [];
 		},
 		setGlobalStyles() {
 			unsupportedLogger.method("setGlobalStyles");

@@ -15,7 +15,7 @@ const tokens = Object.freeze({
 	},
 } as const);
 
-const { createKeyframes, createMetadata, createStyles, setGlobalStyles } =
+export const { createKeyframes, createStyles, getMetadata, setGlobalStyles } =
 	createCoulis({
 		properties(theme) {
 			return {
@@ -38,5 +38,3 @@ const { createKeyframes, createMetadata, createStyles, setGlobalStyles } =
 			},
 		},
 	});
-
-export { createKeyframes, createMetadata, createStyles, setGlobalStyles };

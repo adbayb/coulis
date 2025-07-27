@@ -39,15 +39,11 @@ describe("createCoulis (web adapter)", () => {
 	});
 
 	test("should extract styles", () => {
-		const metadata = createMetadata();
-
-		expect(metadata.get()).toMatchSnapshot();
+		expect(getMetadata()).toMatchSnapshot();
 	});
 
 	test("should extract styles given stringified styles", () => {
-		const metadata = createMetadata();
-
-		expect(metadata.getAsString()).toMatchSnapshot();
+		expect(String(getMetadata())).toMatchSnapshot();
 	});
 
 	test("should get contract", () => {
@@ -93,9 +89,9 @@ const tokens = Object.freeze({
 
 const {
 	createKeyframes,
-	createMetadata,
 	createStyles,
 	getContract,
+	getMetadata,
 	setGlobalStyles,
 } = createCoulis({
 	properties(theme) {

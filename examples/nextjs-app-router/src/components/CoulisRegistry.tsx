@@ -1,10 +1,10 @@
 "use client";
 
-import { useMemo, useRef } from "react";
+import { useRef } from "react";
 import type { ReactNode } from "react";
 import { useServerInsertedHTML } from "next/navigation";
 
-import { createMetadata, setGlobalStyles } from "../helpers/coulis";
+import { getMetadata, setGlobalStyles } from "../helpers/coulis";
 
 setGlobalStyles({
 	"*,*::before,*::after": {
@@ -29,7 +29,6 @@ type CoulisRegistryProps = {
 
 export const CoulisRegistry = ({ children }: CoulisRegistryProps) => {
 	const hasBeenInserted = useRef(false);
-	const metadata = useMemo(() => createMetadata(), []);
 
 	useServerInsertedHTML(() => {
 		/**
@@ -40,7 +39,7 @@ export const CoulisRegistry = ({ children }: CoulisRegistryProps) => {
 
 		hasBeenInserted.current = true;
 
-		return metadata.get().map(({ attributes, content }) => {
+		return getMetadata().map(({ attributes, content }) => {
 			return (
 				<style
 					{...attributes}

@@ -8,7 +8,7 @@ export type StyleSheet = {
 	getContent: () => string;
 	getHydratedClassNames: () => ClassName[];
 	insert: (className: ClassName, rule: Rule) => void;
-	remove: (preservableClassNames: ClassName[]) => void;
+	remove: () => void;
 };
 
 export type CreateStyleSheet = (type: StyleType) => StyleSheet;

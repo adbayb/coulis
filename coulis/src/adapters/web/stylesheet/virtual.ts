@@ -14,8 +14,8 @@ export const createVirtualStyleSheet: CreateStyleSheet = () => {
 		insert(key, rule) {
 			ruleByClassName.add(key, rule);
 		},
-		remove(preservableClassNames) {
-			ruleByClassName.removeAllExcept(preservableClassNames);
+		remove() {
+			ruleByClassName.removeAll();
 		},
 	};
 };

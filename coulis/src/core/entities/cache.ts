@@ -4,7 +4,6 @@ export type SetCache<Key extends string> = {
 	has: (key: Key) => boolean;
 	remove: (key: Key) => void;
 	removeAll: () => void;
-	removeAllExcept: (keys: Key[]) => void;
 };
 
 /**
@@ -16,10 +15,6 @@ export type SetCache<Key extends string> = {
  */
 export const createSetCache = <Key extends string>(): SetCache<Key> => {
 	const cache = new Set<Key>();
-
-	const getKeys = () => {
-		return [...cache.keys()];
-	};
 
 	const getAll: SetCache<Key>["getAll"] = () => {
 		return [...cache.values()];
@@ -41,13 +36,6 @@ export const createSetCache = <Key extends string>(): SetCache<Key> => {
 		removeAll() {
 			cache.clear();
 		},
-		removeAllExcept(keys: Key[]) {
-			getKeys()
-				.filter((key) => !keys.includes(key))
-				.forEach((key) => {
-					remove(key);
-				});
-		},
 	};
 };
 
@@ -58,7 +46,6 @@ export type MapCache<Key extends string, Value> = {
 	has: (key: Key) => boolean;
 	remove: (key: Key) => void;
 	removeAll: () => void;
-	removeAllExcept: (keys: Key[]) => void;
 };
 
 /**
@@ -73,10 +60,6 @@ export const createMapCache = <Key extends string, Value>(): MapCache<
 	Value
 > => {
 	const cache = new Map<Key, Value>();
-
-	const getKeys = () => {
-		return [...cache.keys()];
-	};
 
 	const getAll: MapCache<Key, Value>["getAll"] = () => {
 		return [...cache.values()];
@@ -100,13 +83,6 @@ export const createMapCache = <Key extends string, Value>(): MapCache<
 		remove,
 		removeAll() {
 			cache.clear();
-		},
-		removeAllExcept(keys: Key[]) {
-			getKeys()
-				.filter((key) => !keys.includes(key))
-				.forEach((key) => {
-					remove(key);
-				});
 		},
 	};
 };

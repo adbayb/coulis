@@ -1,7 +1,7 @@
 import { logger } from "../../core/entities/logger";
 
 export const createUnsupportedLogger = () => {
-	type Method = "createKeyframes" | "setGlobalStyles";
+	type Method = "createKeyframes" | "getMetadata" | "setGlobalStyles";
 
 	const cache = new Set<string>(); // To log only once.
 

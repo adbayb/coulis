@@ -146,7 +146,7 @@ export const App = () => {
 
 ### How to implement server-side rendering?
 
-Coulis provides a dedicated method called `createMetadata` that allows collecting style instructions for injecting into the `<head />` section of the web page.  
+Coulis provides a dedicated method called `getMetadata` that allows collecting style instructions for injecting into the `<head />` section of the web page.  
 Its primary use case is server-side rendering. The getter helps prevent the FOUC (Flash Of Unstyled Content) issue, where the user briefly sees the unstyled content before the styles are applied on the browser side.
 
 Here's a vanilla React integration example generating HTML content:
@@ -157,9 +157,8 @@ import { coulis } from "./helpers/coulis"; // Factory instance created via `crea
 import { App } from "./App"; // Main component entry point (depending on your project specificities).
 
 export const renderHtml = () => {
-	const metadata = coulis.createMetadata(); // Must be created before initial rendering.
 	const bodyContent = renderToString(<App />);
-	const headContent = metadata.getAsString(); // Must be get after initial rendering to retrieve generated styles after the `renderToString` traversal.
+	const headContent = String(getMetadata()); // Must be get after the `renderToString` traversal to retrieve generated styles.
 
 	return `<html>
 		<head>

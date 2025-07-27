@@ -1,6 +1,6 @@
 import { createCoulis } from "coulis";
 
-const { createKeyframes, createMetadata, createStyles, setGlobalStyles } =
+export const { createKeyframes, createStyles, getMetadata, setGlobalStyles } =
 	createCoulis({
 		properties() {
 			return {
@@ -12,5 +12,3 @@ const { createKeyframes, createMetadata, createStyles, setGlobalStyles } =
 			hover: "coulis[selector]:hover{coulis[declaration]}",
 		},
 	});
-
-export { createKeyframes, createMetadata, createStyles, setGlobalStyles };

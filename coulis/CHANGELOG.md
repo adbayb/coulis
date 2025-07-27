@@ -1,5 +1,13 @@
 # Change Log
 
+## 0.18.0
+
+### Minor Changes
+
+- [`13f74a4`](https://github.com/adbayb/coulis/commit/13f74a4ea5de150990accdab64e9305d757413ea) Thanks [@adbayb](https://github.com/adbayb)! - Improve type inference performance by simplifying and removing conditional types for setGlobalStyles interface.
+
+- [`27fbdd0`](https://github.com/adbayb/coulis/commit/27fbdd0e955322ba02a53c641d86c79c5f77c45c) Thanks [@adbayb](https://github.com/adbayb)! - `createMetadata` is replaced by `getMetadata` to simplify developer experience and avoid premature cross-request state pollution optimization introducing side effects.
+
 ## 0.17.0
 
 ### Minor Changes

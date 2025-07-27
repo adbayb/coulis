@@ -242,8 +242,8 @@ describe("createCoulis (port)", () => {
 
 		coulis.setGlobalStyles({
 			"*,*::before,*::after": {
-				// @ts-expect-error Should not accept unknown property
-				unknown: "white",
+				// @ts-expect-error Should not accept unknown value (number)
+				unknown: 2,
 			},
 			".globalClass": {
 				// @ts-expect-error Should not allow stateful definition
@@ -251,12 +251,10 @@ describe("createCoulis (port)", () => {
 					base: "initial",
 				},
 			},
-			// @ts-expect-error Should not accept unknown value
+			// @ts-expect-error Should not accept unknown value (boolean)
 			"@import": true,
 			"html,body": {
-				// @ts-expect-error Should not accept unknown value
 				backgroundColor: "white",
-				// @ts-expect-error Should not accept unknown value
 				backgroundColorShorthand: "black",
 				fontFamily: "Open Sans, AliasedHelvetica",
 			},

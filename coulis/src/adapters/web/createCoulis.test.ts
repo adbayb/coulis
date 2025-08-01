@@ -145,6 +145,9 @@ setGlobalStyles({
 	},
 	"@import":
 		"url('https://fonts.googleapis.com/css?family=Open+Sans&display=swap')",
+	"div": {
+		backgroundColor: "red", // Non-theme-based value to check if set properly by `setGlobalStyles`
+	},
 	"html": {
 		boxSizing: "border-box",
 	},

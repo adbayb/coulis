@@ -82,7 +82,7 @@ export const createCoulis: CreateCoulis<{
 					? // eslint-disable-next-line @typescript-eslint/no-unsafe-call
 						propertyValue(value)
 					: isObject(propertyValue)
-						? propertyValue[value as string]
+						? (propertyValue[value as string] ?? value)
 						: value,
 		});
 	};
@@ -343,7 +343,7 @@ export const createCoulis: CreateCoulis<{
 					for (const selector of selectors) {
 						const style = input[selector];
 
-						if (style === undefined) continue;
+						if (style === undefined) continue; // TODO: fix coulis side undefined value (see bienvenuemarket)
 
 						rule +=
 							typeof style === "string"

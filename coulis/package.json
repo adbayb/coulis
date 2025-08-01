@@ -1,6 +1,6 @@
 {
 	"name": "coulis",
-	"version": "0.18.0",
+	"version": "0.18.1",
 	"description": "Yet another atomic CSS-in-JS library",
 	"keywords": [
 		"css",

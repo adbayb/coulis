@@ -1,6 +1,4 @@
-/* eslint-disable unicorn/string-content */
 /* eslint-disable n/no-process-env */
-import process from "node:process";
 import fs from "node:fs/promises";
 
 import express from "express";

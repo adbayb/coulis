@@ -18,7 +18,7 @@ export const createDomStyleSheet: CreateStyleSheet = (type) => {
 			 * `textContent` is more performant than `innerText` (no layout reflow).
 			 * @see {@link https://esbench.com/bench/680c1f4e545f8900a4de2cf7 Benchmark}
 			 */
-			return element.textContent ?? "";
+			return element.textContent;
 		},
 		getHydratedClassNames() {
 			const source = element.dataset.coulisCache;

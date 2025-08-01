@@ -1,5 +1,11 @@
 # Change Log
 
+## 0.18.1
+
+### Patch Changes
+
+- [`133fa4b`](https://github.com/adbayb/coulis/commit/133fa4b9e53bb4afe941b6a6d0f3dc50f35a787d) Thanks [@adbayb](https://github.com/adbayb)! - Fix non-theme-based global style value being passed as undefined.
+
 ## 0.18.0
 
 ### Minor Changes

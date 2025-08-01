@@ -60,7 +60,7 @@
 	},
 	"devDependencies": {
 		"quickbundle": "2.13.0",
-		"react-native": "0.80.1",
+		"react-native": "0.80.2",
 		"vitest": "3.2.4"
 	},
 	"peerDependencies": {

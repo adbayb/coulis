@@ -1,6 +1,6 @@
 import type { CreateCoulis } from "../../core/ports/createCoulis";
 import { isObject } from "../../core/entities/primitive";
-import { translator } from "./translator";
+import { getDimensionValue, translator } from "./translator";
 import { createUnsupportedLogger } from "./helpers";
 
 type CreateCoulisOutput = Record<string, unknown>;
@@ -49,7 +49,15 @@ export const createCoulis: CreateCoulis<{
 								? propertyValue[styleValue as string]
 								: styleValue;
 
-					return translator[name]?.(output) ?? output;
+					if (name in translator) {
+						return translator[name]?.(output);
+					}
+
+					if (typeof output === "string") {
+						return getDimensionValue(output);
+					}
+
+					return output;
 				};
 
 				if (isObject(value)) {

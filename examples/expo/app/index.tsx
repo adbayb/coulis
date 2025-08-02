@@ -1,98 +1,103 @@
-import { Text, View } from "react-native";
-import { useEffect, useState } from "react";
+import { Pressable, Text, View } from "react-native";
 import type { PropsWithChildren, ReactNode } from "react";
 
-import { createStyles } from "../src/helpers/coulis";
+import { createStyles } from "../src/styles";
 
 export default function Index() {
-	const [counter, setCounter] = useState(0);
-
-	useEffect(() => {
-		const id = setInterval(() => {
-			setCounter((value) => {
-				return value + 1;
-			});
-		}, 1000);
-
-		return () => {
-			clearInterval(id);
-		};
-	});
-
 	return (
 		<Layout>
-			<Example title="With static styles">
-				<Text
-					style={createStyles({
-						backgroundColor: "surfacePrimary",
-						borderRadius: "large",
-						boxShadow:
-							"0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -2px rgba(0,0,0,0.1)", // TODO: parse box shadow to replace non-px value via getDimensionValue.
-						color: {
-							base: "neutralLight",
-							hover: "neutralDark",
-						},
-						colorScheme: {
-							base: "white",
-							hover: "black",
-						},
-						fontSize: "body",
-						fontWeight: "body",
-						padding: 1,
-						transitionProperty: {
-							base: ["color", "background-color"],
-							hover: ["color"],
-						},
-					})}
-				>
-					{TEXT}
-				</Text>
-			</Example>
-			<Example title="With dynamic styles">
-				<Text
-					style={createStyles({
-						color:
-							counter % 2 === 0
-								? "surfacePrimary"
-								: "surfaceSecondary",
-					})}
-				>
-					{TEXT}
-				</Text>
-			</Example>
-			<Example title="With contextual styles">
-				<Text
-					style={createStyles({
-						backgroundColor: {
-							base: "surfacePrimary",
-							medium: "surfaceSecondary",
-							smallWithHover: "neutralLight",
-						},
-					})}
-				>
-					Resize and/or hover to test
-				</Text>
-			</Example>
-			<Example title="With custom properties">
-				<Text
-					style={createStyles({
-						borderRadius: "small",
-						borderStyle: "solid",
-					})}
-				>
-					{TEXT}
-				</Text>
-			</Example>
-			<Example title="With keyframes">
+			<Example title="Button">
 				<View
 					style={createStyles({
-						backgroundColor: "surfacePrimary",
-						borderRadius: "medium",
-						height: 50,
-						marginHorizontal: 1.5,
-						width: 50,
+						display: "flex",
+						flexDirection: "row",
+						gap: 2,
 					})}
-				/>
+				>
+					<Pressable
+						onPress={() => {
+							console.log("Pressable");
+						}}
+						style={({ pressed }) =>
+							createStyles({
+								alignItems: "center",
+								alignSelf: "flex-start",
+								backgroundColor: pressed
+									? "backgroundPrimaryActive"
+									: "backgroundPrimary",
+								borderRadius: "md",
+								borderStyle: "none",
+								color: "neutralWhite",
+								cursor: "pointer",
+								display: "flex",
+								height: 40,
+								justifyContent: "center",
+								lineHeight: "normal",
+								paddingHorizontal: 4,
+							})
+						}
+					>
+						<Text
+							style={createStyles({
+								color: "neutralWhite",
+								fontFamily: "sans",
+								fontSize: "lg",
+								fontWeight: "medium",
+							})}
+						>
+							Hello
+						</Text>
+					</Pressable>
+					<Pressable
+						onPress={() => {
+							console.log("Pressable");
+						}}
+						style={({ pressed }) =>
+							createStyles({
+								alignItems: "center",
+								alignSelf: "flex-start",
+								backgroundColor: pressed
+									? "backgroundPrimaryActive"
+									: "backgroundPrimary",
+								borderRadius: "md",
+								borderStyle: "none",
+								color: "neutralWhite",
+								cursor: "pointer",
+								display: "flex",
+								height: 40,
+								justifyContent: "center",
+								lineHeight: "normal",
+								paddingHorizontal: 4,
+							})
+						}
+					>
+						<Text
+							style={createStyles({
+								color: "neutralWhite",
+								fontFamily: "sans",
+								fontSize: "lg",
+								fontWeight: "medium",
+							})}
+						>
+							Hello
+						</Text>
+					</Pressable>
+				</View>
+			</Example>
+			<Example title="Callout">
+				<Text
+					style={createStyles({
+						backgroundColor: "backgroundDanger",
+						borderRadius: "lg",
+						boxShadow: "lg",
+						color: "foregroundDanger",
+						fontSize: "base",
+						fontWeight: "normal",
+						padding: 1,
+					})}
+				>
+					{TEXT}
+				</Text>
 			</Example>
 		</Layout>
 	);
@@ -111,8 +116,9 @@ const Example = ({ title, children }: ExampleProps) => {
 		<View>
 			<Text
 				style={createStyles({
-					fontSize: "heading",
-					fontWeight: "heading",
+					fontSize: "3xl",
+					fontWeight: "bold",
+					marginBottom: 1,
 				})}
 			>
 				{title}
@@ -128,9 +134,9 @@ const Layout = ({ children }: PropsWithChildren) => {
 			style={createStyles({
 				display: "flex",
 				flexDirection: "column",
-				gap: 16,
-				paddingHorizontal: 1.5,
-				paddingVertical: 1.5,
+				gap: 6,
+				paddingHorizontal: 6,
+				paddingVertical: 2,
 			})}
 		>
 			{children}

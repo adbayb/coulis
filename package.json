@@ -14,7 +14,7 @@
 		"release:publish": "stack release --publish",
 		"release:version": "stack release --tag",
 		"start": "stack start",
-		"start:native": "pnpm --filter @coulis/example-expo start:ios",
+		"start:native": "pnpm --filter coulis start & pnpm --filter @coulis/example-expo start:ios",
 		"test": "stack test",
 		"watch": "stack watch"
 	},

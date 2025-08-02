@@ -1,5 +1,11 @@
 # Change Log
 
+## 0.19.0
+
+### Minor Changes
+
+- [`408fdd6`](https://github.com/adbayb/coulis/commit/408fdd6c3ef3e3b158312e4000a4a00ccff46f06) Thanks [@adbayb](https://github.com/adbayb)! - Process other dimension-like style properties for react native target.
+
 ## 0.18.1
 
 ### Patch Changes

@@ -1,145 +1,143 @@
-import { Pressable, Text, View } from "react-native";
-import type { PropsWithChildren, ReactNode } from "react";
+import { ScrollView, View } from "react-native";
 
-import { createStyles } from "../src/styles";
+import { colors, createStyles } from "../src/styles";
+import { Typography } from "../src/components/Typography";
+import { Stack } from "../src/components/Stack";
+import { Separator } from "../src/components/Separator";
+import { Section } from "../src/components/Section";
+import { Callout } from "../src/components/Callout";
+import { Button } from "../src/components/Button";
+import { Badge } from "../src/components/Badge";
+import { Avatar } from "../src/components/Avatar";
 
 export default function Index() {
 	return (
-		<Layout>
-			<Example title="Button">
-				<View
-					style={createStyles({
-						display: "flex",
-						flexDirection: "row",
-						gap: 2,
-					})}
-				>
-					<Pressable
-						onPress={() => {
-							console.log("Pressable");
-						}}
-						style={({ pressed }) =>
-							createStyles({
-								alignItems: "center",
-								alignSelf: "flex-start",
-								backgroundColor: pressed
-									? "backgroundPrimaryActive"
-									: "backgroundPrimary",
-								borderRadius: "md",
-								borderStyle: "none",
-								color: "neutralWhite",
-								cursor: "pointer",
-								display: "flex",
-								height: 40,
-								justifyContent: "center",
-								lineHeight: "normal",
-								paddingHorizontal: 4,
-							})
-						}
+		<ScrollView>
+			<Stack
+				gap={8}
+				paddingHorizontal={6}
+				paddingVertical={2}
+			>
+				<Section title="Avatar">
+					<Stack
+						gap={2}
+						orientation="horizontal"
 					>
-						<Text
-							style={createStyles({
-								color: "neutralWhite",
-								fontFamily: "sans",
-								fontSize: "lg",
-								fontWeight: "medium",
-							})}
-						>
-							Hello
-						</Text>
-					</Pressable>
-					<Pressable
-						onPress={() => {
-							console.log("Pressable");
-						}}
-						style={({ pressed }) =>
-							createStyles({
-								alignItems: "center",
-								alignSelf: "flex-start",
-								backgroundColor: pressed
-									? "backgroundPrimaryActive"
-									: "backgroundPrimary",
-								borderRadius: "md",
-								borderStyle: "none",
-								color: "neutralWhite",
-								cursor: "pointer",
-								display: "flex",
-								height: 40,
-								justifyContent: "center",
-								lineHeight: "normal",
-								paddingHorizontal: 4,
-							})
-						}
+						<Avatar
+							accessibilityLabel="Avatar"
+							size="small"
+							source="https://github.com/adbayb.png"
+						/>
+						<Avatar
+							accessibilityLabel="Avatar"
+							size="medium"
+							source="https://github.com/adbayb.png"
+						/>
+						<Avatar
+							accessibilityLabel="Avatar"
+							size="large"
+							source="https://github.com/adbayb.png"
+						/>
+					</Stack>
+				</Section>
+				<Section title="Badge">
+					<Stack
+						gap={2}
+						orientation="horizontal"
 					>
-						<Text
-							style={createStyles({
-								color: "neutralWhite",
-								fontFamily: "sans",
-								fontSize: "lg",
-								fontWeight: "medium",
-							})}
+						<Badge variant="danger">Danger</Badge>
+						<Badge variant="note">Note</Badge>
+						<Badge variant="success">Success</Badge>
+						<Badge variant="warning">Warning</Badge>
+					</Stack>
+				</Section>
+				<Section title="Button">
+					<View
+						style={createStyles({
+							display: "flex",
+							flexDirection: "row",
+							gap: 2,
+						})}
+					>
+						<Button
+							onPress={() => {
+								console.log("Primary");
+							}}
 						>
-							Hello
-						</Text>
-					</Pressable>
-				</View>
-			</Example>
-			<Example title="Callout">
-				<Text
-					style={createStyles({
-						backgroundColor: "backgroundDanger",
-						borderRadius: "lg",
-						boxShadow: "lg",
-						color: "foregroundDanger",
-						fontSize: "base",
-						fontWeight: "normal",
-						padding: 1,
-					})}
-				>
-					{TEXT}
-				</Text>
-			</Example>
-		</Layout>
+							Primary
+						</Button>
+						<Button
+							onPress={() => {
+								console.log("Secondary");
+							}}
+							variant="secondary"
+						>
+							Secondary
+						</Button>
+					</View>
+				</Section>
+				<Section title="Callout">
+					<Callout title="Visually important content">
+						Lorem ipsum dolor sit amet, consectetur adipiscing elit,
+						sed do eiusmod tempor incididunt ut labore et dolore
+						magna aliqua. Ut enim ad minim veniam, quis nostrud
+						exercitation ullamco laboris nisi ut aliquip ex ea
+						commodo consequat. Duis aute irure dolor in
+						reprehenderit in voluptate velit esse cillum dolore eu
+						fugiat nulla pariatur. Excepteur sint occaecat cupidatat
+						non proident, sunt in culpa qui officia deserunt mollit
+						anim id est laborum.
+					</Callout>
+				</Section>
+				<Section title="Color Tokens">
+					{Object.entries(colors)
+						.filter(
+							([, colorValues]) =>
+								typeof colorValues === "object",
+						)
+						.map(([colorName, colorsValues]) => (
+							<Stack
+								gap={4}
+								key={colorName}
+								marginVertical={2}
+								orientation="vertical"
+							>
+								<Typography variant="caption">
+									{colorName.toUpperCase()}
+								</Typography>
+								<Stack orientation="horizontal">
+									{Object.entries(colorsValues).map(
+										([key, value]) => (
+											<View
+												key={key}
+												style={{
+													backgroundColor: value,
+													height: 50,
+													width: 50,
+												}}
+											/>
+										),
+									)}
+								</Stack>
+							</Stack>
+						))}
+				</Section>
+				<Section title="Separator">
+					<Stack
+						gap={2}
+						orientation="horizontal"
+					>
+						<Separator
+							orientation="horizontal"
+							size={100}
+						/>
+						<Separator
+							orientation="vertical"
+							size={100}
+						/>
+					</Stack>
+				</Section>
+			</Stack>
+		</ScrollView>
 	);
 }
-
-const TEXT =
-	"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
-
-type ExampleProps = {
-	readonly title: string;
-	readonly children: ReactNode;
-};
-
-const Example = ({ title, children }: ExampleProps) => {
-	return (
-		<View>
-			<Text
-				style={createStyles({
-					fontSize: "3xl",
-					fontWeight: "bold",
-					marginBottom: 1,
-				})}
-			>
-				{title}
-			</Text>
-			<View>{children}</View>
-		</View>
-	);
-};
-
-const Layout = ({ children }: PropsWithChildren) => {
-	return (
-		<View
-			style={createStyles({
-				display: "flex",
-				flexDirection: "column",
-				gap: 6,
-				paddingHorizontal: 6,
-				paddingVertical: 2,
-			})}
-		>
-			{children}
-		</View>
-	);
-};

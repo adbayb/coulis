@@ -1,5 +1,13 @@
 # Change Log
 
+## 0.19.0
+
+### Minor Changes
+
+- [`408fdd6`](https://github.com/adbayb/coulis/commit/408fdd6c3ef3e3b158312e4000a4a00ccff46f06) Thanks [@adbayb](https://github.com/adbayb)! - Process other dimension-like style properties for react native target.
+
+- [`f65ee85`](https://github.com/adbayb/coulis/commit/f65ee85191ab306c30ad15bd2b573582e9e88911) Thanks [@adbayb](https://github.com/adbayb)! - Make react-native transformation logic scalable with a composing approach.
+
 ## 0.18.1
 
 ### Patch Changes

@@ -26,10 +26,16 @@ export type WithNewLeafNodes<Object_ extends RecordLike, LeafType> = {
  */
 type Ungreedify<U extends number | string> = Record<never, never> & U;
 
-export const compose = (...input: string[]) => {
-	return input.join(" ");
+export const compose = <Value>(
+	startingFunction: (input: Value) => Value,
+	...restFunctions: ((input: Value) => Value)[]
+) => {
+	return restFunctions.reduce(
+		(previousFunction, nextFunction) => (value) =>
+			previousFunction(nextFunction(value)),
+		startingFunction,
+	);
 };
-
 export const isNumber = (input: unknown): input is number => {
 	return typeof input === "number" || !Number.isNaN(Number(input));
 };

@@ -1,6 +1,6 @@
 import type { CreateCoulis } from "../../core/ports/createCoulis";
-import { isObject } from "../../core/entities/primitive";
-import { getDimensionValue, translator } from "./translator";
+import { compose, isObject } from "../../core/entities/primitive";
+import { transformDimension } from "./transformers";
 import { createUnsupportedLogger } from "./helpers";
 
 type CreateCoulisOutput = Record<string, unknown>;
@@ -25,6 +25,34 @@ export const createCoulis: CreateCoulis<{
 		return shorthandNames.includes(name);
 	};
 
+	const getStyleValue = (name: string, value: unknown) => {
+		const getValue = (styleValue: unknown): unknown => {
+			const transform = compose(transformDimension);
+			const propertyValue = properties[name as keyof typeof properties];
+
+			return transform({
+				name,
+				value:
+					typeof propertyValue === "function"
+						? // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+							propertyValue(styleValue)
+						: isObject(propertyValue)
+							? propertyValue[styleValue as string]
+							: styleValue,
+			}).value;
+		};
+
+		if (isObject(value)) {
+			unsupportedLogger.behavior(
+				"States are not supported, ignoring non-base values.",
+			);
+
+			return getValue(value.base);
+		}
+
+		return getValue(value);
+	};
+
 	return {
 		createKeyframes() {
 			unsupportedLogger.method("createKeyframes");
@@ -32,44 +60,8 @@ export const createCoulis: CreateCoulis<{
 			return {};
 		},
 		createStyles(input) {
-			const styles: CreateCoulisOutput = {};
-
 			// TODO: cache (insert method)
-			// eslint-disable-next-line unicorn/consistent-function-scoping
-			const getStyleValue = (name: string, value: unknown) => {
-				const getValue = (styleValue: unknown): unknown => {
-					const propertyValue =
-						properties[name as keyof typeof properties];
-
-					const output: unknown =
-						typeof propertyValue === "function"
-							? // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-								propertyValue(styleValue)
-							: isObject(propertyValue)
-								? propertyValue[styleValue as string]
-								: styleValue;
-
-					if (name in translator) {
-						return translator[name]?.(output);
-					}
-
-					if (typeof output === "string") {
-						return getDimensionValue(output);
-					}
-
-					return output;
-				};
-
-				if (isObject(value)) {
-					unsupportedLogger.behavior(
-						"States are not supported, ignoring non-base values.",
-					);
-
-					return getValue(value.base);
-				}
-
-				return getValue(value);
-			};
+			const styles: CreateCoulisOutput = {};
 
 			for (const propertyName of Object.keys(input)) {
 				const value = input[propertyName as keyof typeof input];

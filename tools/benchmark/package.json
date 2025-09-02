@@ -16,12 +16,12 @@
 		"@emotion/css": "11.13.5",
 		"@emotion/server": "11.11.0",
 		"coulis": "workspace:*",
-		"playwright-test": "14.1.11",
+		"playwright-test": "14.1.12",
 		"react": "19.1.1",
 		"react-dom": "19.1.1",
 		"styled-components": "6.1.19",
-		"tinybench": "4.0.1",
-		"tsx": "4.20.3",
+		"tinybench": "4.1.0",
+		"tsx": "4.20.5",
 		"typescript": "5.9.2"
 	}
 }

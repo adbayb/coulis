@@ -17,9 +17,9 @@
 		"@emotion/server": "11.11.0",
 		"coulis": "workspace:*",
 		"playwright-test": "14.1.12",
-		"react": "19.2.3",
-		"react-dom": "19.2.3",
-		"styled-components": "6.1.19",
+		"react": "19.2.4",
+		"react-dom": "19.2.4",
+		"styled-components": "6.3.9",
 		"tinybench": "4.1.0",
 		"tsx": "4.21.0",
 		"typescript": "5.9.3"

@@ -60,11 +60,11 @@
 	},
 	"devDependencies": {
 		"quickbundle": "2.16.0",
-		"react-native": "0.83.1",
+		"react-native": "0.84.0",
 		"vitest": "3.2.4"
 	},
 	"peerDependencies": {
-		"react-native": "^0.80.0 || ^0.81.0 || ^0.82.0 || ^0.83.0"
+		"react-native": "^0.80.0 || ^0.81.0 || ^0.82.0 || ^0.83.0 || ^0.84.0"
 	},
 	"peerDependenciesMeta": {
 		"react-native": {

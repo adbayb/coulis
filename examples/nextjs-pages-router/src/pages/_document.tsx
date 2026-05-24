@@ -1,5 +1,6 @@
-import Document, { Head, Html, Main, NextScript } from "next/document";
 import type { DocumentContext } from "next/document";
+
+import Document, { Head, Html, Main, NextScript } from "next/document";
 
 import { getMetadata } from "../helpers/coulis";
 
@@ -16,7 +17,7 @@ class MyDocument extends Document {
 						return (
 							<style
 								{...attributes}
-								// eslint-disable-next-line react/dom/no-dangerously-set-innerhtml
+								// eslint-disable-next-line @eslint-react/dom-no-dangerously-set-innerhtml
 								dangerouslySetInnerHTML={{
 									__html: content,
 								}}

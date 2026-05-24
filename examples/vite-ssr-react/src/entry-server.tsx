@@ -1,8 +1,8 @@
-import { renderToString } from "react-dom/server";
 import { StrictMode } from "react";
+import { renderToString } from "react-dom/server";
 
-import { getMetadata } from "./helpers/coulis";
 import App from "./App";
+import { getMetadata } from "./helpers/coulis";
 
 export const renderHtml = (_url: string) => {
 	const bodyContent = renderToString(

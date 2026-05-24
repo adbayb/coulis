@@ -1,8 +1,9 @@
 import { Image } from "react-native";
 
-import { createStyles } from "../styles";
 import type { StyleProps } from "../styles";
 import type { CreateComponentProps } from "./types";
+
+import { createStyles } from "../styles";
 
 export type AvatarProps = CreateComponentProps<{
 	accessibilityLabel: string;

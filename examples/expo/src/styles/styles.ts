@@ -1,19 +1,18 @@
 import { createCoulis } from "coulis/react-native";
 
-/* eslint-disable sort-keys-custom-order/object-keys */
-import { spacings } from "./tokens/spacings";
-import { boxShadows } from "./tokens/shadows";
-import { radii } from "./tokens/radii";
+import { negateTokens } from "./helpers";
+import { colors } from "./tokens/colors";
 import {
 	fontFamilies,
 	fontSizes,
 	fontWeights,
 	lineHeights,
 } from "./tokens/fonts";
-import { colors } from "./tokens/colors";
-import { negateTokens } from "./helpers";
+import { radii } from "./tokens/radii";
+import { boxShadows } from "./tokens/shadows";
+import { spacings } from "./tokens/spacings";
 
-export const { createStyles, setGlobalStyles, getContract, getMetadata } =
+export const { createStyles, getContract, getMetadata, setGlobalStyles } =
 	createCoulis({
 		properties(theme) {
 			const spacingValues = {
@@ -44,8 +43,8 @@ export const { createStyles, setGlobalStyles, getContract, getMetadata } =
 				color: theme.colors,
 				cursor: ["none", "default", "pointer"],
 				display: true,
-				flexDirection: ["column", "row"],
 				flex: true,
+				flexDirection: ["column", "row"],
 				fontFamily: theme.fontFamilies,
 				fontSize: fontSizes,
 				fontWeight: theme.fontWeights,
@@ -114,31 +113,31 @@ export const { createStyles, setGlobalStyles, getContract, getMetadata } =
 		},
 		theme: {
 			colors: {
-				none: colors.transparent,
-				neutralWhite: colors.white,
-				neutralBlack: colors.black,
+				backgroundDanger: colors.red["100"],
+				backgroundNote: colors.gray["100"],
 				backgroundPrimary: colors.gray["500"],
-				backgroundPrimaryHover: colors.gray["400"],
 				backgroundPrimaryActive: colors.gray["600"],
+				backgroundPrimaryHover: colors.gray["400"],
 				backgroundSecondary: colors.gray["100"],
-				backgroundSecondaryHover: colors.gray["200"],
 				backgroundSecondaryActive: colors.gray["300"],
+				backgroundSecondaryHover: colors.gray["200"],
+				backgroundSuccess: colors.green["100"],
+				backgroundWarning: colors.yellow["100"],
+				borderDanger: colors.red["400"],
+				borderNote: colors.gray["400"],
+				borderPrimary: colors.gray["400"],
+				borderSecondary: colors.gray["300"],
+				borderSuccess: colors.green["400"],
+				borderWarning: colors.yellow["400"],
+				foregroundDanger: colors.red["400"],
+				foregroundNote: colors.gray["400"],
 				foregroundPrimary: colors.gray["600"],
 				foregroundSecondary: colors.gray["400"],
-				borderSecondary: colors.gray["300"],
-				borderPrimary: colors.gray["400"],
-				backgroundDanger: colors.red["100"],
-				borderDanger: colors.red["400"],
-				foregroundDanger: colors.red["400"],
-				backgroundWarning: colors.yellow["100"],
-				borderWarning: colors.yellow["400"],
-				foregroundWarning: colors.yellow["400"],
-				backgroundSuccess: colors.green["100"],
-				borderSuccess: colors.green["400"],
 				foregroundSuccess: colors.green["400"],
-				backgroundNote: colors.gray["100"],
-				borderNote: colors.gray["400"],
-				foregroundNote: colors.gray["400"],
+				foregroundWarning: colors.yellow["400"],
+				neutralBlack: colors.black,
+				neutralWhite: colors.white,
+				none: colors.transparent,
 			},
 			fontFamilies,
 			fontSizes,

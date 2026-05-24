@@ -1,14 +1,14 @@
 import { Bench } from "tinybench";
 
 type Case = {
-	name: string;
 	handler: () => void;
+	name: string;
 };
 
 export const createBenchmark = (cases: Case[]) => {
 	const benchmark = new Bench({ time: 1000 });
 
-	for (const { name, handler } of cases) {
+	for (const { handler, name } of cases) {
 		benchmark.add(name, handler);
 	}
 

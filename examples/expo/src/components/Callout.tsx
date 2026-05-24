@@ -1,7 +1,8 @@
 import { View } from "react-native";
 
-import { createStyles } from "../styles";
 import type { CreateComponentProps, TextLikeChildren } from "./types";
+
+import { createStyles } from "../styles";
 import { Typography } from "./Typography";
 
 export type CalloutProps = CreateComponentProps<
@@ -11,7 +12,7 @@ export type CalloutProps = CreateComponentProps<
 	TextLikeChildren
 >;
 
-export const Callout = ({ title, children }: CalloutProps) => {
+export const Callout = ({ children, title }: CalloutProps) => {
 	return (
 		<View
 			style={createStyles({

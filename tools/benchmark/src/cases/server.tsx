@@ -1,15 +1,15 @@
-import { EmotionCase } from "./emotion/server";
-import { CoulisCase } from "./coulis/server";
 import { createBenchmark } from "../helpers";
+import { CoulisCase } from "./coulis/server";
+import { EmotionCase } from "./emotion/server";
 
 const benchmark = createBenchmark([
 	{
-		name: "coulis",
 		handler: CoulisCase,
+		name: "coulis",
 	},
 	{
-		name: "emotion",
 		handler: EmotionCase,
+		name: "emotion",
 	},
 ]);
 

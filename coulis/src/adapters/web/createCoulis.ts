@@ -1,13 +1,13 @@
-import type { CreateCoulis } from "../../core/ports/createCoulis";
-import { STYLE_TYPES } from "../../core/entities/style";
-import type { StyleType } from "../../core/entities/style";
-import { isNumber, isObject } from "../../core/entities/primitive";
-import type { RecordLike } from "../../core/entities/primitive";
-import { createMapCache, createSetCache } from "../../core/entities/cache";
 import type { SetCache } from "../../core/entities/cache";
+import type { RecordLike } from "../../core/entities/primitive";
+import type { StyleType } from "../../core/entities/style";
+import type { CreateCoulis } from "../../core/ports/createCoulis";
 import type { ClassName, Rule, StyleSheet } from "./types";
-import { createVirtualStyleSheet } from "./stylesheet/virtual";
-import { createDomStyleSheet } from "./stylesheet/dom";
+
+import { createMapCache, createSetCache } from "../../core/entities/cache";
+import { isNumber, isObject } from "../../core/entities/primitive";
+import { STYLE_TYPES } from "../../core/entities/style";
+import { IS_SERVER_ENVIRONMENT } from "./constants";
 import {
 	createClassName,
 	createCustomProperties,
@@ -15,7 +15,8 @@ import {
 	getEvaluatedTemplate,
 	isShorthandProperty,
 } from "./helpers";
-import { IS_SERVER_ENVIRONMENT } from "./constants";
+import { createDomStyleSheet } from "./stylesheet/dom";
+import { createVirtualStyleSheet } from "./stylesheet/virtual";
 
 export const createCoulis: CreateCoulis<{
 	Input: {
@@ -75,15 +76,21 @@ export const createCoulis: CreateCoulis<{
 	}) => {
 		const propertyValue = properties[name as keyof typeof properties];
 
+		if (typeof propertyValue === "function") {
+			return createDeclaration({
+				name,
+				// eslint-disable-next-line @typescript-eslint/no-unsafe-call
+				value: propertyValue(value),
+			});
+		}
+
+		const finalValue = isObject(propertyValue)
+			? (propertyValue[value as string] ?? value)
+			: value;
+
 		return createDeclaration({
 			name,
-			value:
-				typeof propertyValue === "function"
-					? // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-						propertyValue(value)
-					: isObject(propertyValue)
-						? (propertyValue[value as string] ?? value)
-						: value,
+			value: finalValue,
 		});
 	};
 
@@ -236,7 +243,7 @@ export const createCoulis: CreateCoulis<{
 						stateTemplate,
 						{
 							declaration,
-							selector: `.coulis[className]`,
+							selector: ".coulis[className]",
 						},
 					);
 

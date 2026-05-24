@@ -41,7 +41,7 @@ export const createSetCache = <Key extends string>(): SetCache<Key> => {
 
 export type MapCache<Key extends string, Value> = {
 	add: (key: Key, value: Value) => void;
-	get: (key: Key) => Value | undefined;
+	get: (key: Key) => undefined | Value;
 	getAll: () => Value[];
 	has: (key: Key) => boolean;
 	remove: (key: Key) => void;

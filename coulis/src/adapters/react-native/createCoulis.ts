@@ -1,7 +1,8 @@
 import type { CreateCoulis } from "../../core/ports/createCoulis";
+
 import { compose, isObject } from "../../core/entities/primitive";
-import { transformDimension } from "./transformers";
 import { createUnsupportedLogger } from "./helpers";
+import { transformDimension } from "./transformers";
 
 type CreateCoulisOutput = Record<string, unknown>;
 
@@ -30,15 +31,21 @@ export const createCoulis: CreateCoulis<{
 			const transform = compose(transformDimension);
 			const propertyValue = properties[name as keyof typeof properties];
 
+			if (typeof propertyValue === "function") {
+				return transform({
+					name,
+					// eslint-disable-next-line @typescript-eslint/no-unsafe-call
+					value: propertyValue(styleValue),
+				}).value;
+			}
+
+			const finalValue = isObject(propertyValue)
+				? propertyValue[styleValue as string]
+				: styleValue;
+
 			return transform({
 				name,
-				value:
-					typeof propertyValue === "function"
-						? // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-							propertyValue(styleValue)
-						: isObject(propertyValue)
-							? propertyValue[styleValue as string]
-							: styleValue,
+				value: finalValue,
 			}).value;
 		};
 

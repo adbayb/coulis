@@ -1,13 +1,14 @@
 import { View } from "react-native";
 
-import { createStyles } from "../styles";
 import type { StyleProps } from "../styles";
 import type { CreateComponentProps, ReactElementLike } from "./types";
 
+import { createStyles } from "../styles";
+
 export type StackProps = CreateComponentProps<
-	Omit<StyleProps, "children" | "display" | "flexDirection"> & {
+	{
 		orientation?: "horizontal" | "vertical";
-	},
+	} & Omit<StyleProps, "children" | "display" | "flexDirection">,
 	ReactElementLike
 >;
 

@@ -1,17 +1,18 @@
 "use client";
 
-import { useRef } from "react";
 import type { ReactNode } from "react";
+
 import { useServerInsertedHTML } from "next/navigation";
+import { useRef } from "react";
 
 import { getMetadata, setGlobalStyles } from "../helpers/coulis";
 
 setGlobalStyles({
-	"*,*::before,*::after": {
-		boxSizing: "inherit",
-	},
 	".globalClass": {
 		color: "surfaceSecondary",
+	},
+	"*,*::before,*::after": {
+		boxSizing: "inherit",
 	},
 	"html": {
 		boxSizing: "border-box",
@@ -28,22 +29,22 @@ type CoulisRegistryProps = {
 };
 
 export const CoulisRegistry = ({ children }: CoulisRegistryProps) => {
-	const hasBeenInserted = useRef(false);
+	const hasBeenInsertedRef = useRef(false);
 
 	useServerInsertedHTML(() => {
 		/**
 		 * Prevent inserting multiple times stylesheets if already done.
 		 * @see {@link https://github.com/vercel/next.js/discussions/49354 Issue}.
 		 */
-		if (hasBeenInserted.current) return;
+		if (hasBeenInsertedRef.current) return;
 
-		hasBeenInserted.current = true;
+		hasBeenInsertedRef.current = true;
 
 		return getMetadata().map(({ attributes, content }) => {
 			return (
 				<style
 					{...attributes}
-					// eslint-disable-next-line react/dom/no-dangerously-set-innerhtml
+					// eslint-disable-next-line @eslint-react/dom-no-dangerously-set-innerhtml
 					dangerouslySetInnerHTML={{
 						__html: content,
 					}}

@@ -1,14 +1,14 @@
 import { ScrollView, View } from "react-native";
 
-import { colors, createStyles } from "../src/styles";
-import { Typography } from "../src/components/Typography";
-import { Stack } from "../src/components/Stack";
-import { Separator } from "../src/components/Separator";
-import { Section } from "../src/components/Section";
-import { Callout } from "../src/components/Callout";
-import { Button } from "../src/components/Button";
-import { Badge } from "../src/components/Badge";
 import { Avatar } from "../src/components/Avatar";
+import { Badge } from "../src/components/Badge";
+import { Button } from "../src/components/Button";
+import { Callout } from "../src/components/Callout";
+import { Section } from "../src/components/Section";
+import { Separator } from "../src/components/Separator";
+import { Stack } from "../src/components/Stack";
+import { Typography } from "../src/components/Typography";
+import { colors, createStyles } from "../src/styles";
 
 export default function Index() {
 	return (

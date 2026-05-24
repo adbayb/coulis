@@ -218,9 +218,6 @@ describe("createCoulis (port)", () => {
 		expectTypeOf(coulis.setGlobalStyles).returns.toBeVoid();
 
 		coulis.setGlobalStyles({
-			"*,*::before,*::after": {
-				boxSizing: "inherit",
-			},
 			".globalClass": {
 				display: "flex",
 			},
@@ -229,6 +226,9 @@ describe("createCoulis (port)", () => {
 			},
 			"@import":
 				"url('https://fonts.googleapis.com/css?family=Open+Sans&display=swap')",
+			"*,*::before,*::after": {
+				boxSizing: "inherit",
+			},
 			"html": {
 				backgroundColorShorthand: "neutralWhite",
 				boxSizing: "border-box",
@@ -240,10 +240,6 @@ describe("createCoulis (port)", () => {
 		});
 
 		coulis.setGlobalStyles({
-			"*,*::before,*::after": {
-				// @ts-expect-error Should not accept unknown value (number)
-				unknown: 2,
-			},
 			".globalClass": {
 				// @ts-expect-error Should not allow stateful definition
 				display: {
@@ -252,6 +248,10 @@ describe("createCoulis (port)", () => {
 			},
 			// @ts-expect-error Should not accept unknown value (boolean)
 			"@import": true,
+			"*,*::before,*::after": {
+				// @ts-expect-error Should not accept unknown value (number)
+				unknown: 2,
+			},
 			"html,body": {
 				backgroundColor: "white",
 				backgroundColorShorthand: "black",

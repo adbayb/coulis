@@ -22,6 +22,6 @@ export const negateTokens = <
 
 			return withNegativeProps;
 		},
-		{} as Record<Keys | `-${Exclude<Keys, "none">}`, string>,
+		{} as Record<`-${Exclude<Keys, "none">}` | Keys, string>,
 	);
 };

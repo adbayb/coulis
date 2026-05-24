@@ -1,10 +1,11 @@
-import { createRoot } from "react-dom/client";
 import type { JSX } from "react";
 
-import { StyledComponentsComponent } from "./styled-components/Component";
-import { EmotionComponent } from "./emotion/Component";
-import { CoulisComponent } from "./coulis/Component";
+import { createRoot } from "react-dom/client";
+
 import { createBenchmark } from "../helpers";
+import { CoulisComponent } from "./coulis/Component";
+import { EmotionComponent } from "./emotion/Component";
+import { StyledComponentsComponent } from "./styled-components/Component";
 
 const createHandler = (Component: () => JSX.Element) => {
 	return () => {
@@ -21,16 +22,16 @@ const createHandler = (Component: () => JSX.Element) => {
 
 const benchmark = createBenchmark([
 	{
-		name: "coulis",
 		handler: createHandler(CoulisComponent),
+		name: "coulis",
 	},
 	{
-		name: "emotion",
 		handler: createHandler(EmotionComponent),
+		name: "emotion",
 	},
 	{
-		name: "styled-components",
 		handler: createHandler(StyledComponentsComponent),
+		name: "styled-components",
 	},
 ]);
 

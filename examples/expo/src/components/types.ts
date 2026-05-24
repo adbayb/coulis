@@ -2,15 +2,17 @@ import type { ReactElement, ReactNode } from "react";
 
 import type { StyleProps } from "../styles";
 
-export type TextLikeChildren = TextLikeChildren[] | boolean | number | string;
-
-export type ReactElementLike = ReactElement | ReactElementLike[] | boolean;
-
 export type CreateComponentProps<
 	// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 	OwnProps extends Record<string, unknown> = {},
 	Children extends ReactNode = undefined,
-> = OwnProps &
+> = (Children extends undefined
+	? // eslint-disable-next-line @typescript-eslint/no-empty-object-type
+		{}
+	: {
+			children: Children;
+		}) &
+	OwnProps &
 	Pick<
 		StyleProps,
 		| "margin"
@@ -20,10 +22,8 @@ export type CreateComponentProps<
 		| "marginRight"
 		| "marginTop"
 		| "marginVertical"
-	> &
-	(Children extends undefined
-		? // eslint-disable-next-line @typescript-eslint/no-empty-object-type
-			{}
-		: {
-				children: Children;
-			});
+	>;
+
+export type ReactElementLike = boolean | ReactElement | ReactElementLike[];
+
+export type TextLikeChildren = boolean | number | string | TextLikeChildren[];

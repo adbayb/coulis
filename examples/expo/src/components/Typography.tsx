@@ -1,9 +1,10 @@
-import { Text } from "react-native";
 import { useMemo } from "react";
+import { Text } from "react-native";
 
-import { createStyles } from "../styles";
 import type { StyleProps } from "../styles";
 import type { CreateComponentProps, TextLikeChildren } from "./types";
+
+import { createStyles } from "../styles";
 
 export type TypographyProps = CreateComponentProps<
 	{
@@ -42,12 +43,6 @@ export const Typography = ({
 type Variant = "body" | "caption" | "subTitle" | "title";
 
 const PROPS_BY_VARIANT: Record<Variant, StyleProps> = {
-	title: {
-		color: "foregroundPrimary",
-		fontSize: "3xl",
-		fontWeight: "bold",
-		// lineHeight: "relaxed", // TODO: to fix on coulis react native adapter
-	},
 	body: {
 		color: "foregroundSecondary",
 		fontSize: "base",
@@ -65,5 +60,11 @@ const PROPS_BY_VARIANT: Record<Variant, StyleProps> = {
 		fontSize: "xl",
 		fontWeight: "semibold",
 		// lineHeight: "relaxed",
+	},
+	title: {
+		color: "foregroundPrimary",
+		fontSize: "3xl",
+		fontWeight: "bold",
+		// lineHeight: "relaxed", // TODO: to fix on coulis react native adapter
 	},
 };

@@ -1,8 +1,9 @@
-import { isObject } from "../../core/entities/primitive";
 import type {
 	RecordLike,
 	WithNewLeafNodes,
 } from "../../core/entities/primitive";
+
+import { isObject } from "../../core/entities/primitive";
 import { SHORTHAND_PROPERTIES, UNITLESS_PROPERTIES } from "./constants";
 
 /**
@@ -13,14 +14,15 @@ import { SHORTHAND_PROPERTIES, UNITLESS_PROPERTIES } from "./constants";
  * @example
  * const safeCssVariable = escape("--spacings-1.5"); // Will generate `--spacings-1\5`
  */
+// eslint-disable-next-line sonarjs/no-built-in-override
 export const escape = (input: string) => {
 	return input.replaceAll(/[!"#$%&'()*+,./:;<=>?@[\]^`{|}~]/g, "-");
 };
 
 export const createClassName = (input: string) => {
 	// hash content based with FNV-1a algorithm:
-	const FNVOffsetBasis = 2166136261;
-	const FNVPrime = 16777619;
+	const FNVOffsetBasis = 2_166_136_261;
+	const FNVPrime = 16_777_619;
 	let hashedValue = FNVOffsetBasis;
 
 	for (let index = 0; index < input.length; index++) {

@@ -1,7 +1,7 @@
 import { renderToString } from "react-dom/server";
 
-import { getMetadata } from "./helpers";
 import { CoulisComponent } from "./Component";
+import { getMetadata } from "./helpers";
 
 export const CoulisCase = () => {
 	renderToString(<CoulisComponent />);

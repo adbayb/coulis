@@ -1,8 +1,9 @@
 import { Text } from "react-native";
 
-import { createStyles } from "../styles";
 import type { StyleProps } from "../styles";
 import type { CreateComponentProps, TextLikeChildren } from "./types";
+
+import { createStyles } from "../styles";
 
 export type BadgeProps = CreateComponentProps<
 	{

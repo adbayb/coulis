@@ -32,6 +32,7 @@ export const EmotionComponent = () => {
 			<tbody>
 				{Array.from({ length: NUMBER_OF_DATA }).map((_, index) => {
 					return (
+						// eslint-disable-next-line @eslint-react/no-array-index-key
 						<tr key={index}>
 							<td className={firstTdClassName}>The table body</td>
 							<td className={secondTdClassName}>

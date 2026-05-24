@@ -1,9 +1,9 @@
-import type { ThemeLike } from "../entities/theme";
-import type { GlobalStyles, PropertiesLike, Styles } from "../entities/style";
-import type { StatesLike } from "../entities/state";
-import type { ShortandsLike } from "../entities/shorthand";
-import type { RecordLike, WithNewLeafNodes } from "../entities/primitive";
 import type { Keyframes } from "../entities/keyframe";
+import type { RecordLike, WithNewLeafNodes } from "../entities/primitive";
+import type { ShortandsLike } from "../entities/shorthand";
+import type { StatesLike } from "../entities/state";
+import type { GlobalStyles, PropertiesLike, Styles } from "../entities/style";
+import type { ThemeLike } from "../entities/theme";
 
 export type CreateCoulis<
 	CreateCoulisGeneric extends {

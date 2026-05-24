@@ -1,4 +1,3 @@
-export { colors } from "./tokens/colors";
 export { resetStyles } from "./reset";
 export {
 	createStyles,
@@ -7,3 +6,4 @@ export {
 	STYLE_PROPERTY_NAMES,
 } from "./styles";
 export type { StyleProps } from "./styles";
+export { colors } from "./tokens/colors";

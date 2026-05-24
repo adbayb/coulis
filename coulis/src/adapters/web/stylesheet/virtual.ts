@@ -1,4 +1,5 @@
 import type { ClassName, CreateStyleSheet, Rule } from "../types";
+
 import { createMapCache } from "../../../core/entities/cache";
 
 export const createVirtualStyleSheet: CreateStyleSheet = () => {

@@ -2,6 +2,8 @@ import type { StyleType } from "../../core/entities/style";
 
 export type ClassName = string;
 
+export type CreateStyleSheet = (type: StyleType) => StyleSheet;
+
 export type Rule = string;
 
 export type StyleSheet = {
@@ -10,5 +12,3 @@ export type StyleSheet = {
 	insert: (className: ClassName, rule: Rule) => void;
 	remove: () => void;
 };
-
-export type CreateStyleSheet = (type: StyleType) => StyleSheet;

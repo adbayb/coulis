@@ -132,9 +132,6 @@ const {
 
 // eslint-disable-next-line vitest/require-hook
 setGlobalStyles({
-	"*,*::before,*::after": {
-		boxSizing: "inherit",
-	},
 	".globalClass+.otherGlobalClass": {
 		colorScheme: "black",
 	},
@@ -145,6 +142,9 @@ setGlobalStyles({
 	},
 	"@import":
 		"url('https://fonts.googleapis.com/css?family=Open+Sans&display=swap')",
+	"*,*::before,*::after": {
+		boxSizing: "inherit",
+	},
 	"div": {
 		backgroundColor: "red", // Non-theme-based value to check if set properly by `setGlobalStyles`
 	},

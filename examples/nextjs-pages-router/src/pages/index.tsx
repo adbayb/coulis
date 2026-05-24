@@ -1,5 +1,6 @@
-import { useEffect, useState } from "react";
 import type { PropsWithChildren, ReactNode } from "react";
+
+import { useEffect, useState } from "react";
 
 import {
 	createKeyframes,
@@ -8,9 +9,6 @@ import {
 } from "../helpers/coulis";
 
 setGlobalStyles({
-	"*,*::before,*::after": {
-		boxSizing: "inherit",
-	},
 	".globalClass": {
 		borderRadius: "large",
 	},
@@ -20,6 +18,9 @@ setGlobalStyles({
 	},
 	"@import":
 		"url('https://fonts.googleapis.com/css?family=Open+Sans&display=swap')",
+	"*,*::before,*::after": {
+		boxSizing: "inherit",
+	},
 	"html": {
 		boxSizing: "border-box",
 	},
@@ -148,11 +149,11 @@ const TEXT =
 	"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
 
 type ExampleProps = {
-	readonly title: string;
 	readonly children: ReactNode;
+	readonly title: string;
 };
 
-const Example = ({ title, children }: ExampleProps) => {
+const Example = ({ children, title }: ExampleProps) => {
 	return (
 		<section>
 			<h3>{title}</h3>

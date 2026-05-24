@@ -1,8 +1,9 @@
 import { View } from "react-native";
 
 import type { CreateComponentProps, ReactElementLike } from "./types";
-import { Typography } from "./Typography";
+
 import { Stack } from "./Stack";
+import { Typography } from "./Typography";
 
 export type SectionProps = CreateComponentProps<
 	{
@@ -11,7 +12,7 @@ export type SectionProps = CreateComponentProps<
 	ReactElementLike
 >;
 
-export const Section = ({ title, children }: SectionProps) => {
+export const Section = ({ children, title }: SectionProps) => {
 	return (
 		<Stack
 			gap={2}

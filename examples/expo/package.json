@@ -11,8 +11,8 @@
 	},
 	"dependencies": {
 		"coulis": "workspace:^",
-		"expo": "^55.0.11",
-		"expo-router": "^55.0.10",
+		"expo": "^56.0.0",
+		"expo-router": "^56.2.3",
 		"react": "^19.2.4",
 		"react-native": "^0.84.1"
 	},

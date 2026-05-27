@@ -1,5 +1,6 @@
 import type { CreateCoulis } from "../../core/ports/createCoulis";
 
+import { createMapCache } from "../../core/entities/cache";
 import { compose, isObject } from "../../core/entities/primitive";
 import { createUnsupportedLogger } from "./helpers";
 import { transformDimension } from "./transformers";
@@ -21,6 +22,7 @@ export const createCoulis: CreateCoulis<{
 	>;
 
 	const shorthandNames = Object.keys(shorthands);
+	const stylesCache = createMapCache<string, CreateCoulisOutput>();
 
 	const isCustomShorthandProperty = (name: string) => {
 		return shorthandNames.includes(name);
@@ -67,7 +69,11 @@ export const createCoulis: CreateCoulis<{
 			return {};
 		},
 		createStyles(input) {
-			// TODO: cache (insert method)
+			const cacheKey = JSON.stringify(input);
+			const cachedStyles = stylesCache.get(cacheKey);
+
+			if (cachedStyles) return cachedStyles;
+
 			const styles: CreateCoulisOutput = {};
 
 			for (const propertyName of Object.keys(input)) {
@@ -91,7 +97,7 @@ export const createCoulis: CreateCoulis<{
 				}
 			}
 
-			console.log(styles);
+			stylesCache.add(cacheKey, styles);
 
 			return styles;
 		},

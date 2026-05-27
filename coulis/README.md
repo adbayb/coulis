@@ -184,4 +184,37 @@ For more server-side integration recipes, the following examples can be checked:
 - **...**
     - Welcome to any contribution.
 
+### How to use Coulis with React Native?
+
+Import from the dedicated entry point:
+
+```ts
+import { createCoulis } from "coulis/react-native";
+```
+
+The API is identical to the web adapter with the following differences:
+
+| Method            | Web                                           | React Native                                       |
+| ----------------- | --------------------------------------------- | -------------------------------------------------- |
+| `createStyles`    | Returns a CSS class name string               | Returns a style object (`Record<string, unknown>`) |
+| `createKeyframes` | Injects `@keyframes` rule, returns class name | ⚠️ Not supported — logs a warning and returns `{}` |
+| `setGlobalStyles` | Injects global CSS rules                      | ⚠️ Not supported — logs a warning and does nothing |
+| `getMetadata`     | Returns injected style sheets (for SSR)       | ⚠️ Not supported — logs a warning and returns `[]` |
+
+Theme values are passed as-is (raw values, not CSS custom properties).
+
+<br>
+
+## 🔭 Examples
+
+Working integrations are available in the [`examples/`](../examples/) directory:
+
+| Example                                                 | Description                         |
+| ------------------------------------------------------- | ----------------------------------- |
+| [vite-csr-react](../examples/vite-csr-react/)           | Vite + React, client-side rendering |
+| [vite-ssr-react](../examples/vite-ssr-react/)           | Vite + React, server-side rendering |
+| [nextjs-app-router](../examples/nextjs-app-router/)     | Next.js with the App Router         |
+| [nextjs-pages-router](../examples/nextjs-pages-router/) | Next.js with the Pages Router       |
+| [expo](../examples/expo/)                               | React Native via Expo               |
+
 <br>

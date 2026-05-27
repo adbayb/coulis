@@ -7,6 +7,14 @@ import type { ThemeLike } from "../entities/theme";
 
 export type CreateCoulis<
 	CreateCoulisGeneric extends {
+		/**
+		 * Controls how theme values are exposed to the `properties` callback.
+		 * - `true` (web adapter): leaf values in the theme are transformed into
+		 * CSS custom property references (`var(--token-name)`). The adapter
+		 * injects a `:root { --token-name: value }` rule automatically.
+		 * - `false` (react-native adapter): theme values are passed through as-is
+		 * (raw strings/numbers), since CSS variables are not supported on native platforms.
+		 */
 		Input: { WithCSSVariables: boolean };
 		Output: unknown;
 	},

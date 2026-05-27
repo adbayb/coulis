@@ -59,6 +59,7 @@
 		"csstype": "^3.2.3"
 	},
 	"devDependencies": {
+		"happy-dom": "20.9.0",
 		"quickbundle": "3.0.0",
 		"react-native": "0.85.3",
 		"vitest": "4.1.7"

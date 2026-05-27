@@ -178,6 +178,17 @@ export const createCoulis: CreateCoulis<{
 	});
 
 	return {
+		/**
+		 * Creates a CSS `@keyframes` animation rule from a map of keyframe selectors
+		 * (e.g. `"from"`, `"to"`, `"50%"`, or a plain number interpreted as a percentage)
+		 * to style objects. Returns the generated animation name, which can be passed
+		 * directly to an `animation` or `animationName` property.
+		 * @param input - Style properties.
+		 * @returns Animation name.
+		 * @example
+		 * 	const spin = createKeyframes({ from: { transform: "rotate(0deg)" }, to: { transform: "rotate(360deg)" } });
+		 * 	createStyles({ animation: `${spin} 1s linear infinite` });
+		 */
 		createKeyframes(input) {
 			return insert({
 				cacheInput: JSON.stringify(input),
@@ -205,6 +216,17 @@ export const createCoulis: CreateCoulis<{
 				type: "global",
 			});
 		},
+		/**
+		 * Generates atomic CSS class names for a given style object. Each
+		 * property/value pair produces its own class name and CSS rule. Identical
+		 * inputs always return the same space-separated class name string (cached).
+		 * State variants (e.g. `{ base: "red", hover: "blue" }`) are supported when
+		 * `states` is configured in the contract.
+		 * @param input - Style properties.
+		 * @returns Class name.
+		 * @example
+		 * 	const className = createStyles({ color: "neutralDark", display: "flex" });
+		 */
 		createStyles(input) {
 			const classNames: ClassName[] = [];
 
@@ -308,6 +330,14 @@ export const createCoulis: CreateCoulis<{
 
 			return classNames.join(" ");
 		},
+		/**
+		 * Returns the list of all property names (including shorthands) accepted by
+		 * `createStyles` and `setGlobalStyles`. Useful for runtime introspection or
+		 * building tooling on top of a coulis instance.
+		 * @returns The list of all property names.
+		 * @example
+		 * 	const contract = getContract();
+		 */
 		getContract() {
 			return {
 				propertyNames: [
@@ -316,6 +346,18 @@ export const createCoulis: CreateCoulis<{
 				] as ReturnType<typeof this.getContract>["propertyNames"],
 			};
 		},
+		/**
+		 * Returns the collected style sheets as an array of metadata objects, each
+		 * containing the `content` (CSS text) and `attributes` to set on the
+		 * `<style>` element. Calling `.toString()` on the result produces a ready-to-
+		 * inject HTML string of `<style>` tags.
+		 *
+		 * Call this **After** rendering your component tree (e.g. After
+		 * `renderToString`) to collect all styles generated during that render.
+		 * @returns Metadata object.
+		 * @example
+		 * 	const html = `<head>${String(getMetadata())}</head><body>${body}</body>`;
+		 */
 		getMetadata() {
 			const metadata = STYLE_TYPES.map((type) => {
 				const { getContent } = styleSheetByTypeAdaptee[type];
@@ -353,6 +395,18 @@ export const createCoulis: CreateCoulis<{
 
 			return metadata;
 		},
+		/**
+		 * Injects global (non-component) CSS rules: element selectors, `@import`,
+		 * `@font-face`, `@charset`, and any other top-level CSS constructs.
+		 * Rules are deduplicated — calling this multiple times with the same input
+		 * only injects once.
+		 * @param input - Style properties.
+		 * @example
+		 * 	setGlobalStyles({
+		 * 		"html,body": { margin: "none", padding: "none" },
+		 * 		"@import": "url('https://fonts.googleapis.com/css?family=Open+Sans')",
+		 * 	});
+		 */
 		setGlobalStyles(input) {
 			insert({
 				cacheInput: JSON.stringify(input),

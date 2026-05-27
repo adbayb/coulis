@@ -1,6 +1,7 @@
 import type { ClassName, CreateStyleSheet, Rule } from "../types";
 
 import { createMapCache } from "../../../core/entities/cache";
+import { minify } from "../helpers";
 
 export const createVirtualStyleSheet: CreateStyleSheet = () => {
 	const ruleByClassName = createMapCache<ClassName, Rule>();
@@ -24,8 +25,4 @@ export const createVirtualStyleSheet: CreateStyleSheet = () => {
 			cachedContent = undefined;
 		},
 	};
-};
-
-const minify = (value: string) => {
-	return value.replaceAll(/\s{2,}|\s+(?={)|\r?\n/gm, "");
 };

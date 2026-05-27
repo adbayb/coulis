@@ -1,5 +1,21 @@
 # Change Log
 
+## 0.20.0
+
+### Minor Changes
+
+- [`3c86e19`](https://github.com/adbayb/coulis/commit/3c86e19944a7044b2cfa8dbf7241667358c4a8f3) Thanks [@adbayb](https://github.com/adbayb)! - Add runtime validation for `states`: each template must contain `coulis[selector]` and `coulis[declaration]` markers; an error is thrown at configuration time if either is missing.
+
+### Patch Changes
+
+- [`3c86e19`](https://github.com/adbayb/coulis/commit/3c86e19944a7044b2cfa8dbf7241667358c4a8f3) Thanks [@adbayb](https://github.com/adbayb)! - Performance improvements:
+    - **Web / class name generation**: `createClassName` now uses `charCodeAt()` instead of `codePointAt()` and `Math.imul()` for 32-bit integer multiplication instead of the `*` operator, making FNV-1a hashing faster while preserving collision resistance.
+    - **Web / DOM stylesheet**: CSS rules are now batched and flushed in a single `textContent` write instead of one `insertAdjacentText` call per rule, reducing style recalculations during initial render.
+    - **Web / virtual stylesheet (SSR)**: the minified CSS string returned by `getMetadata` is cached after the first computation instead of being recomputed on every call.
+    - **React Native**: `Dimensions.get("window")` is now memoized inside dimension transformers instead of being called on every `vh`/`vw` conversion.
+
+- [`ed1a4d5`](https://github.com/adbayb/coulis/commit/ed1a4d5ffe36afad7b09d0b8cee52c5ed99c8ca2) Thanks [@adbayb](https://github.com/adbayb)! - Cache `createStyles` output in the React Native adapter. Identical style inputs now return the same object reference on subsequent calls instead of recomputing the style object every time.
+
 ## 0.19.1
 
 ### Patch Changes

@@ -1,4 +1,7 @@
+/* eslint-disable perfectionist/sort-objects */
 import { Bench } from "tinybench";
+
+import type { BenchmarkOutput } from "./types";
 
 type Case = {
 	handler: () => void;
@@ -13,32 +16,53 @@ export const createBenchmark = (cases: Case[]) => {
 	}
 
 	return {
-		run() {
-			benchmark.runSync();
+		async run() {
+			const tasks = await benchmark.run();
+
+			const results = tasks
+				.map(({ name, result }) => {
+					if (result.state !== "completed") return undefined;
+
+					return {
+						name,
+						"Throughput mean (ops/s)": toFixed(
+							result.throughput.mean,
+						),
+						"Throughput med (ops/s)": toFixed(
+							result.throughput.p50,
+						),
+						"Latency mean (ns)": toFixed(result.latency.mean),
+						"Latency med (ns)": toFixed(result.latency.p50),
+					};
+				})
+				.filter(Boolean) as BenchmarkOutput[];
 
 			const fastestCase = cases[
-				benchmark.results.reduce(
-					(fastestResult, currentResult, index) => {
+				tasks.reduce(
+					(fastestTask, currentTask, index) => {
+						if (currentTask.result.state !== "completed")
+							return fastestTask;
+
 						const currentThroughput =
-							currentResult?.throughput.mean;
+							currentTask.result.throughput.mean;
 
-						if (currentThroughput === undefined)
-							return fastestResult;
-
-						if (currentThroughput > fastestResult.throughput)
+						if (currentThroughput > fastestTask.throughput)
 							return { index, throughput: currentThroughput };
 
-						return fastestResult;
+						return fastestTask;
 					},
 					{ index: 0, throughput: 0 },
 				).index
 			] as Case;
 
-			console.log("Fastest is", fastestCase.name, "✨");
-			console.table(benchmark.table());
-
-			// eslint-disable-next-line unicorn/no-process-exit
-			process.exit(0);
+			return {
+				fastestCase: fastestCase.name,
+				results,
+			};
 		},
 	};
+};
+
+const toFixed = (input: number) => {
+	return Number(input.toFixed(4));
 };

@@ -7,16 +7,23 @@
 	"license": "MIT",
 	"author": "Ayoub Adib <adbayb@gmail.com>",
 	"type": "module",
+	"exports": {
+		"./browser": {
+			"source": "./src/cases/browser.tsx",
+			"default": "./dist/browser.js"
+		}
+	},
 	"scripts": {
 		"benchmark": "pnpm benchmark:browser && pnpm benchmark:server",
-		"benchmark:browser": "playwright-test ./src/cases/browser.tsx --runner benchmark",
-		"benchmark:server": "tsx ./src/cases/server.tsx"
+		"benchmark:browser": "quickbundle build --minification && playwright test ./src/playwright.spec.ts --headed",
+		"benchmark:server": "node ./src/cases/server.spec.ts"
 	},
 	"devDependencies": {
 		"@emotion/css": "11.13.5",
 		"@emotion/server": "11.11.0",
 		"coulis": "workspace:*",
-		"playwright-test": "14.1.13",
+		"playwright": "1.60.0",
+		"quickbundle": "3.0.0",
 		"react": "19.2.6",
 		"react-dom": "19.2.6",
 		"styled-components": "6.4.2",

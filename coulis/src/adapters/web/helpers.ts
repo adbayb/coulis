@@ -12,7 +12,7 @@ import { SHORTHAND_PROPERTIES, UNITLESS_PROPERTIES } from "./constants";
  * @returns The escaped input.
  * @see https://mathiasbynens.be/notes/css-escapes
  * @example
- * const safeCssVariable = escape("--spacings-1.5"); // Will generate `--spacings-1\5`
+ * const safeCssVariable = escape("--spacings-1.5"); // Will generate `--spacings-1-5`
  */
 // eslint-disable-next-line sonarjs/no-built-in-override
 export const escape = (input: string) => {

@@ -15,8 +15,8 @@
 	},
 	"scripts": {
 		"benchmark": "pnpm benchmark:browser && pnpm benchmark:server",
-		"benchmark:browser": "quickbundle build --minification && playwright test ./src/playwright.spec.ts --headed",
-		"benchmark:server": "node ./src/cases/server.spec.ts"
+		"benchmark:browser": "quickbundle build --minification && playwright test ./src/cases/browser.spec.ts",
+		"benchmark:server": "tsx ./src/cases/server.spec.ts"
 	},
 	"devDependencies": {
 		"@emotion/css": "11.13.5",

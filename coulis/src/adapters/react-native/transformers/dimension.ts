@@ -2,6 +2,12 @@ import { Dimensions } from "react-native";
 
 import type { Transform } from "./types";
 
+let windowDimensions = Dimensions.get("window");
+
+Dimensions.addEventListener("change", ({ window }) => {
+	windowDimensions = window;
+});
+
 export const transformDimension: Transform = (input) => {
 	if (typeof input.value !== "string") return input;
 
@@ -21,10 +27,10 @@ const getDimensionValue = (input: string) => {
 	if (["em", "rem"].some((unit) => input.endsWith(unit))) return value * 16;
 
 	if (["vh", "vmax"].some((unit) => input.endsWith(unit)))
-		return (value / 100) * Dimensions.get("window").height;
+		return (value / 100) * windowDimensions.height;
 
 	if (["vw", "vmin"].some((unit) => input.endsWith(unit)))
-		return (value / 100) * Dimensions.get("window").width;
+		return (value / 100) * windowDimensions.width;
 
 	return input;
 };

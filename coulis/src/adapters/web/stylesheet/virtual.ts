@@ -4,19 +4,24 @@ import { createMapCache } from "../../../core/entities/cache";
 
 export const createVirtualStyleSheet: CreateStyleSheet = () => {
 	const ruleByClassName = createMapCache<ClassName, Rule>();
+	let cachedContent: string | undefined = undefined;
 
 	return {
 		getContent() {
-			return minify([...ruleByClassName.getAll()].join(""));
+			return (
+				cachedContent ?? minify([...ruleByClassName.getAll()].join(""))
+			);
 		},
 		getHydratedClassNames() {
 			return [];
 		},
 		insert(key, rule) {
 			ruleByClassName.add(key, rule);
+			cachedContent = undefined;
 		},
 		remove() {
 			ruleByClassName.removeAll();
+			cachedContent = undefined;
 		},
 	};
 };

@@ -63,6 +63,19 @@ export const createCoulis: CreateCoulis<{
 			})) as Parameters<typeof contract.properties>[0],
 	);
 
+	if (contract.states) {
+		for (const [name, template] of Object.entries(contract.states)) {
+			if (
+				!template.includes("coulis[selector]") ||
+				!template.includes("coulis[declaration]")
+			) {
+				throw new Error(
+					`The \`${name}\` state must include \`coulis[selector]\` and \`coulis[declaration]\` template markers.`,
+				);
+			}
+		}
+	}
+
 	const isCustomShorthandProperty = (name: string) => {
 		return shorthandNames.includes(name);
 	};

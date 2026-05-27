@@ -4,24 +4,24 @@ exports[`createCoulis (web adapter) > should extract styles 1`] = `
 [
   {
     "attributes": {
-      "data-coulis-cache": "c66501570,c427a20e8,c77e20e50",
+      "data-coulis-cache": "c2446b4d9,c988c097b,c3feb3671",
       "data-coulis-type": "global",
     },
-    "content": ":root{--colors-neutralDark:black;--colors-neutralLight:white;--colors-neutralTransparent:transparent;--colors-surfacePrimary:rgb(119,146,185);--colors-surfaceSecondary:rgb(201,212,227);--spacings-0:0px;--spacings-1:1rem;--spacings-0-5:0.5rem;--spacings-1-5:2rem;}.globalClass+.otherGlobalClass{color-scheme:dark;}@charset "utf-8";@font-face{font-family:'AliasedHelvetica';src:local(Helvetica);}@import url('https://fonts.googleapis.com/css?family=Open+Sans&display=swap');*,*::before,*::after{box-sizing:inherit;}div{background-color:red;}html{box-sizing:border-box;}html,body{background-color:var(--colors-surfacePrimary);font-family:Open Sans, AliasedHelvetica;margin:var(--spacings-0);padding:var(--spacings-0);}@keyframes c77e20e50{25%{transform:scale(1.25);}50%{transform:scale(1.5);}from{transform:scale(1);}to{transform:scale(1);}}",
+    "content": ":root{--colors-neutralDark:black;--colors-neutralLight:white;--colors-neutralTransparent:transparent;--colors-surfacePrimary:rgb(119,146,185);--colors-surfaceSecondary:rgb(201,212,227);--spacings-0:0px;--spacings-1:1rem;--spacings-0-5:0.5rem;--spacings-1-5:2rem;}.globalClass+.otherGlobalClass{color-scheme:dark;}@charset "utf-8";@font-face{font-family:'AliasedHelvetica';src:local(Helvetica);}@import url('https://fonts.googleapis.com/css?family=Open+Sans&display=swap');*,*::before,*::after{box-sizing:inherit;}div{background-color:red;}html{box-sizing:border-box;}html,body{background-color:var(--colors-surfacePrimary);font-family:Open Sans, AliasedHelvetica;margin:var(--spacings-0);padding:var(--spacings-0);}@keyframes c3feb3671{25%{transform:scale(1.25);}50%{transform:scale(1.5);}from{transform:scale(1);}to{transform:scale(1);}}",
   },
   {
     "attributes": {
-      "data-coulis-cache": "c8cf22ec5",
+      "data-coulis-cache": "c6c43fc52",
       "data-coulis-type": "shorthand",
     },
-    "content": ".c8cf22ec5{padding:var(--spacings-0);}",
+    "content": ".c6c43fc52{padding:var(--spacings-0);}",
   },
   {
     "attributes": {
-      "data-coulis-cache": "ce5eab527,ca4eaf829,ce899257c,cdf15bb1c",
+      "data-coulis-cache": "c9420ae5f,ced44f712,c9b11817e,c35ef7535",
       "data-coulis-type": "longhand",
     },
-    "content": ".ce5eab527[alt]{background-color:var(--colors-surfacePrimary);}.ca4eaf829{background-color:var(--colors-surfaceSecondary);}.ce899257c{background-color:var(--colors-neutralTransparent);}.cdf15bb1c{color:var(--colors-neutralDark);}",
+    "content": ".c9420ae5f[alt]{background-color:var(--colors-surfacePrimary);}.ced44f712{background-color:var(--colors-surfaceSecondary);}.c9b11817e{background-color:var(--colors-neutralTransparent);}.c35ef7535{color:var(--colors-neutralDark);}",
   },
   {
     "attributes": {
@@ -40,4 +40,4 @@ exports[`createCoulis (web adapter) > should extract styles 1`] = `
 ]
 `;
 
-exports[`createCoulis (web adapter) > should extract styles given stringified styles 1`] = `"<style data-coulis-cache="c66501570,c427a20e8,c77e20e50" data-coulis-type="global">:root{--colors-neutralDark:black;--colors-neutralLight:white;--colors-neutralTransparent:transparent;--colors-surfacePrimary:rgb(119,146,185);--colors-surfaceSecondary:rgb(201,212,227);--spacings-0:0px;--spacings-1:1rem;--spacings-0-5:0.5rem;--spacings-1-5:2rem;}.globalClass+.otherGlobalClass{color-scheme:dark;}@charset "utf-8";@font-face{font-family:'AliasedHelvetica';src:local(Helvetica);}@import url('https://fonts.googleapis.com/css?family=Open+Sans&display=swap');*,*::before,*::after{box-sizing:inherit;}div{background-color:red;}html{box-sizing:border-box;}html,body{background-color:var(--colors-surfacePrimary);font-family:Open Sans, AliasedHelvetica;margin:var(--spacings-0);padding:var(--spacings-0);}@keyframes c77e20e50{25%{transform:scale(1.25);}50%{transform:scale(1.5);}from{transform:scale(1);}to{transform:scale(1);}}</style><style data-coulis-cache="c8cf22ec5" data-coulis-type="shorthand">.c8cf22ec5{padding:var(--spacings-0);}</style><style data-coulis-cache="ce5eab527,ca4eaf829,ce899257c,cdf15bb1c" data-coulis-type="longhand">.ce5eab527[alt]{background-color:var(--colors-surfacePrimary);}.ca4eaf829{background-color:var(--colors-surfaceSecondary);}.ce899257c{background-color:var(--colors-neutralTransparent);}.cdf15bb1c{color:var(--colors-neutralDark);}</style><style data-coulis-cache="" data-coulis-type="atShorthand"></style><style data-coulis-cache="" data-coulis-type="atLonghand"></style>"`;
+exports[`createCoulis (web adapter) > should extract styles given stringified styles 1`] = `"<style data-coulis-cache="c2446b4d9,c988c097b,c3feb3671" data-coulis-type="global">:root{--colors-neutralDark:black;--colors-neutralLight:white;--colors-neutralTransparent:transparent;--colors-surfacePrimary:rgb(119,146,185);--colors-surfaceSecondary:rgb(201,212,227);--spacings-0:0px;--spacings-1:1rem;--spacings-0-5:0.5rem;--spacings-1-5:2rem;}.globalClass+.otherGlobalClass{color-scheme:dark;}@charset "utf-8";@font-face{font-family:'AliasedHelvetica';src:local(Helvetica);}@import url('https://fonts.googleapis.com/css?family=Open+Sans&display=swap');*,*::before,*::after{box-sizing:inherit;}div{background-color:red;}html{box-sizing:border-box;}html,body{background-color:var(--colors-surfacePrimary);font-family:Open Sans, AliasedHelvetica;margin:var(--spacings-0);padding:var(--spacings-0);}@keyframes c3feb3671{25%{transform:scale(1.25);}50%{transform:scale(1.5);}from{transform:scale(1);}to{transform:scale(1);}}</style><style data-coulis-cache="c6c43fc52" data-coulis-type="shorthand">.c6c43fc52{padding:var(--spacings-0);}</style><style data-coulis-cache="c9420ae5f,ced44f712,c9b11817e,c35ef7535" data-coulis-type="longhand">.c9420ae5f[alt]{background-color:var(--colors-surfacePrimary);}.ced44f712{background-color:var(--colors-surfaceSecondary);}.c9b11817e{background-color:var(--colors-neutralTransparent);}.c35ef7535{color:var(--colors-neutralDark);}</style><style data-coulis-cache="" data-coulis-type="atShorthand"></style><style data-coulis-cache="" data-coulis-type="atLonghand"></style>"`;

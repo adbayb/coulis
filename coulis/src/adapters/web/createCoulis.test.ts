@@ -19,7 +19,7 @@ describe("createCoulis (web adapter)", () => {
 					transform: "scale(1)",
 				},
 			}),
-		).toBe("c77e20e50");
+		).toBe("c3feb3671");
 	});
 
 	test("should create styles", () => {
@@ -35,7 +35,7 @@ describe("createCoulis (web adapter)", () => {
 					base: 0,
 				},
 			}),
-		).toBe("ce5eab527 ca4eaf829 ce899257c cdf15bb1c c8cf22ec5");
+		).toBe("c9420ae5f ced44f712 c9b11817e c35ef7535 c6c43fc52");
 	});
 
 	test("should extract styles", () => {

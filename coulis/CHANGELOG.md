@@ -1,5 +1,11 @@
 # Change Log
 
+## 0.19.1
+
+### Patch Changes
+
+- [`ac93383`](https://github.com/adbayb/coulis/commit/ac93383c6fb6f91b0502196c4f2ebea9d04fdf55) Thanks [@adbayb](https://github.com/adbayb)! - Update `csstype` and fix `react-native` peer dependency contract to allow up to v1 version.
+
 ## 0.19.0
 
 ### Minor Changes

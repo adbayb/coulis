@@ -11,13 +11,13 @@
 	},
 	"dependencies": {
 		"coulis": "workspace:^",
-		"expo": "^56.0.4",
-		"expo-router": "^56.2.6",
+		"expo": "^56.0.5",
+		"expo-router": "^56.2.7",
 		"react": "^19.2.6",
 		"react-native": "^0.85.3"
 	},
 	"devDependencies": {
-		"@babel/core": "7.29.0",
+		"@babel/core": "7.29.7",
 		"@types/react": "19.2.15"
 	}
 }

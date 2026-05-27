@@ -1,8 +1,8 @@
 import type { AtRule, Properties as CSSProperties } from "csstype";
 
-import type { StatesLike } from "./state";
-import type { ShortandsLike } from "./shorthand";
 import type { EmptyRecord, UngreedyString } from "./primitive";
+import type { ShortandsLike } from "./shorthand";
+import type { StatesLike } from "./state";
 
 /**
  * The order is important to enforce the more precise properties take precedence over less precise ones.
@@ -17,7 +17,15 @@ export const STYLE_TYPES = Object.freeze([
 	"atLonghand",
 ] as const);
 
-export type StyleType = (typeof STYLE_TYPES)[number];
+export type GlobalStyles<
+	P extends PropertiesLike,
+	Shorthands extends ShortandsLike<P> | undefined,
+> = Record<
+	string,
+	| Record<string, string>
+	| string
+	| WithUngreedyString<Styles<P, Shorthands, undefined>>
+>;
 
 export type PropertiesLike = {
 	[K in keyof NativeProperties]?:
@@ -29,29 +37,33 @@ export type Styles<
 	P extends PropertiesLike,
 	Shorthands extends ShortandsLike<P> | undefined,
 	States extends StatesLike | undefined,
-> = (Shorthands extends undefined
+> = {
+	[PropertyName in keyof P]?: PropertyValue<PropertyName, P, States>;
+} & (Shorthands extends undefined
 	? EmptyRecord
 	: {
 			[PropertyName in keyof Shorthands]?: Shorthands[PropertyName] extends (keyof P)[]
 				? PropertyValue<Shorthands[PropertyName][number], P, States>
 				: never;
-		}) & {
-	[PropertyName in keyof P]?: PropertyValue<PropertyName, P, States>;
-};
+		});
 
-export type GlobalStyles<
-	P extends PropertiesLike,
-	Shorthands extends ShortandsLike<P> | undefined,
-> = Record<
-	string,
-	| Record<string, string>
-	| WithUngreedyString<Styles<P, Shorthands, undefined>>
-	| string
->;
+export type StyleType = (typeof STYLE_TYPES)[number];
 
-type WithUngreedyString<Properties extends Record<string, unknown>> = {
-	[Key in keyof Properties]: Properties[Key] | UngreedyString;
-};
+type CreatePropertyValue<Value, S extends StatesLike | undefined> =
+	| (S extends Record<infer State, unknown>
+			? Partial<Record<State, Value>> & Record<"base", Value>
+			: never)
+	| undefined
+	| Value;
+
+type CustomPropertyValue<Value> =
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	((input: any) => Value) | Record<string, Value> | Value[];
+
+type NativeProperties = AtRule.FontFace &
+	CSSProperties<number | UngreedyString>;
+
+type NativePropertyValue = true;
 
 type PropertyValue<
 	PropertyName extends keyof P,
@@ -71,20 +83,6 @@ type PropertyValue<
 				: never
 		: never;
 
-type CreatePropertyValue<Value, S extends StatesLike | undefined> =
-	| Value
-	| (S extends Record<infer State, unknown>
-			? Partial<Record<State, Value>> & Record<"base", Value>
-			: never)
-	| undefined;
-
-type CustomPropertyValue<Value> =
-	| Record<string, Value>
-	| Value[]
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	| ((input: any) => Value);
-
-type NativePropertyValue = true;
-
-type NativeProperties = AtRule.FontFace &
-	CSSProperties<UngreedyString | number>;
+type WithUngreedyString<Properties extends Record<string, unknown>> = {
+	[Key in keyof Properties]: Properties[Key] | UngreedyString;
+};

@@ -23,12 +23,12 @@
 		"@adbayb/stack": "2.36.1",
 		"@types/node": "24.12.4"
 	},
-	"packageManager": "pnpm@11.3.0",
+	"packageManager": "pnpm@11.4.0",
 	"devEngines": {
 		"packageManager": [
 			{
 				"name": "pnpm",
-				"version": "11.3.0",
+				"version": "11.4.0",
 				"onFail": "download"
 			},
 			{

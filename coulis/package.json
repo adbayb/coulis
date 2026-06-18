@@ -55,14 +55,12 @@
 		"test": "vitest --typecheck",
 		"watch": "quickbundle watch"
 	},
-	"dependencies": {
-		"csstype": "^3.2.3"
-	},
 	"devDependencies": {
-		"happy-dom": "20.9.0",
+		"csstype": "3.2.3",
+		"happy-dom": "20.10.6",
 		"quickbundle": "3.0.0",
-		"react-native": "0.85.3",
-		"vitest": "4.1.7"
+		"react-native": "0.86.0",
+		"vitest": "4.1.9"
 	},
 	"peerDependencies": {
 		"react-native": "^0.80.0 || <1.0.0"

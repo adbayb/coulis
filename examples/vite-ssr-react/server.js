@@ -61,8 +61,8 @@ app.use("*all", async (request, response) => {
 		const rendered = await render(url);
 
 		const html = template
-			.replace("<!--app-head-->", rendered.head ?? "")
-			.replace("<!--app-html-->", rendered.html ?? "");
+			.replace("<!--app-head-->", () => rendered.head ?? "")
+			.replace("<!--app-html-->", () => rendered.html ?? "");
 
 		response.status(200).set({ "Content-Type": "text/html" }).send(html);
 	} catch (error) {

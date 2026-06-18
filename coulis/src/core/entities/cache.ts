@@ -17,7 +17,7 @@ export const createSetCache = <Key extends string>(): SetCache<Key> => {
 	const cache = new Set<Key>();
 
 	const getAll: SetCache<Key>["getAll"] = () => {
-		return [...cache.values()];
+		return [...cache];
 	};
 
 	const remove: SetCache<Key>["remove"] = (key) => {

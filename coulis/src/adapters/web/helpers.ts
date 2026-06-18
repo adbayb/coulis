@@ -125,7 +125,7 @@ export const getEvaluatedTemplate = (
 	let output = template;
 
 	for (const [key, value] of Object.entries(variables)) {
-		output = output.replaceAll(`coulis[${key}]`, value);
+		output = output.replaceAll(`coulis[${key}]`, () => value);
 	}
 
 	return output;

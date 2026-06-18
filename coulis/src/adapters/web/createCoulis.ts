@@ -300,6 +300,7 @@ export const createCoulis: CreateCoulis<{
 							onCreateRule({ className }) {
 								return preComputedRule.replaceAll(
 									"coulis[className]",
+									// eslint-disable-next-line unicorn/no-unsafe-string-replacement
 									className,
 								);
 							},

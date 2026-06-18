@@ -20,15 +20,15 @@
 	},
 	"prettier": "@adbayb/stack/prettier",
 	"devDependencies": {
-		"@adbayb/stack": "2.36.1",
-		"@types/node": "24.12.4"
+		"@adbayb/stack": "2.39.0",
+		"@types/node": "24.13.2"
 	},
-	"packageManager": "pnpm@11.4.0",
+	"packageManager": "pnpm@11.8.0",
 	"devEngines": {
 		"packageManager": [
 			{
 				"name": "pnpm",
-				"version": "11.4.0",
+				"version": "11.8.0",
 				"onFail": "download"
 			},
 			{

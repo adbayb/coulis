@@ -13,7 +13,7 @@ export const createDomStyleSheet: CreateStyleSheet = (type) => {
 	}
 
 	let pendingRules = "";
-	let flushScheduled = false;
+	let isFlushScheduled = false;
 
 	const flush = () => {
 		if (!pendingRules) return;
@@ -25,7 +25,7 @@ export const createDomStyleSheet: CreateStyleSheet = (type) => {
 		// eslint-disable-next-line unicorn/prefer-modern-dom-apis
 		element.insertAdjacentText("beforeend", pendingRules);
 		pendingRules = "";
-		flushScheduled = false;
+		isFlushScheduled = false;
 	};
 
 	return {
@@ -46,8 +46,8 @@ export const createDomStyleSheet: CreateStyleSheet = (type) => {
 		insert(_, rule) {
 			pendingRules += rule;
 
-			if (!flushScheduled) {
-				flushScheduled = true;
+			if (!isFlushScheduled) {
+				isFlushScheduled = true;
 
 				/**
 				 * Batch all insertions within a single synchronous execution context
@@ -60,7 +60,7 @@ export const createDomStyleSheet: CreateStyleSheet = (type) => {
 		},
 		remove() {
 			pendingRules = "";
-			flushScheduled = false;
+			isFlushScheduled = false;
 			element.remove();
 		},
 	};

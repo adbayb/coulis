@@ -30,9 +30,8 @@ export const StyledComponentsComponent = () => {
 				</tr>
 			</thead>
 			<tbody>
-				{Array.from({ length: NUMBER_OF_DATA }).map((_, index) => {
+				{Array.from({ length: NUMBER_OF_DATA }, (_, index) => {
 					return (
-						// eslint-disable-next-line @eslint-react/no-array-index-key
 						<tr key={index}>
 							<Cell1>The table body</Cell1>
 							<Cell2>with two columns</Cell2>

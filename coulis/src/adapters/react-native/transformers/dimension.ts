@@ -5,6 +5,7 @@ import type { Transform } from "./types";
 let windowDimensions = Dimensions.get("window");
 
 Dimensions.addEventListener("change", ({ window }) => {
+	// eslint-disable-next-line unicorn/no-top-level-assignment-in-function
 	windowDimensions = window;
 });
 
@@ -18,6 +19,7 @@ export const transformDimension: Transform = (input) => {
 };
 
 const getDimensionValue = (input: string) => {
+	// eslint-disable-next-line unicorn/prefer-number-coercion
 	const value = Number.parseFloat(input);
 
 	if (Number.isNaN(value)) return input;

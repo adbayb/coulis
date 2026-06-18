@@ -72,7 +72,9 @@ describe(createCustomProperties, () => {
 
 		createCustomProperties(
 			{ colors: { primary: "blue", secondary: "red" } },
-			(name, value) => collected.push([name, value]),
+			(name, value) => {
+				collected.push([name, value]);
+			},
 		);
 
 		expect(collected).toContainEqual(["--colors-primary", "blue"]);
@@ -93,9 +95,9 @@ describe(createCustomProperties, () => {
 	test("should escape special characters in key names", () => {
 		const collected: [string, unknown][] = [];
 
-		createCustomProperties({ "spacings-1.5": "2rem" }, (name) =>
-			collected.push([name, null]),
-		);
+		createCustomProperties({ "spacings-1.5": "2rem" }, (name) => {
+			collected.push([name, null]);
+		});
 
 		expect(collected[0]?.[0]).toBe("--spacings-1-5");
 	});

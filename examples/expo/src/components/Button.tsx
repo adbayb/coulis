@@ -55,11 +55,11 @@ type Variant = "primary" | "secondary";
 
 const getContainerStyleProps = (
 	variant: Variant,
-	pressed: boolean,
+	isPressed: boolean,
 ): StyleProps => {
 	if (variant === "primary") {
 		return {
-			backgroundColor: pressed
+			backgroundColor: isPressed
 				? "backgroundPrimaryActive"
 				: "backgroundPrimary",
 			borderStyle: "none",
@@ -67,7 +67,7 @@ const getContainerStyleProps = (
 	}
 
 	return {
-		backgroundColor: pressed
+		backgroundColor: isPressed
 			? "backgroundSecondaryActive"
 			: "backgroundSecondary",
 		borderColor: "backgroundPrimary",

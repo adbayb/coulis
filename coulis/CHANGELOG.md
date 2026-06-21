@@ -1,5 +1,11 @@
 # Change Log
 
+## 0.21.0
+
+### Minor Changes
+
+- [`8700a0c`](https://github.com/adbayb/coulis/commit/8700a0cb68bbf25c6b607f3ccc2172c3e8869ed0) Thanks [@adbayb](https://github.com/adbayb)! - Internalize `csstype` and update dependencies.
+
 ## 0.20.0
 
 ### Minor Changes

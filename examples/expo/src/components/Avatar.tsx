@@ -1,15 +1,15 @@
 import { Image } from "react-native";
-
 import type { StyleProps } from "../styles";
-import type { CreateComponentProps } from "./types";
-
 import { createStyles } from "../styles";
+import type { CreateComponentProps } from "./types";
 
 export type AvatarProps = CreateComponentProps<{
 	accessibilityLabel: string;
 	size?: Size;
 	source: string;
 }>;
+
+type Size = "large" | "medium" | "small";
 
 export const Avatar = ({
 	accessibilityLabel,
@@ -30,8 +30,6 @@ export const Avatar = ({
 		/>
 	);
 };
-
-type Size = "large" | "medium" | "small";
 
 const DEFAULT_SIZE: Size = "medium";
 

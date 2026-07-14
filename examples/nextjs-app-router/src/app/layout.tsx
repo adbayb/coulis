@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
-
 import { CoulisRegistry } from "../components/CoulisRegistry";
 
+// oxlint-disable-next-line react/only-export-components
 export const metadata: Metadata = {
 	title: "Coulis",
 };

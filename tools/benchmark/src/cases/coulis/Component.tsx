@@ -33,9 +33,7 @@ export const CoulisComponent = () => {
 					return (
 						<tr key={index}>
 							<td className={firstTdClassName}>The table body</td>
-							<td className={secondTdClassName}>
-								with two columns
-							</td>
+							<td className={secondTdClassName}>with two columns</td>
 						</tr>
 					);
 				})}

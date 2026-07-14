@@ -1,7 +1,6 @@
-import type { CreateCoulis } from "../../core/ports/createCoulis";
-
 import { createMapCache } from "../../core/entities/cache";
 import { compose, isObject } from "../../core/entities/primitive";
+import type { CreateCoulis } from "../../core/ports/createCoulis";
 import { createUnsupportedLogger } from "./helpers";
 import { transformDimension } from "./transformers";
 
@@ -17,10 +16,7 @@ export const createCoulis: CreateCoulis<{
 		contract.theme as Parameters<typeof contract.properties>[0],
 	);
 
-	const shorthands = (contract.shorthands ?? {}) as NonNullable<
-		typeof contract.shorthands
-	>;
-
+	const shorthands = (contract.shorthands ?? {}) as NonNullable<typeof contract.shorthands>;
 	const shorthandNames = Object.keys(shorthands);
 	const stylesCache = createMapCache<string, CreateCoulisOutput>();
 
@@ -36,7 +32,7 @@ export const createCoulis: CreateCoulis<{
 			if (typeof propertyValue === "function") {
 				return transform({
 					name,
-					// eslint-disable-next-line @typescript-eslint/no-unsafe-call
+					// oxlint-disable-next-line typescript/no-unsafe-call
 					value: propertyValue(styleValue),
 				}).value;
 			}
@@ -52,9 +48,7 @@ export const createCoulis: CreateCoulis<{
 		};
 
 		if (isObject(value)) {
-			unsupportedLogger.behavior(
-				"States are not supported, ignoring non-base values.",
-			);
+			unsupportedLogger.behavior("States are not supported, ignoring non-base values.");
 
 			return getValue(value.base);
 		}
@@ -72,7 +66,9 @@ export const createCoulis: CreateCoulis<{
 			const cacheKey = JSON.stringify(input);
 			const cachedStyles = stylesCache.get(cacheKey);
 
-			if (cachedStyles) return cachedStyles;
+			if (cachedStyles) {
+				return cachedStyles;
+			}
 
 			const styles: CreateCoulisOutput = {};
 
@@ -80,11 +76,13 @@ export const createCoulis: CreateCoulis<{
 				const value = input[propertyName as keyof typeof input];
 
 				if (isCustomShorthandProperty(propertyName)) {
-					const shorthandedPropertyNames = shorthands[
-						propertyName
-					] as string[] | undefined;
+					const shorthandedPropertyNames = shorthands[propertyName] as
+						| string[]
+						| undefined;
 
-					if (shorthandedPropertyNames === undefined) continue;
+					if (shorthandedPropertyNames === undefined) {
+						continue;
+					}
 
 					for (const shorthandedPropertyName of shorthandedPropertyNames) {
 						styles[shorthandedPropertyName] = getStyleValue(
@@ -103,10 +101,9 @@ export const createCoulis: CreateCoulis<{
 		},
 		getContract() {
 			return {
-				propertyNames: [
-					...shorthandNames,
-					...Object.keys(properties),
-				] as ReturnType<typeof this.getContract>["propertyNames"],
+				propertyNames: [...shorthandNames, ...Object.keys(properties)] as ReturnType<
+					typeof this.getContract
+				>["propertyNames"],
 			};
 		},
 		getMetadata() {

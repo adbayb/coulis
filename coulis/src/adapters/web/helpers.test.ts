@@ -1,10 +1,8 @@
 import { describe, expect, test } from "vitest";
-
 import {
 	createClassName,
 	createCustomProperties,
 	createDeclaration,
-	// eslint-disable-next-line sonarjs/no-built-in-override
 	escape,
 	getEvaluatedTemplate,
 	minify,
@@ -26,13 +24,11 @@ describe(escape, () => {
 
 describe(createClassName, () => {
 	test("should return a string starting with 'c'", () => {
-		expect(createClassName("any-input")).toMatch(/^c[\da-f]+$/);
+		expect(createClassName("any-input")).toMatch(/^c[\da-f]+$/u);
 	});
 
 	test("should be deterministic for the same input", () => {
-		expect(createClassName("same-input")).toBe(
-			createClassName("same-input"),
-		);
+		expect(createClassName("same-input")).toBe(createClassName("same-input"));
 	});
 
 	test("should produce different hashes for different inputs", () => {
@@ -42,27 +38,21 @@ describe(createClassName, () => {
 
 describe(createDeclaration, () => {
 	test("should convert camelCase property to kebab-case", () => {
-		expect(
-			createDeclaration({ name: "backgroundColor", value: "red" }),
-		).toBe("background-color:red;");
+		expect(createDeclaration({ name: "backgroundColor", value: "red" })).toBe(
+			"background-color:red;",
+		);
 	});
 
 	test("should append px unit to numeric values for dimensional properties", () => {
-		expect(createDeclaration({ name: "width", value: 100 })).toBe(
-			"width:100px;",
-		);
+		expect(createDeclaration({ name: "width", value: 100 })).toBe("width:100px;");
 	});
 
 	test("should not append px for unitless properties", () => {
-		expect(createDeclaration({ name: "opacity", value: 0.5 })).toBe(
-			"opacity:0.5;",
-		);
+		expect(createDeclaration({ name: "opacity", value: 0.5 })).toBe("opacity:0.5;");
 	});
 
 	test("should keep string values as-is", () => {
-		expect(createDeclaration({ name: "display", value: "flex" })).toBe(
-			"display:flex;",
-		);
+		expect(createDeclaration({ name: "display", value: "flex" })).toBe("display:flex;");
 	});
 });
 
@@ -70,24 +60,18 @@ describe(createCustomProperties, () => {
 	test("should create CSS custom property names from nested theme keys", () => {
 		const collected: [string, unknown][] = [];
 
-		createCustomProperties(
-			{ colors: { primary: "blue", secondary: "red" } },
-			(name, value) => {
-				collected.push([name, value]);
-			},
-		);
+		createCustomProperties({ colors: { primary: "blue", secondary: "red" } }, (name, value) => {
+			collected.push([name, value]);
+		});
 
 		expect(collected).toContainEqual(["--colors-primary", "blue"]);
 		expect(collected).toContainEqual(["--colors-secondary", "red"]);
 	});
 
 	test("should return an output map with var() references", () => {
-		const output = createCustomProperties(
-			{ spacings: { sm: "4px" } },
-			() => {
-				// noop
-			},
-		);
+		const output = createCustomProperties({ spacings: { sm: "4px" } }, () => {
+			// Noop
+		});
 
 		expect(output.spacings.sm).toBe("var(--spacings-sm)");
 	});
@@ -96,7 +80,7 @@ describe(createCustomProperties, () => {
 		const collected: [string, unknown][] = [];
 
 		createCustomProperties({ "spacings-1.5": "2rem" }, (name) => {
-			collected.push([name, null]);
+			collected.push([name, undefined]);
 		});
 
 		expect(collected[0]?.[0]).toBe("--spacings-1-5");

@@ -1,5 +1,6 @@
 /**
  * Credits: Tailwind.
+ *
  * @see {@link https://github.com/tailwindlabs/tailwindcss/blob/a53d854d1d5b87db4ed1916bf0aee964b052c410/stubs/config.full.js#L108 Source}.
  */
 export const boxShadows = {

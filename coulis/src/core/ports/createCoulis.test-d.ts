@@ -1,8 +1,6 @@
 import { describe, expect, expectTypeOf, test } from "vitest";
-
 import type { CreateCoulis } from "./createCoulis";
 
-// eslint-disable-next-line sonarjs/max-lines-per-function
 describe("createCoulis (port)", () => {
 	test("should type `createCoulis`", () => {
 		createCoulisFake({
@@ -145,7 +143,7 @@ describe("createCoulis (port)", () => {
 		expectTypeOf(lightCoulis.createStyles).returns.toEqualTypeOf<string>();
 	});
 
-	test.todo("should type `createKeyframes`", () => {
+	test("should type `createKeyframes`", () => {
 		coulis.createKeyframes({
 			25: {
 				backgroundColor: "surfacePrimary",
@@ -202,13 +200,10 @@ describe("createCoulis (port)", () => {
 		expectTypeOf(coulis.createKeyframes).returns.toEqualTypeOf<string>();
 	});
 
-	test.todo("should type `getMetadata`", () => {
+	test("should type `getMetadata`", () => {
 		expectTypeOf(coulis.getMetadata).returns.toEqualTypeOf<
 			{
-				attributes: Record<
-					"data-coulis-cache" | "data-coulis-type",
-					string
-				>;
+				attributes: Record<"data-coulis-cache" | "data-coulis-type", string>;
 				content: string;
 			}[] & { toString: () => string }
 		>();
@@ -218,17 +213,16 @@ describe("createCoulis (port)", () => {
 		expectTypeOf(coulis.setGlobalStyles).returns.toBeVoid();
 
 		coulis.setGlobalStyles({
+			"*,*::before,*::after": {
+				boxSizing: "inherit",
+			},
 			".globalClass": {
 				display: "flex",
 			},
 			"@font-face": {
 				fontFamily: "'AliasedHelvetica'",
 			},
-			"@import":
-				"url('https://fonts.googleapis.com/css?family=Open+Sans&display=swap')",
-			"*,*::before,*::after": {
-				boxSizing: "inherit",
-			},
+			"@import": "url('https://fonts.googleapis.com/css?family=Open+Sans&display=swap')",
 			"html": {
 				backgroundColorShorthand: "neutralWhite",
 				boxSizing: "border-box",
@@ -240,6 +234,10 @@ describe("createCoulis (port)", () => {
 		});
 
 		coulis.setGlobalStyles({
+			"*,*::before,*::after": {
+				// @ts-expect-error Should not accept unknown value (number)
+				unknown: 2,
+			},
 			".globalClass": {
 				// @ts-expect-error Should not allow stateful definition
 				display: {
@@ -248,10 +246,6 @@ describe("createCoulis (port)", () => {
 			},
 			// @ts-expect-error Should not accept unknown value (boolean)
 			"@import": true,
-			"*,*::before,*::after": {
-				// @ts-expect-error Should not accept unknown value (number)
-				unknown: 2,
-			},
 			"html,body": {
 				backgroundColor: "white",
 				backgroundColorShorthand: "black",

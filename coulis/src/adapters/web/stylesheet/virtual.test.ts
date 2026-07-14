@@ -1,5 +1,4 @@
 import { describe, expect, test } from "vitest";
-
 import { createVirtualStyleSheet } from "./virtual";
 
 const redColorRule = ".c1{color:red;}";
@@ -16,7 +15,6 @@ describe(createVirtualStyleSheet, () => {
 
 		sheet.insert("c1", redColorRule);
 		sheet.insert("c2", ".c2{display:flex;}");
-
 		expect(sheet.getContent()).toContain(redColorRule);
 		expect(sheet.getContent()).toContain(".c2{display:flex;}");
 	});
@@ -25,7 +23,6 @@ describe(createVirtualStyleSheet, () => {
 		const sheet = createVirtualStyleSheet("longhand");
 
 		sheet.insert("c1", ".c1 {\n  color:red;\n}");
-
 		expect(sheet.getContent()).toBe(".c1{color:red;}");
 	});
 
@@ -66,7 +63,6 @@ describe(createVirtualStyleSheet, () => {
 
 		sheet.insert("c1", redColorRule);
 		sheet.remove();
-
 		expect(sheet.getContent()).toBe("");
 	});
 
@@ -78,7 +74,6 @@ describe(createVirtualStyleSheet, () => {
 		const before = sheet.getContent();
 
 		sheet.remove();
-
 		expect(sheet.getContent()).not.toBe(before);
 	});
 });

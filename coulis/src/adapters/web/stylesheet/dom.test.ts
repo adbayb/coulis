@@ -1,6 +1,5 @@
 // @vitest-environment happy-dom
 import { afterEach, describe, expect, test, vi } from "vitest";
-
 import { createDomStyleSheet } from "./dom";
 
 const longhandSelector = 'style[data-coulis-type="longhand"]';
@@ -13,40 +12,30 @@ describe(createDomStyleSheet, () => {
 
 	test("should create a <style> element in <head>", () => {
 		createDomStyleSheet("longhand");
-
 		expect(document.head.querySelector(longhandSelector)).not.toBeNull();
 	});
 
 	test("should reuse an existing <style> element on repeated calls", () => {
 		createDomStyleSheet("longhand");
 		createDomStyleSheet("longhand");
-
-		expect(document.head.querySelectorAll(longhandSelector)).toHaveLength(
-			1,
-		);
+		expect(document.head.querySelectorAll(longhandSelector)).toHaveLength(1);
 	});
 
 	test("should getContent include pending rules before flush", () => {
 		const sheet = createDomStyleSheet("longhand");
 
 		sheet.insert("c1", redColorRule);
-
 		expect(sheet.getContent()).toContain(redColorRule);
 	});
 
 	test("should flush pending rules to the DOM via queueMicrotask", async () => {
 		const sheet = createDomStyleSheet("longhand");
-
-		const element =
-			document.head.querySelector<HTMLStyleElement>(longhandSelector);
+		const element = document.head.querySelector<HTMLStyleElement>(longhandSelector);
 
 		sheet.insert("c1", redColorRule);
 		sheet.insert("c2", ".c2{display:flex;}");
-
 		expect(element?.textContent).toBe("");
-
-		await Promise.resolve(); // flush microtasks
-
+		await Promise.resolve(); // Flush microtasks
 		expect(element?.textContent).toContain(redColorRule);
 		expect(element?.textContent).toContain(".c2{display:flex;}");
 	});
@@ -54,16 +43,14 @@ describe(createDomStyleSheet, () => {
 	test("should batch multiple inserts into one DOM write", async () => {
 		const sheet = createDomStyleSheet("longhand");
 
-		const element = document.head.querySelector<HTMLStyleElement>(
-			longhandSelector,
-		) as HTMLStyleElement;
-
-		const spy = vi.spyOn(element, "insertAdjacentText");
+		const spy = vi.spyOn(
+			document.head.querySelector<HTMLStyleElement>(longhandSelector) as HTMLStyleElement,
+			"insertAdjacentText",
+		);
 
 		sheet.insert("c1", redColorRule);
 		sheet.insert("c2", ".c2{display:flex;}");
 		sheet.insert("c3", ".c3{margin:0;}");
-
 		await Promise.resolve();
 
 		expect(spy).toHaveBeenCalledExactlyOnceWith(
@@ -95,9 +82,7 @@ describe(createDomStyleSheet, () => {
 
 		sheet.insert("c1", redColorRule);
 		sheet.remove();
-
 		await Promise.resolve();
-
 		expect(document.head.querySelector(longhandSelector)).toBeNull();
 	});
 });

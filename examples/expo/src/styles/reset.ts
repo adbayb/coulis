@@ -2,14 +2,6 @@ import { setGlobalStyles } from "./styles";
 
 export const resetStyles = () => {
 	setGlobalStyles({
-		":root": {
-			"-webkit-font-smoothing": "antialiased",
-			"boxSizing": "border-box",
-			"color": "foregroundSecondary",
-			"font-family": "InterVariable, sans-serif",
-			"font-optical-sizing": "auto",
-			"fontSize": "base",
-		},
 		"*": {
 			all: "unset",
 			display: "revert",
@@ -19,6 +11,14 @@ export const resetStyles = () => {
 		},
 		"*, *::before, *::after": {
 			boxSizing: "inherit",
+		},
+		":root": {
+			"-webkit-font-smoothing": "antialiased",
+			"boxSizing": "border-box",
+			"color": "foregroundSecondary",
+			"font-family": "InterVariable, sans-serif",
+			"font-optical-sizing": "auto",
+			"fontSize": "base",
 		},
 		"html,body": {
 			height: "100%",

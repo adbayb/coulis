@@ -1,5 +1,4 @@
 import styled from "styled-components";
-
 import { NUMBER_OF_DATA } from "../../constants";
 
 const Table = styled.table`

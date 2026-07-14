@@ -3,24 +3,27 @@
 	"version": "0.21.0",
 	"description": "Yet another atomic CSS-in-JS library",
 	"keywords": [
+		"atomic",
 		"css",
-		"js",
 		"css-in-js",
-		"atomic"
+		"js"
 	],
-	"repository": {
-		"type": "git",
-		"url": "git@github.com:adbayb/coulis.git",
-		"directory": "packages/coulis"
-	},
 	"license": "MIT",
 	"author": {
 		"name": "Ayoub Adib",
 		"email": "adbayb@gmail.com",
 		"url": "https://twitter.com/adbayb"
 	},
-	"sideEffects": false,
+	"repository": {
+		"type": "git",
+		"url": "git@github.com:adbayb/coulis.git",
+		"directory": "packages/coulis"
+	},
+	"files": [
+		"dist"
+	],
 	"type": "module",
+	"sideEffects": false,
 	"exports": {
 		".": {
 			"types": "./dist/web.d.ts",
@@ -43,9 +46,6 @@
 			"default": "./dist/react-native.mjs"
 		}
 	},
-	"files": [
-		"dist"
-	],
 	"scripts": {
 		"prebuild": "pnpm run clean",
 		"build": "quickbundle build",
@@ -57,10 +57,10 @@
 	},
 	"devDependencies": {
 		"csstype": "3.2.3",
-		"happy-dom": "20.10.6",
-		"quickbundle": "3.0.0",
-		"react-native": "0.86.0",
-		"vitest": "4.1.9"
+		"happy-dom": "20.11.1",
+		"quickbundle": "3.1.1",
+		"react-native": "0.86.2",
+		"vitest": "4.1.10"
 	},
 	"peerDependencies": {
 		"react-native": "^0.80.0 || <1.0.0"

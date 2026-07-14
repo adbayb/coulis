@@ -1,5 +1,4 @@
 import { describe, expect, test } from "vitest";
-
 import { createCoulis } from "./createCoulis";
 
 describe("createCoulis (web adapter)", () => {
@@ -87,13 +86,7 @@ const tokens = Object.freeze({
 	},
 } as const);
 
-const {
-	createKeyframes,
-	createStyles,
-	getContract,
-	getMetadata,
-	setGlobalStyles,
-} = createCoulis({
+const { createKeyframes, createStyles, getContract, getMetadata, setGlobalStyles } = createCoulis({
 	properties(theme) {
 		return {
 			backgroundColor: theme.colors,
@@ -130,8 +123,11 @@ const {
 	},
 });
 
-// eslint-disable-next-line vitest/require-hook
+// oxlint-disable-next-line vitest/require-hook
 setGlobalStyles({
+	"*,*::before,*::after": {
+		boxSizing: "inherit",
+	},
 	".globalClass+.otherGlobalClass": {
 		colorScheme: "black",
 	},
@@ -140,11 +136,7 @@ setGlobalStyles({
 		fontFamily: "'AliasedHelvetica'",
 		src: "local(Helvetica)",
 	},
-	"@import":
-		"url('https://fonts.googleapis.com/css?family=Open+Sans&display=swap')",
-	"*,*::before,*::after": {
-		boxSizing: "inherit",
-	},
+	"@import": "url('https://fonts.googleapis.com/css?family=Open+Sans&display=swap')",
 	"div": {
 		backgroundColor: "red", // Non-theme-based value to check if set properly by `setGlobalStyles`
 	},

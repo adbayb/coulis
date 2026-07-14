@@ -1,19 +1,24 @@
 packages:
-    - coulis
-    - examples/*
-    - tools/*
-allowBuilds:
-    "@swc/core": false
-    esbuild: false
-    sharp: false
-    unrs-resolver: false
+    - "examples/*"
+    - "tools/*"
+    - "coulis"
+saveExact: true
+verifyDepsBeforeRun: "warn"
+update:
+    githubActions: true
 minimumReleaseAgeExclude:
     - "@adbayb/*"
+    - "quickbundle"
+    - "termost"
 publicHoistPattern:
     - "*changesets*"
     - "*commitlint*"
-    - "*eslint*"
-    - "*prettier*"
+    - "*oxfmt*"
+    - "*oxlint*"
     - "*turbo*"
     - "*typescript*"
     - "*types*"
+allowBuilds:
+    "@swc/core": true
+    esbuild: true
+    sharp: true

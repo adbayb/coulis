@@ -8,10 +8,12 @@ export type SetCache<Key extends string> = {
 
 /**
  * Factory to create a set cache instance to manage caching operations.
- * @returns The cache instance.
+ *
  * @example
  * 	const cache = createSetCache();
  * 	cache.add("key");
+ *
+ * @returns The cache instance.
  */
 export const createSetCache = <Key extends string>(): SetCache<Key> => {
 	const cache = new Set<Key>();
@@ -50,15 +52,14 @@ export type MapCache<Key extends string, Value> = {
 
 /**
  * Factory to create a map cache instance to manage caching operations.
- * @returns The cache instance.
+ *
  * @example
  * 	const cache = createMapCache();
  * 	cache.add("key", "value");
+ *
+ * @returns The cache instance.
  */
-export const createMapCache = <Key extends string, Value>(): MapCache<
-	Key,
-	Value
-> => {
+export const createMapCache = <Key extends string, Value>(): MapCache<Key, Value> => {
 	const cache = new Map<Key, Value>();
 
 	const getAll: MapCache<Key, Value>["getAll"] = () => {

@@ -1,5 +1,6 @@
 /**
  * Credits: Tailwind.
+ *
  * @see {@link https://github.com/tailwindlabs/tailwindcss/blob/a53d854d1d5b87db4ed1916bf0aee964b052c410/stubs/config.full.js#L302 Source}.
  */
 export const fontFamilies = {
@@ -10,6 +11,7 @@ export const fontFamilies = {
 
 /**
  * Credits: Tailwind.
+ *
  * @see {@link https://github.com/tailwindlabs/tailwindcss/blob/a53d854d1d5b87db4ed1916bf0aee964b052c410/stubs/config.full.js#L324 Source}.
  */
 export const fontSizes = {
@@ -30,6 +32,7 @@ export const fontSizes = {
 
 /**
  * Credits: Tailwind.
+ *
  * @see {@link https://github.com/tailwindlabs/tailwindcss/blob/a53d854d1d5b87db4ed1916bf0aee964b052c410/stubs/config.full.js#L339 Source}.
  */
 export const fontWeights = {
@@ -43,6 +46,7 @@ export const fontWeights = {
 	semibold: "600",
 	thin: "100",
 };
+
 export const lineHeights = {
 	none: "1",
 	normal: "1.5",

@@ -1,6 +1,4 @@
-/**
- * Utility type to extract keys.
- */
+/** Utility type to extract keys. */
 type ExtractKeys<T> = T extends Record<infer Key, unknown> ? Key : never;
 
 export const negateTokens = <
@@ -15,10 +13,11 @@ export const negateTokens = <
 
 			withNegativeProps[key] = value;
 
-			if (key === "none") return withNegativeProps; // no-op
+			if (key === "none") {
+				return withNegativeProps;
+			} // No-op
 
-			withNegativeProps[`-${key}` as `-${Exclude<Keys, "none">}`] =
-				`calc(-${value})`;
+			withNegativeProps[`-${key}` as `-${Exclude<Keys, "none">}`] = `calc(-${value})`;
 
 			return withNegativeProps;
 		},

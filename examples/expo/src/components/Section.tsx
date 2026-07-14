@@ -1,8 +1,6 @@
 import { View } from "react-native";
-
-import type { CreateComponentProps, ReactElementLike } from "./types";
-
 import { Stack } from "./Stack";
+import type { CreateComponentProps, ReactElementLike } from "./types";
 import { Typography } from "./Typography";
 
 export type SectionProps = CreateComponentProps<

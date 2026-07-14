@@ -1,13 +1,10 @@
 /**
  * Https://supercolorpalette.com/.
  *
- * 6 scales per color variant:
- * - 100: Secondary Background / Primary Light Text
- * - 200: Secondary Hover Background / Secondary Light Text
- * - 300: Secondary Active Background / Secondary Border
- * - 400: Primary Hover Background / Secondary Dark Text / Primary Border
- * - 500: Primary Background / Primary Dark Text
- * - 600: Primary Active Background.
+ * 6 scales per color variant: - 100: Secondary Background / Primary Light Text - 200: Secondary
+ * Hover Background / Secondary Light Text - 300: Secondary Active Background / Secondary Border -
+ * 400: Primary Hover Background / Secondary Dark Text / Primary Border - 500: Primary Background /
+ * Primary Dark Text - 600: Primary Active Background.
  */
 export const colors = {
 	black: "#000",

@@ -15,26 +15,25 @@ const tokens = Object.freeze({
 	},
 } as const);
 
-export const { createKeyframes, createStyles, getMetadata, setGlobalStyles } =
-	createCoulis({
-		properties(theme) {
-			return {
-				backgroundColor: theme.colors,
-				boxSizing: true,
-				color: theme.colors,
-				fontFamily: true,
-				fontSize: true,
-				margin: true,
-				padding: true,
-			};
+export const { createKeyframes, createStyles, getMetadata, setGlobalStyles } = createCoulis({
+	properties(theme) {
+		return {
+			backgroundColor: theme.colors,
+			boxSizing: true,
+			color: theme.colors,
+			fontFamily: true,
+			fontSize: true,
+			margin: true,
+			padding: true,
+		};
+	},
+	theme: {
+		colors: {
+			neutralDark: tokens.colors.black,
+			neutralLight: tokens.colors.white,
+			neutralTransparent: tokens.colors.transparent,
+			surfacePrimary: tokens.colors.blue[4],
+			surfaceSecondary: tokens.colors.blue[2],
 		},
-		theme: {
-			colors: {
-				neutralDark: tokens.colors.black,
-				neutralLight: tokens.colors.white,
-				neutralTransparent: tokens.colors.transparent,
-				surfacePrimary: tokens.colors.blue[4],
-				surfaceSecondary: tokens.colors.blue[2],
-			},
-		},
-	});
+	},
+});

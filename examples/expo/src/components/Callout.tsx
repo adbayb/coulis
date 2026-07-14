@@ -1,8 +1,6 @@
 import { View } from "react-native";
-
-import type { CreateComponentProps, TextLikeChildren } from "./types";
-
 import { createStyles } from "../styles";
+import type { CreateComponentProps, TextLikeChildren } from "./types";
 import { Typography } from "./Typography";
 
 export type CalloutProps = CreateComponentProps<

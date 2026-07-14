@@ -1,10 +1,8 @@
 import { useMemo } from "react";
 import { Text } from "react-native";
-
 import type { StyleProps } from "../styles";
-import type { CreateComponentProps, TextLikeChildren } from "./types";
-
 import { createStyles } from "../styles";
+import type { CreateComponentProps, TextLikeChildren } from "./types";
 
 export type TypographyProps = CreateComponentProps<
 	{
@@ -14,16 +12,17 @@ export type TypographyProps = CreateComponentProps<
 	TextLikeChildren
 >;
 
+type Variant = "body" | "caption" | "subTitle" | "title";
+
 export const Typography = ({
 	children,
 	color,
 	variant = "body",
 	...marginProps
 }: TypographyProps) => {
-	const { color: defaultColor, ...mappedProps } = useMemo(
-		() => PROPS_BY_VARIANT[variant],
-		[variant],
-	);
+	const { color: defaultColor, ...mappedProps } = useMemo(() => {
+		return PROPS_BY_VARIANT[variant];
+	}, [variant]);
 
 	return (
 		<Text
@@ -40,31 +39,29 @@ export const Typography = ({
 	);
 };
 
-type Variant = "body" | "caption" | "subTitle" | "title";
-
 const PROPS_BY_VARIANT: Record<Variant, StyleProps> = {
+	title: {
+		color: "foregroundPrimary",
+		fontSize: "3xl",
+		fontWeight: "bold",
+		// LineHeight: "relaxed", // TODO: to fix on coulis react native adapter
+	},
 	body: {
 		color: "foregroundSecondary",
 		fontSize: "base",
 		fontWeight: "normal",
-		// lineHeight: "normal",
+		// LineHeight: "normal",
 	},
 	caption: {
 		color: "foregroundSecondary",
 		fontSize: "sm",
 		fontWeight: "normal",
-		// lineHeight: "normal",
+		// LineHeight: "normal",
 	},
 	subTitle: {
 		color: "foregroundPrimary",
 		fontSize: "xl",
 		fontWeight: "semibold",
-		// lineHeight: "relaxed",
-	},
-	title: {
-		color: "foregroundPrimary",
-		fontSize: "3xl",
-		fontWeight: "bold",
-		// lineHeight: "relaxed", // TODO: to fix on coulis react native adapter
+		// LineHeight: "relaxed",
 	},
 };

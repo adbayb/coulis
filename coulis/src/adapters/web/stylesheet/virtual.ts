@@ -1,7 +1,6 @@
-import type { ClassName, CreateStyleSheet, Rule } from "../types";
-
 import { createMapCache } from "../../../core/entities/cache";
 import { minify } from "../helpers";
+import type { ClassName, CreateStyleSheet, Rule } from "../types";
 
 export const createVirtualStyleSheet: CreateStyleSheet = () => {
 	const ruleByClassName = createMapCache<ClassName, Rule>();
@@ -9,9 +8,7 @@ export const createVirtualStyleSheet: CreateStyleSheet = () => {
 
 	return {
 		getContent() {
-			return (
-				cachedContent ?? minify([...ruleByClassName.getAll()].join(""))
-			);
+			return cachedContent ?? minify([...ruleByClassName.getAll()].join(""));
 		},
 		getHydratedClassNames() {
 			return [];

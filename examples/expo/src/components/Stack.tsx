@@ -1,20 +1,18 @@
 import { View } from "react-native";
-
 import type { StyleProps } from "../styles";
+import { createStyles } from "../styles";
 import type { CreateComponentProps, ReactElementLike } from "./types";
 
-import { createStyles } from "../styles";
-
 export type StackProps = CreateComponentProps<
-	{
+	Omit<StyleProps, "children" | "display" | "flexDirection"> & {
 		orientation?: "horizontal" | "vertical";
-	} & Omit<StyleProps, "children" | "display" | "flexDirection">,
+	},
 	ReactElementLike
 >;
 
 export const Stack = ({
-	alignItems = "flex-start",
 	children,
+	alignItems = "flex-start",
 	gap = "none",
 	orientation = "vertical",
 	...marginProps

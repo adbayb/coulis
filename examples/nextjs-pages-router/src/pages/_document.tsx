@@ -1,7 +1,5 @@
 import type { DocumentContext } from "next/document";
-
 import Document, { Head, Html, Main, NextScript } from "next/document";
-
 import { getMetadata } from "../helpers/coulis";
 
 class MyDocument extends Document {
@@ -17,11 +15,11 @@ class MyDocument extends Document {
 						return (
 							<style
 								{...attributes}
-								// eslint-disable-next-line @eslint-react/dom-no-dangerously-set-innerhtml
+								key={attributes["data-coulis-type"]}
+								// oxlint-disable-next-line react/no-danger
 								dangerouslySetInnerHTML={{
 									__html: content,
 								}}
-								key={attributes["data-coulis-type"]}
 							/>
 						);
 					})}

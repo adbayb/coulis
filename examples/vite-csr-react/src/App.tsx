@@ -1,14 +1,11 @@
 import type { PropsWithChildren, ReactNode } from "react";
-
 import { useEffect, useState } from "react";
-
-import {
-	createKeyframes,
-	createStyles,
-	setGlobalStyles,
-} from "./helpers/coulis";
+import { createKeyframes, createStyles, setGlobalStyles } from "./helpers/coulis";
 
 setGlobalStyles({
+	"*,*::before,*::after": {
+		boxSizing: "inherit",
+	},
 	".globalClass": {
 		borderRadius: "large",
 	},
@@ -16,11 +13,7 @@ setGlobalStyles({
 		fontFamily: "'AliasedHelvetica'",
 		src: "local(Helvetica)",
 	},
-	"@import":
-		"url('https://fonts.googleapis.com/css?family=Open+Sans&display=swap')",
-	"*,*::before,*::after": {
-		boxSizing: "inherit",
-	},
+	"@import": "url('https://fonts.googleapis.com/css?family=Open+Sans&display=swap')",
 	"html": {
 		boxSizing: "border-box",
 	},
@@ -97,10 +90,7 @@ const App = () => {
 			<Example title="With dynamic styles">
 				<p
 					className={createStyles({
-						color:
-							counter % 2 === 0
-								? "surfacePrimary"
-								: "surfaceSecondary",
+						color: counter % 2 === 0 ? "surfacePrimary" : "surfaceSecondary",
 					})}
 				>
 					{TEXT}

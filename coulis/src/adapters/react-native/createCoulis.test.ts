@@ -1,22 +1,26 @@
 import type { Dimensions } from "react-native";
 import type { MockInstance } from "vitest";
-
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
-
 import { createCoulis } from "./createCoulis";
 
-vi.mock(import("react-native"), (): { Dimensions: Dimensions } => ({
-	Dimensions: {
-		addEventListener: vi.fn(),
-		get: vi.fn(() => ({
-			fontScale: 0,
-			height: 800,
-			scale: 0,
-			width: 400,
-		})),
-		set: vi.fn(),
-	},
-}));
+vi.mock(import("react-native"), (): { Dimensions: Dimensions } => {
+	return {
+		Dimensions: {
+			addEventListener: vi.fn(),
+			get: vi.fn(() => {
+				return {
+					fontScale: 0,
+					height: 800,
+					scale: 0,
+					width: 400,
+				};
+			}),
+			set: () => {
+				// No op
+			},
+		},
+	};
+});
 
 const createInstance = () => {
 	return createCoulis({
@@ -62,9 +66,10 @@ describe("createCoulis (react-native adapter)", () => {
 	test("should use base value when a stateful object is passed", () => {
 		const { createStyles } = createInstance();
 
-		expect(
-			createStyles({ width: { base: "200px" } as unknown as string }),
-		).toStrictEqual({ width: 200 });
+		expect(createStyles({ width: { base: "200px" } as unknown as string })).toStrictEqual({
+			width: 200,
+		});
+
 		expect(debugSpy).toHaveBeenCalledWith(
 			"States are not supported, ignoring non-base values.",
 		);
@@ -90,6 +95,7 @@ describe("createCoulis (react-native adapter)", () => {
 		const { createKeyframes } = createInstance();
 
 		expect(createKeyframes({})).toStrictEqual({});
+
 		expect(debugSpy).toHaveBeenCalledWith(
 			"The `react-native` platform does not support `createKeyframes` method. Ignoring the call...",
 		);
@@ -99,6 +105,7 @@ describe("createCoulis (react-native adapter)", () => {
 		const { getMetadata } = createInstance();
 
 		expect(getMetadata()).toStrictEqual([]);
+
 		expect(debugSpy).toHaveBeenCalledWith(
 			"The `react-native` platform does not support `getMetadata` method. Ignoring the call...",
 		);

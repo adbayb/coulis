@@ -1,5 +1,4 @@
 import { describe, expect, test } from "vitest";
-
 import { createMapCache, createSetCache } from "./cache";
 
 describe(createSetCache, () => {
@@ -7,7 +6,6 @@ describe(createSetCache, () => {
 		const cache = createSetCache<string>();
 
 		cache.add("key1");
-
 		expect(cache.has("key1")).toBe(true);
 	});
 
@@ -21,9 +19,7 @@ describe(createSetCache, () => {
 		const cache = createSetCache<string>();
 
 		cache.add("key1");
-		// eslint-disable-next-line sonarjs/no-element-overwrite
 		cache.add("key1");
-
 		expect(cache.getAll()).toStrictEqual(["key1"]);
 	});
 
@@ -33,7 +29,6 @@ describe(createSetCache, () => {
 		cache.add("a");
 		cache.add("b");
 		cache.add("c");
-
 		expect(cache.getAll()).toStrictEqual(["a", "b", "c"]);
 	});
 
@@ -43,7 +38,6 @@ describe(createSetCache, () => {
 		cache.add("key1");
 		cache.add("key2");
 		cache.remove("key1");
-
 		expect(cache.has("key1")).toBe(false);
 		expect(cache.has("key2")).toBe(true);
 	});
@@ -54,7 +48,6 @@ describe(createSetCache, () => {
 		cache.add("key1");
 		cache.add("key2");
 		cache.removeAll();
-
 		expect(cache.getAll()).toStrictEqual([]);
 	});
 });
@@ -64,7 +57,6 @@ describe(createMapCache, () => {
 		const cache = createMapCache<string, number>();
 
 		cache.add("key1", 42);
-
 		expect(cache.get("key1")).toBe(42);
 	});
 
@@ -85,7 +77,6 @@ describe(createMapCache, () => {
 
 		cache.add("key1", 1);
 		cache.add("key1", 99);
-
 		expect(cache.get("key1")).toBe(99);
 	});
 
@@ -95,7 +86,6 @@ describe(createMapCache, () => {
 		cache.add("a", 1);
 		cache.add("b", 2);
 		cache.add("c", 3);
-
 		expect(cache.getAll()).toStrictEqual([1, 2, 3]);
 	});
 
@@ -105,7 +95,6 @@ describe(createMapCache, () => {
 		cache.add("key1", 1);
 		cache.add("key2", 2);
 		cache.remove("key1");
-
 		expect(cache.has("key1")).toBe(false);
 		expect(cache.has("key2")).toBe(true);
 	});
@@ -116,7 +105,6 @@ describe(createMapCache, () => {
 		cache.add("key1", 1);
 		cache.add("key2", 2);
 		cache.removeAll();
-
 		expect(cache.getAll()).toStrictEqual([]);
 	});
 });

@@ -1,29 +1,25 @@
-/* eslint-disable n/no-process-env, unicorn/no-await-expression-member */
-import express from "express";
+// oxlint-disable node/no-top-level-await
 import fs from "node:fs/promises";
+// oxlint-disable-next-line e18e/ban-dependencies
+import express from "express";
 
 // Constants
 const isProduction = process.env.NODE_ENV === "production";
-const port = process.env.PORT || 3003;
-const base = process.env.BASE || "/";
-
+const port = process.env.PORT ?? 3003;
+const base = process.env.BASE ?? "/";
 // Cached production assets
-const templateHtml = isProduction
-	? await fs.readFile("./dist/client/index.html", "utf8")
-	: "";
-
+const templateHtml = isProduction ? await fs.readFile("./dist/client/index.html", "utf8") : "";
 // Create http server
 const app = express();
 
 app.disable("x-powered-by");
 
 // Add Vite or respective production middlewares
-/** @type {import('vite').ViteDevServer | undefined} */
-let vite;
+let vite = undefined;
 
 if (isProduction) {
-	const compression = (await import("compression")).default;
-	const sirv = (await import("sirv")).default;
+	const { default: compression } = await import("compression");
+	const { default: sirv } = await import("sirv");
 
 	app.use(compression());
 	app.use(base, sirv("./dist/client", { extensions: [] }));
@@ -35,6 +31,7 @@ if (isProduction) {
 		base,
 		server: { middlewareMode: true },
 	});
+
 	app.use(vite.middlewares);
 }
 
@@ -42,27 +39,29 @@ if (isProduction) {
 app.use("*all", async (request, response) => {
 	try {
 		const url = request.originalUrl.replace(base, "");
-		/** @type {string} */
 		let template;
-		/** @type {import('./src/entry-server.ts').render} */
-		let render;
+		let serverEntryModule;
 
 		if (isProduction) {
 			template = templateHtml;
-			render = (await import("./dist/server/entry-server.js")).renderHtml;
+			serverEntryModule = await import("./dist/server/entry-server.js");
 		} else {
 			// Always read fresh template in development
 			template = await fs.readFile("./index.html", "utf8");
 			template = await vite.transformIndexHtml(url, template);
-			render = (await vite.ssrLoadModule("/src/entry-server.tsx"))
-				.renderHtml;
+			serverEntryModule = await vite.ssrLoadModule("/src/entry-server.tsx");
 		}
 
+		const render = serverEntryModule.renderHtml;
 		const rendered = await render(url);
 
 		const html = template
-			.replace("<!--app-head-->", () => rendered.head ?? "")
-			.replace("<!--app-html-->", () => rendered.html ?? "");
+			.replace("<!--app-head-->", () => {
+				return rendered.head ?? "";
+			})
+			.replace("<!--app-html-->", () => {
+				return rendered.html ?? "";
+			});
 
 		response.status(200).set({ "Content-Type": "text/html" }).send(html);
 	} catch (error) {

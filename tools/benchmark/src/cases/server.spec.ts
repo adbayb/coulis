@@ -1,17 +1,16 @@
 import { test } from "node:test";
-
 import { createBenchmark } from "../helpers";
 import { CoulisCase } from "./coulis/server";
 import { EmotionCase } from "./emotion/server";
 
 const benchmark = createBenchmark([
 	{
-		handler: CoulisCase,
 		name: "coulis",
+		handler: CoulisCase,
 	},
 	{
-		handler: EmotionCase,
 		name: "emotion",
+		handler: EmotionCase,
 	},
 ]);
 

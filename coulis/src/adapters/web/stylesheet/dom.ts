@@ -1,9 +1,7 @@
 import type { CreateStyleSheet } from "../types";
 
 export const createDomStyleSheet: CreateStyleSheet = (type) => {
-	let element = document.querySelector<HTMLStyleElement>(
-		`style[data-coulis-type="${type}"]`,
-	);
+	let element = document.querySelector<HTMLStyleElement>(`style[data-coulis-type="${type}"]`);
 
 	if (!element) {
 		element = document.createElement("style");
@@ -16,13 +14,16 @@ export const createDomStyleSheet: CreateStyleSheet = (type) => {
 	let isFlushScheduled = false;
 
 	const flush = () => {
-		if (!pendingRules) return;
+		if (!pendingRules) {
+			return;
+		}
 
 		/**
 		 * `insertAdjacentText` is the most performant API for appending text.
+		 *
 		 * @see {@link https://esbench.com/bench/680c1080545f8900a4de2ce6 Benchmark}
 		 */
-		// eslint-disable-next-line unicorn/prefer-modern-dom-apis
+		// oxlint-disable-next-line unicorn/prefer-modern-dom-apis
 		element.insertAdjacentText("beforeend", pendingRules);
 		pendingRules = "";
 		isFlushScheduled = false;
@@ -32,6 +33,7 @@ export const createDomStyleSheet: CreateStyleSheet = (type) => {
 		getContent() {
 			/**
 			 * `textContent` is more performant than `innerText` (no layout reflow).
+			 *
 			 * @see {@link https://esbench.com/bench/680c1f4e545f8900a4de2cf7 Benchmark}
 			 */
 			return element.textContent + pendingRules;
@@ -39,7 +41,9 @@ export const createDomStyleSheet: CreateStyleSheet = (type) => {
 		getHydratedClassNames() {
 			const source = element.dataset.coulisCache;
 
-			if (!source) return [];
+			if (!source) {
+				return [];
+			}
 
 			return source.split(",");
 		},
@@ -48,12 +52,10 @@ export const createDomStyleSheet: CreateStyleSheet = (type) => {
 
 			if (!isFlushScheduled) {
 				isFlushScheduled = true;
-
 				/**
-				 * Batch all insertions within a single synchronous execution context
-				 * into one `insertAdjacentText` call via a microtask. Styles are still
-				 * applied before the first paint because browsers flush microtasks
-				 * before rendering.
+				 * Batch all insertions within a single synchronous execution context into one
+				 * `insertAdjacentText` call via a microtask. Styles are still applied before the
+				 * first paint because browsers flush microtasks before rendering.
 				 */
 				queueMicrotask(flush);
 			}

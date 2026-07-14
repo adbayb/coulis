@@ -1,5 +1,4 @@
 import { ScrollView, View } from "react-native";
-
 import { Avatar } from "../src/components/Avatar";
 import { Badge } from "../src/components/Badge";
 import { Button } from "../src/components/Button";
@@ -78,49 +77,47 @@ export default function Index() {
 				</Section>
 				<Section title="Callout">
 					<Callout title="Visually important content">
-						Lorem ipsum dolor sit amet, consectetur adipiscing elit,
-						sed do eiusmod tempor incididunt ut labore et dolore
-						magna aliqua. Ut enim ad minim veniam, quis nostrud
-						exercitation ullamco laboris nisi ut aliquip ex ea
-						commodo consequat. Duis aute irure dolor in
-						reprehenderit in voluptate velit esse cillum dolore eu
-						fugiat nulla pariatur. Excepteur sint occaecat cupidatat
-						non proident, sunt in culpa qui officia deserunt mollit
-						anim id est laborum.
+						Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
+						tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
+						quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
+						consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse
+						cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat
+						non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
 					</Callout>
 				</Section>
 				<Section title="Color Tokens">
 					{Object.entries(colors)
-						.filter(
-							([, colorValues]) =>
-								typeof colorValues === "object",
-						)
-						.map(([colorName, colorsValues]) => (
-							<Stack
-								gap={4}
-								key={colorName}
-								marginVertical={2}
-								orientation="vertical"
-							>
-								<Typography variant="caption">
-									{colorName.toUpperCase()}
-								</Typography>
-								<Stack orientation="horizontal">
-									{Object.entries(colorsValues).map(
-										([key, value]) => (
-											<View
-												key={key}
-												style={{
-													backgroundColor: value,
-													height: 50,
-													width: 50,
-												}}
-											/>
-										),
-									)}
+						.filter(([, colorValues]) => {
+							return typeof colorValues === "object";
+						})
+						.map(([colorName, colorsValues]) => {
+							return (
+								<Stack
+									key={colorName}
+									gap={4}
+									marginVertical={2}
+									orientation="vertical"
+								>
+									<Typography variant="caption">
+										{colorName.toUpperCase()}
+									</Typography>
+									<Stack orientation="horizontal">
+										{Object.entries(colorsValues).map(([key, value]) => {
+											return (
+												<View
+													key={key}
+													style={{
+														backgroundColor: value,
+														height: 50,
+														width: 50,
+													}}
+												/>
+											);
+										})}
+									</Stack>
 								</Stack>
-							</Stack>
-						))}
+							);
+						})}
 				</Section>
 				<Section title="Separator">
 					<Stack

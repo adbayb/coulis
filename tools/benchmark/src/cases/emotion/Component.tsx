@@ -1,5 +1,4 @@
 import { css } from "@emotion/css";
-
 import { NUMBER_OF_DATA } from "../../constants";
 
 const tableClassName = css`
@@ -34,9 +33,7 @@ export const EmotionComponent = () => {
 					return (
 						<tr key={index}>
 							<td className={firstTdClassName}>The table body</td>
-							<td className={secondTdClassName}>
-								with two columns
-							</td>
+							<td className={secondTdClassName}>with two columns</td>
 						</tr>
 					);
 				})}

@@ -1,9 +1,7 @@
 import { Pressable, Text } from "react-native";
-
 import type { StyleProps } from "../styles";
-import type { CreateComponentProps, TextLikeChildren } from "./types";
-
 import { createStyles } from "../styles";
+import type { CreateComponentProps, TextLikeChildren } from "./types";
 
 export type ButtonProps = CreateComponentProps<
 	{
@@ -13,17 +11,14 @@ export type ButtonProps = CreateComponentProps<
 	TextLikeChildren
 >;
 
-export const Button = ({
-	children,
-	onPress,
-	variant = "primary",
-	...marginProps
-}: ButtonProps) => {
+type Variant = "primary" | "secondary";
+
+export const Button = ({ children, onPress, variant = "primary", ...marginProps }: ButtonProps) => {
 	return (
 		<Pressable
 			onPress={onPress}
-			style={({ pressed }) =>
-				createStyles({
+			style={({ pressed }) => {
+				return createStyles({
 					...marginProps,
 					...getContainerStyleProps(variant, pressed),
 					alignItems: "center",
@@ -35,8 +30,8 @@ export const Button = ({
 					justifyContent: "center",
 					lineHeight: "normal",
 					paddingHorizontal: 4,
-				})
-			}
+				});
+			}}
 		>
 			<Text
 				style={createStyles({
@@ -51,25 +46,16 @@ export const Button = ({
 	);
 };
 
-type Variant = "primary" | "secondary";
-
-const getContainerStyleProps = (
-	variant: Variant,
-	isPressed: boolean,
-): StyleProps => {
+const getContainerStyleProps = (variant: Variant, isPressed: boolean): StyleProps => {
 	if (variant === "primary") {
 		return {
-			backgroundColor: isPressed
-				? "backgroundPrimaryActive"
-				: "backgroundPrimary",
+			backgroundColor: isPressed ? "backgroundPrimaryActive" : "backgroundPrimary",
 			borderStyle: "none",
 		};
 	}
 
 	return {
-		backgroundColor: isPressed
-			? "backgroundSecondaryActive"
-			: "backgroundSecondary",
+		backgroundColor: isPressed ? "backgroundSecondaryActive" : "backgroundSecondary",
 		borderColor: "backgroundPrimary",
 		borderStyle: "solid",
 		borderWidth: 2,

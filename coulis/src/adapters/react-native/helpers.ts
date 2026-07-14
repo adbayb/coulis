@@ -6,10 +6,11 @@ export const createUnsupportedLogger = () => {
 	const cache = new Set<string>(); // To log only once.
 
 	const log = (input: string) => {
-		if (cache.has(input)) return;
+		if (cache.has(input)) {
+			return;
+		}
 
 		logger.debug(input);
-
 		cache.add(input);
 	};
 

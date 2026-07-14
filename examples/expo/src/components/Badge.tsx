@@ -1,9 +1,7 @@
 import { Text } from "react-native";
-
 import type { StyleProps } from "../styles";
-import type { CreateComponentProps, TextLikeChildren } from "./types";
-
 import { createStyles } from "../styles";
+import type { CreateComponentProps, TextLikeChildren } from "./types";
 
 export type BadgeProps = CreateComponentProps<
 	{
@@ -12,11 +10,9 @@ export type BadgeProps = CreateComponentProps<
 	TextLikeChildren
 >;
 
-export const Badge = ({
-	children,
-	variant = "note",
-	...marginProps
-}: BadgeProps) => {
+type Variant = "danger" | "note" | "success" | "warning";
+
+export const Badge = ({ children, variant = "note", ...marginProps }: BadgeProps) => {
 	return (
 		<Text
 			style={createStyles({
@@ -25,7 +21,7 @@ export const Badge = ({
 				borderRadius: "md",
 				fontSize: "xs",
 				fontWeight: "medium",
-				// lineHeight: "normal", // TODO: to fix
+				// LineHeight: "normal", // TODO: to fix
 				paddingHorizontal: 1.5,
 				paddingVertical: 0.5,
 			})}
@@ -34,8 +30,6 @@ export const Badge = ({
 		</Text>
 	);
 };
-
-type Variant = "danger" | "note" | "success" | "warning";
 
 const PROPS_BY_VARIANT: Record<Variant, StyleProps> = {
 	danger: {

@@ -1,9 +1,7 @@
 import { View } from "react-native";
-
 import type { StyleProps } from "../styles";
-import type { CreateComponentProps } from "./types";
-
 import { createStyles } from "../styles";
+import type { CreateComponentProps } from "./types";
 
 export type SeparatorProps = CreateComponentProps<{
 	orientation?: "horizontal" | "vertical";
@@ -20,6 +18,7 @@ export const Separator = ({
 	return (
 		<View
 			aria-orientation={orientation}
+			// oxlint-disable-next-line jsx-a11y/prefer-tag-over-role
 			role="separator"
 			style={createStyles({
 				...marginProps,

@@ -20,7 +20,7 @@
 	},
 	"prettier": "@adbayb/stack/prettier",
 	"devDependencies": {
-		"@adbayb/stack": "2.39.0",
+		"@adbayb/stack": "2.40.0",
 		"@types/node": "24.13.2"
 	},
 	"packageManager": "pnpm@11.8.0",

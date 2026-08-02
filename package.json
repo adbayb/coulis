@@ -19,7 +19,7 @@
 		"watch": "stack watch"
 	},
 	"devDependencies": {
-		"@adbayb/stack": "3.0.0",
+		"@adbayb/stack": "3.0.1",
 		"@types/node": "24.13.3"
 	},
 	"devEngines": {

@@ -208,8 +208,8 @@ importers:
   .:
     devDependencies:
       '@adbayb/stack':
-        specifier: 3.0.0
-        version: 3.0.0(@types/node@24.13.3)(conventional-commits-parser@7.1.2)(eslint@10.5.0(jiti@2.6.1)(supports-color@8.1.1))(supports-color@8.1.1)
+        specifier: 3.0.1
+        version: 3.0.1(@types/node@24.13.3)(conventional-commits-parser@7.1.2)(eslint@10.5.0(jiti@2.6.1)(supports-color@8.1.1))(supports-color@8.1.1)
       '@types/node':
         specifier: 24.13.3
         version: 24.13.3
@@ -404,8 +404,8 @@ importers:
 
 packages:
 
-  '@adbayb/stack@3.0.0':
-    resolution: {integrity: sha512-2nyGqjFwQL7lTVK+LT2cqS+9IaTAQxVGGKBI5FLnRPTwWOf+dedxqD0xO+xQ0qiV8IPFv9ZCFIIwqatr4g/f6Q==}
+  '@adbayb/stack@3.0.1':
+    resolution: {integrity: sha512-y1aUr+mAcJASWblwSeHmB3fJwWdzFcrYhRFyTcWYJXuHzHwvP7if+XO4od+wMAt1/NFJ5NcxaF1QhucIzd0zNA==}
     hasBin: true
 
   '@adobe/css-tools@4.5.0':
@@ -5782,7 +5782,7 @@ packages:
 
 snapshots:
 
-  '@adbayb/stack@3.0.0(@types/node@24.13.3)(conventional-commits-parser@7.1.2)(eslint@10.5.0(jiti@2.6.1)(supports-color@8.1.1))(supports-color@8.1.1)':
+  '@adbayb/stack@3.0.1(@types/node@24.13.3)(conventional-commits-parser@7.1.2)(eslint@10.5.0(jiti@2.6.1)(supports-color@8.1.1))(supports-color@8.1.1)':
     dependencies:
       '@changesets/changelog-github': 0.7.0
       '@changesets/cli': 2.31.1(@types/node@24.13.3)

@@ -1,5 +1,11 @@
 # Change Log
 
+## 0.22.0
+
+### Minor Changes
+
+- [`44dcb5d`](https://github.com/adbayb/coulis/commit/44dcb5d825564e636efcf86fa514f97ed7f1f434) Thanks [@adbayb](https://github.com/adbayb)! - Replace FNV-1a by DJB2 hash algorithm for class name generation.
+
 ## 0.21.0
 
 ### Minor Changes
@@ -15,6 +21,7 @@
 ### Patch Changes
 
 - [`3c86e19`](https://github.com/adbayb/coulis/commit/3c86e19944a7044b2cfa8dbf7241667358c4a8f3) Thanks [@adbayb](https://github.com/adbayb)! - Performance improvements:
+
     - **Web / class name generation**: `createClassName` now uses `charCodeAt()` instead of `codePointAt()` and `Math.imul()` for 32-bit integer multiplication instead of the `*` operator, making FNV-1a hashing faster while preserving collision resistance.
     - **Web / DOM stylesheet**: CSS rules are now batched and flushed in a single `textContent` write instead of one `insertAdjacentText` call per rule, reducing style recalculations during initial render.
     - **Web / virtual stylesheet (SSR)**: the minified CSS string returned by `getMetadata` is cached after the first computation instead of being recomputed on every call.
@@ -71,6 +78,7 @@
 - [#51](https://github.com/adbayb/coulis/pull/51) [`3e1132f`](https://github.com/adbayb/coulis/commit/3e1132f296ff1daf3cd76b36ea08d27ab9655ec5) Thanks [@adbayb](https://github.com/adbayb)! - API refactoring to prepare for future adapter development (currently web, later React Native).
 
     The following breaking changes have been introduced:
+
     - Remove singleton in favor of `createCoulis` factory.
     - Move `createStyles` contract definition to `createCoulis` to make the styling contract available to all interfaces.
     - `createStyles` does not return a function anymore, but the class name.

@@ -3,8 +3,12 @@
 	"access": "public",
 	"baseBranch": "main",
 	"changelog": ["@changesets/changelog-github", { "repo": "adbayb/coulis" }],
-	"commit": false,
 	"ignore": ["@coulis/example-*", "@coulis/benchmark"],
+	"privatePackages": true,
+	"snapshot": {
+		"prereleaseTemplate": "{tag}.{timestamp}.{commit-short}",
+		"useCalculatedVersion": true
+	},
 	"updateInternalDependencies": "patch",
 	"___experimentalUnsafeOptions_WILL_CHANGE_IN_PATCH": {
 		"onlyUpdatePeerDependentsWhenOutOfRange": true,

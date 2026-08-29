@@ -57,10 +57,10 @@
 	},
 	"devDependencies": {
 		"csstype": "3.2.3",
-		"happy-dom": "20.11.1",
-		"quickbundle": "3.1.1",
-		"react-native": "0.86.2",
-		"vitest": "4.1.10"
+		"happy-dom": "20.11.12",
+		"quickbundle": "3.2.0",
+		"react-native": "0.87.1",
+		"vitest": "4.1.11"
 	},
 	"peerDependencies": {
 		"react-native": "^0.80.0 || <1.0.0"

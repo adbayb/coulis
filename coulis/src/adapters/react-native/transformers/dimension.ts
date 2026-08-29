@@ -3,7 +3,7 @@ import type { Transform } from "./types";
 
 let windowDimensions = Dimensions.get("window");
 
-Dimensions.addEventListener("change", ({ window }) => {
+Dimensions.addEventListener("change", ({ window }: { window: typeof windowDimensions }) => {
 	windowDimensions = window;
 });
 

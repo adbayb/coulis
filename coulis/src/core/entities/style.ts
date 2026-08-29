@@ -72,7 +72,8 @@ type PropertyValue<
 	: P[PropertyName] extends CustomPropertyValue<unknown>
 		? P[PropertyName] extends (input: infer Value) => unknown
 			? CreatePropertyValue<Value, S>
-			: P[PropertyName] extends (infer Value)[] | Record<infer Value, unknown>
+			: // oxlint-disable-next-line no-redeclare
+				P[PropertyName] extends (infer Value)[] | Record<infer Value, unknown>
 				? CreatePropertyValue<Value, S>
 				: never
 		: never;

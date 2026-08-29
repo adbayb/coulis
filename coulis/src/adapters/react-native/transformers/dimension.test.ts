@@ -2,6 +2,7 @@ import type { Dimensions } from "react-native";
 import { describe, expect, test, vi } from "vitest";
 import { transformDimension } from "./dimension";
 
+// @ts-expect-error Partial mocking for testing purposes
 vi.mock(import("react-native"), (): { Dimensions: Dimensions } => {
 	return {
 		Dimensions: {
@@ -14,9 +15,6 @@ vi.mock(import("react-native"), (): { Dimensions: Dimensions } => {
 					width: 400,
 				};
 			}),
-			set: () => {
-				// No op
-			},
 		},
 	};
 });

@@ -21,4 +21,3 @@ publicHoistPattern:
 allowBuilds:
     "@swc/core": true
     esbuild: true
-    sharp: true

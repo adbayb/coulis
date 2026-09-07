@@ -6,16 +6,63 @@ import type { StyleType } from "../../core/entities/style";
 import { STYLE_TYPES } from "../../core/entities/style";
 import type { CreateCoulis } from "../../core/ports/createCoulis";
 import { IS_SERVER_ENVIRONMENT } from "./constants";
+import type { CompiledTemplate } from "./helpers";
 import {
+	compileTemplate,
 	createClassName,
 	createCustomProperties,
 	createDeclaration,
-	getEvaluatedTemplate,
+	evaluateCompiledTemplate,
 	isShorthandProperty,
 } from "./helpers";
 import { createDomStyleSheet } from "./stylesheet/dom";
 import { createVirtualStyleSheet } from "./stylesheet/virtual";
 import type { ClassName, Rule, StyleSheet } from "./types";
+
+type PropertyInfo = {
+	customExpansion: readonly string[] | undefined;
+	/**
+	 * Declaration memo (`raw value -> declaration`). Declarations are pure functions of (name,
+	 * value) so repeated `createStyles` calls reuse them without any string building, regex or
+	 * `Set` lookup.
+	 */
+	declarations: Map<unknown, string>;
+	isCSSShorthand: boolean;
+	isCustomShorthand: boolean;
+	resolverFn: ((input: never) => unknown) | undefined;
+	resolverKind: PropertyResolverKind;
+	resolverMap: Record<string, unknown> | undefined;
+};
+
+type PropertyResolverKind = 0 | 1 | 2;
+
+const getResolvedValue = (info: PropertyInfo, value: unknown) => {
+	if (info.resolverKind === 1) {
+		return (info.resolverFn as (input: unknown) => unknown)(value);
+	}
+
+	if (info.resolverKind === 2) {
+		return (info.resolverMap as Record<string, unknown>)[value as string] ?? value;
+	}
+
+	return value;
+};
+
+const getStyleType = (isCSSShorthand: boolean, isAtRule: boolean): StyleType => {
+	if (isAtRule) {
+		if (isCSSShorthand) {
+			return "atShorthand";
+		}
+
+		return "atLonghand";
+	}
+
+	if (isCSSShorthand) {
+		return "shorthand";
+	}
+
+	return "longhand";
+};
 
 export const createCoulis: CreateCoulis<{
 	Input: {
@@ -43,7 +90,8 @@ export const createCoulis: CreateCoulis<{
 	);
 
 	const shorthands = (contract.shorthands ?? {}) as NonNullable<typeof contract.shorthands>;
-	const shorthandNames = Object.keys(shorthands);
+	const shorthandNameList = Object.keys(shorthands);
+	const customShorthandNames = new Set(shorthandNameList);
 	let collectedCustomProperties = "";
 
 	const properties = contract.properties(
@@ -52,6 +100,9 @@ export const createCoulis: CreateCoulis<{
 				collectedCustomProperties += `${name}:${String(value)};`;
 			})) as Parameters<typeof contract.properties>[0],
 	);
+
+	const propertyRecord = properties as Record<string, unknown>;
+	const shorthandRecord = shorthands as Record<string, readonly string[] | undefined>;
 
 	if (contract.states) {
 		for (const [name, template] of Object.entries(contract.states)) {
@@ -66,68 +117,146 @@ export const createCoulis: CreateCoulis<{
 		}
 	}
 
-	const isCustomShorthandProperty = (name: string) => {
-		return shorthandNames.includes(name);
-	};
+	const compiledStateByName = Object.fromEntries(
+		Object.entries(contract.states ?? {}).map(([name, template]) => {
+			return [name, compileTemplate(template as string)];
+		}),
+	) as Record<string, CompiledTemplate>;
 
-	const getDeclaration = ({
-		name,
-		value,
-	}: {
-		name: keyof RecordLike;
-		value: RecordLike[keyof RecordLike];
-	}) => {
-		const propertyValue = properties[name as keyof typeof properties];
+	/**
+	 * Static per-property metadata, computed once per property name. Resolvers mirror the contract
+	 * `properties` definition: function values are invoked, plain-object values act as lookup maps,
+	 * anything else (including arrays) passes the value through as-is.
+	 */
+	const propertyInfoByName = new Map<string, PropertyInfo>();
 
-		if (typeof propertyValue === "function") {
-			return createDeclaration({
-				name,
-				// oxlint-disable-next-line typescript/no-unsafe-call
-				value: propertyValue(value),
-			});
+	const getPropertyInfo = (name: string): PropertyInfo => {
+		let info = propertyInfoByName.get(name);
+
+		if (info === undefined) {
+			const propertyValue = propertyRecord[name];
+			let resolverFn: PropertyInfo["resolverFn"] = undefined;
+			let resolverKind: PropertyResolverKind = 0;
+			let resolverMap: PropertyInfo["resolverMap"] = undefined;
+
+			if (typeof propertyValue === "function") {
+				resolverFn = propertyValue as (input: never) => unknown;
+				resolverKind = 1;
+			} else if (isObject(propertyValue)) {
+				resolverKind = 2;
+				resolverMap = propertyValue;
+			}
+
+			info = {
+				customExpansion: shorthandRecord[name],
+				declarations: new Map(),
+				isCSSShorthand: isShorthandProperty(name),
+				isCustomShorthand: customShorthandNames.has(name),
+				resolverFn,
+				resolverKind,
+				resolverMap,
+			};
+
+			propertyInfoByName.set(name, info);
 		}
 
-		const finalValue = isObject(propertyValue)
-			? (propertyValue[value as string] ?? value)
-			: value;
+		return info;
+	};
 
-		return createDeclaration({
-			name,
-			value: finalValue,
-		});
+	const getDeclaration = (name: string, value: unknown, info: PropertyInfo) => {
+		const { declarations } = info;
+		let declaration = declarations.get(value);
+
+		if (declaration === undefined) {
+			declaration = createDeclaration({
+				name,
+				value: getResolvedValue(info, value),
+			});
+
+			declarations.set(value, declaration);
+		}
+
+		return declaration;
+	};
+
+	/**
+	 * Fast class-name memo per style type: `cacheInput -> className`. Lets repeated `createStyles`
+	 * calls skip hashing and stylesheet lookups entirely on cache hits.
+	 */
+	const classNameByInputByType = STYLE_TYPES.reduce(
+		(output, type) => {
+			output[type] = new Map<string, ClassName>();
+
+			return output;
+		},
+		{} as Record<StyleType, Map<string, ClassName>>,
+	);
+
+	const commitRule = (
+		type: StyleType,
+		fastCache: Map<string, ClassName>,
+		input: string,
+		className: ClassName,
+		rule: Rule,
+	): ClassName => {
+		if (hydratedClassNameCache.has(className)) {
+			fastCache.set(input, className);
+
+			return className;
+		}
+
+		let cache = classNameByTypeCache.get(type);
+
+		if (!cache) {
+			cache = createSetCache();
+			classNameByTypeCache.add(type, cache);
+		}
+
+		if (cache.has(className)) {
+			fastCache.set(input, className);
+
+			return className;
+		}
+
+		cache.add(className);
+		styleSheetByTypeAdaptee[type].insert(className, rule);
+		fastCache.set(input, className);
+
+		return className;
 	};
 
 	const createDeclarationBlock = (input: RecordLike) => {
 		let declarationBlock = "";
-		const propertyNames = Object.keys(input);
 
-		propertyNames.forEach((propertyName) => {
+		for (const propertyName of Object.keys(input)) {
 			const value = input[propertyName];
 
 			if (value === undefined) {
-				return;
+				continue;
 			}
 
-			if (isCustomShorthandProperty(propertyName)) {
-				const shorthandedPropertyNames = shorthands[propertyName];
+			if (customShorthandNames.has(propertyName)) {
+				const shorthandedPropertyNames = shorthandRecord[propertyName];
 
 				if (shorthandedPropertyNames === undefined) {
-					return;
+					continue;
 				}
 
-				shorthandedPropertyNames.forEach((shorthandedPropertyName) => {
-					declarationBlock += getDeclaration({
-						name: shorthandedPropertyName as string,
+				for (const shorthandedPropertyName of shorthandedPropertyNames) {
+					declarationBlock += getDeclaration(
+						shorthandedPropertyName,
 						value,
-					});
-				});
+						getPropertyInfo(shorthandedPropertyName),
+					);
+				}
 			} else {
-				declarationBlock += getDeclaration({
-					name: propertyName,
+				declarationBlock += getDeclaration(
+					propertyName,
 					value,
-				});
+					getPropertyInfo(propertyName),
+				);
 			}
-		});
+		}
 
 		return declarationBlock;
 	};
@@ -141,27 +270,16 @@ export const createCoulis: CreateCoulis<{
 		onCreateRule: (input: { className: ClassName }) => Rule;
 		type: StyleType;
 	}): ClassName => {
+		const fastCache = classNameByInputByType[type];
+		const fastHit = fastCache.get(cacheInput);
+
+		if (fastHit !== undefined) {
+			return fastHit;
+		}
+
 		const className = createClassName(cacheInput);
 
-		if (hydratedClassNameCache.has(className)) {
-			return className;
-		}
-
-		let cache = classNameByTypeCache.get(type);
-
-		if (!cache) {
-			cache = createSetCache();
-			classNameByTypeCache.add(type, cache);
-		}
-
-		if (cache.has(className)) {
-			return className;
-		}
-
-		cache.add(className);
-		styleSheetByTypeAdaptee[type].insert(className, onCreateRule({ className }));
-
-		return className;
+		return commitRule(type, fastCache, cacheInput, className, onCreateRule({ className }));
 	};
 
 	insert({
@@ -228,89 +346,128 @@ export const createCoulis: CreateCoulis<{
 		createStyles(input) {
 			const classNames: ClassName[] = [];
 
-			const collectClassNames = (name: string, value: unknown) => {
-				const isShorthandPropertyValue = isShorthandProperty(name);
-				let type: StyleType = isShorthandPropertyValue ? "shorthand" : "longhand";
+			const collectBaseClassName = (declaration: string, info: PropertyInfo) => {
+				const type: StyleType = info.isCSSShorthand ? "shorthand" : "longhand";
+				const fastCache = classNameByInputByType[type];
+				let className = fastCache.get(declaration);
 
-				if (!isObject(value)) {
-					const declaration = getDeclaration({
-						name,
-						value,
-					});
+				if (className === undefined) {
+					const freshClassName = createClassName(declaration);
 
-					classNames.push(
-						insert({
-							cacheInput: declaration,
-							onCreateRule({ className }) {
-								return `.${className}{${declaration}}`;
-							},
-							type,
-						}),
+					className = commitRule(
+						type,
+						fastCache,
+						declaration,
+						freshClassName,
+						`.${freshClassName}{${declaration}}`,
 					);
+				}
+
+				classNames.push(className);
+			};
+
+			const collectStateClassName = (
+				declaration: string,
+				info: PropertyInfo,
+				stateKey: string,
+			) => {
+				const isBaseState = stateKey === "base";
+
+				if (isBaseState) {
+					/*
+					 * The key is not included to compute the className when `key` equals to "base" as base is equivalent to an unconditional value.
+					 * This exclusion will allow to recycle cache if the style value has been already defined unconditionally.
+					 */
+					collectBaseClassName(declaration, info);
 
 					return;
 				}
 
-				const stateKeys = Object.keys(value);
+				const compiledState = compiledStateByName[stateKey];
 
-				for (const stateKey of stateKeys) {
-					const stateValue = value[stateKey];
+				if (compiledState === undefined) {
+					return;
+				}
 
-					const declaration = getDeclaration({
-						name,
-						value: stateValue,
-					});
+				const cacheInput = `${stateKey}${declaration}`;
 
-					const isBaseState = stateKey === "base";
+				const isAtRule = compiledState.needsRuntimeAtCheck
+					? undefined
+					: compiledState.isAtRule;
 
-					const stateTemplate = isBaseState
-						? "coulis[selector]{coulis[declaration]}"
-						: contract.states?.[stateKey];
+				const type =
+					isAtRule === undefined
+						? getStyleType(info.isCSSShorthand, false)
+						: getStyleType(info.isCSSShorthand, isAtRule);
 
-					if (stateTemplate === undefined) {
-						continue;
-					}
+				const fastCache = classNameByInputByType[type];
+				let className = fastCache.get(cacheInput);
 
-					const preComputedRule = getEvaluatedTemplate(stateTemplate, {
+				if (className === undefined) {
+					const freshClassName = createClassName(cacheInput);
+
+					const rule = evaluateCompiledTemplate(
+						compiledState,
+						`.${freshClassName}`,
 						declaration,
-						selector: ".coulis[className]",
-					});
+					);
 
-					if (preComputedRule.startsWith("@")) {
-						type = isShorthandPropertyValue ? "atShorthand" : "atLonghand";
-					}
+					const resolvedType =
+						isAtRule === undefined
+							? getStyleType(info.isCSSShorthand, rule.codePointAt(0) === 64) // `@`
+							: type;
 
-					classNames.push(
-						insert({
-							/*
-							 * The key is not included to compute the className when `key` equals to "base" as base is equivalent to an unconditional value.
-							 * This exclusion will allow to recycle cache if the style value has been already defined unconditionally.
-							 */
-							cacheInput: isBaseState ? declaration : `${stateKey}${declaration}`,
-							onCreateRule({ className }) {
-								return preComputedRule.replaceAll("coulis[className]", className);
-							},
-							type,
-						}),
+					className =
+						resolvedType === type
+							? commitRule(type, fastCache, cacheInput, freshClassName, rule)
+							: insert({
+									cacheInput,
+									onCreateRule() {
+										return rule;
+									},
+									type: resolvedType,
+								});
+				}
+
+				classNames.push(className);
+			};
+
+			const collectClassNames = (name: string, info: PropertyInfo, value: unknown) => {
+				if (!isObject(value)) {
+					collectBaseClassName(getDeclaration(name, value, info), info);
+
+					return;
+				}
+
+				for (const stateKey of Object.keys(value)) {
+					collectStateClassName(
+						getDeclaration(name, (value as RecordLike)[stateKey], info),
+						info,
+						stateKey,
 					);
 				}
 			};
 
 			for (const propertyName of Object.keys(input)) {
 				const value = input[propertyName as keyof typeof input];
+				const info = getPropertyInfo(propertyName);
 
-				if (isCustomShorthandProperty(propertyName)) {
-					const shorthandedPropertyNames = shorthands[propertyName];
+				if (info.isCustomShorthand) {
+					const shorthandedPropertyNames = info.customExpansion;
 
 					if (shorthandedPropertyNames === undefined) {
 						continue;
 					}
 
 					for (const shorthandedPropertyName of shorthandedPropertyNames) {
-						collectClassNames(shorthandedPropertyName as string, value);
+						collectClassNames(
+							shorthandedPropertyName,
+							getPropertyInfo(shorthandedPropertyName),
+							value,
+						);
 					}
 				} else {
-					collectClassNames(propertyName, value);
+					collectClassNames(propertyName, info, value);
 				}
 			}
 
@@ -328,7 +485,7 @@ export const createCoulis: CreateCoulis<{
 		 */
 		getContract() {
 			return {
-				propertyNames: [...shorthandNames, ...Object.keys(properties)] as ReturnType<
+				propertyNames: [...shorthandNameList, ...Object.keys(properties)] as ReturnType<
 					typeof this.getContract
 				>["propertyNames"],
 			};

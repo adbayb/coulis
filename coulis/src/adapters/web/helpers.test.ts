@@ -24,7 +24,7 @@ describe(escape, () => {
 
 describe(createClassName, () => {
 	test("should return a string starting with 'c'", () => {
-		expect(createClassName("any-input")).toMatch(/^c[\da-f]+$/u);
+		expect(createClassName("any-input")).toMatch(/^c[\da-z]+$/u);
 	});
 
 	test("should be deterministic for the same input", () => {

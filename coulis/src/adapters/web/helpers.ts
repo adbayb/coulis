@@ -17,7 +17,11 @@ export const escape = (input: string) => {
 };
 
 export const createClassName = (input: string) => {
-	return `c${hashWithDjb2(input)}`;
+	/**
+	 * Base-36 encoding keeps class names short (up to 7 chars vs up to 10 in decimal), shrinking
+	 * HTML class attributes, generated CSS selectors and cache metadata.
+	 */
+	return `c${hashWithDjb2(input).toString(36)}`;
 };
 
 /**
@@ -74,6 +78,27 @@ export const createCustomProperties = <Theme extends RecordLike>(
 	return output;
 };
 
+/**
+ * Cache for camelCase to kebab-case conversions. Property names come from a finite set (the
+ * contract), so each conversion is computed once and reused for every declaration.
+ */
+const kebabNameCache = new Map<string, string>();
+
+const toKebabName = (name: string) => {
+	let kebabName = kebabNameCache.get(name);
+
+	if (kebabName === undefined) {
+		// From JS camelCase to CSS kebab-case
+		kebabName = name.replaceAll(/([A-Z])/gu, (matched) => {
+			return `-${matched.toLowerCase()}`;
+		});
+
+		kebabNameCache.set(name, kebabName);
+	}
+
+	return kebabName;
+};
+
 export const createDeclaration = ({
 	name,
 	value,
@@ -81,10 +106,7 @@ export const createDeclaration = ({
 	name: keyof RecordLike;
 	value: RecordLike[keyof RecordLike];
 }) => {
-	// From JS camelCase to CSS kebeb-case
-	const transformedPropertyName = name.replaceAll(/([A-Z])/gu, (matched) => {
-		return `-${matched.toLowerCase()}`;
-	});
+	const transformedPropertyName = toKebabName(name);
 
 	// Format value to follow CSS specs (unitless number)
 	const transformedPropertyValue =
@@ -125,6 +147,82 @@ export const getEvaluatedTemplate = (
 		output = output.replaceAll(`coulis[${key}]`, () => {
 			return value;
 		});
+	}
+
+	return output;
+};
+
+export type CompiledTemplate = {
+	/**
+	 * Whether the evaluated rule starts with an at-rule marker (`@`). Precomputed from the template
+	 * first character, except when the template starts with the declaration marker in which case it
+	 * must be derived from the evaluated rule at runtime (`needsRuntimeAtCheck`).
+	 */
+	isAtRule: boolean;
+	markers: ("declaration" | "selector")[];
+	needsRuntimeAtCheck: boolean;
+	parts: string[];
+};
+
+/**
+ * Precompiles a state template (e.g. `"coulis[selector]:hover{coulis[declaration]}"`) into static
+ * parts and markers so evaluation becomes plain string concatenation without any `replaceAll` calls
+ * on the hot path. To run once per state at setup.
+ *
+ * @param template - The state template with `coulis[selector]`/`coulis[declaration]` markers.
+ * @returns The compiled template.
+ */
+export const compileTemplate = (template: string): CompiledTemplate => {
+	const pattern = /coulis\[(selector|declaration)\]/gu;
+	const markers: CompiledTemplate["markers"] = [];
+	const parts: string[] = [];
+	let lastIndex = 0;
+	let match: null | RegExpExecArray;
+
+	while ((match = pattern.exec(template)) !== null) {
+		parts.push(template.slice(lastIndex, match.index));
+		markers.push(match[1] as CompiledTemplate["markers"][number]);
+		lastIndex = match.index + match[0].length;
+	}
+
+	parts.push(template.slice(lastIndex));
+
+	const startsWithSelectorMarker = template.startsWith("coulis[selector]");
+
+	const startsWithDeclarationMarker =
+		!startsWithSelectorMarker && template.startsWith("coulis[declaration]");
+
+	return {
+		isAtRule:
+			startsWithSelectorMarker || startsWithDeclarationMarker
+				? false
+				: template.codePointAt(0) === 64, // `@`
+		markers,
+		needsRuntimeAtCheck: startsWithDeclarationMarker,
+		parts,
+	};
+};
+
+/**
+ * Evaluates a precompiled template by concatenating static parts with the given selector and
+ * declaration. Equivalent to `getEvaluatedTemplate` without any regex/`replaceAll` overhead.
+ *
+ * @param compiled - The template compiled with `compileTemplate`.
+ * @param selector - The value for the `coulis[selector]` marker.
+ * @param declaration - The value for the `coulis[declaration]` marker.
+ * @returns The evaluated rule.
+ */
+export const evaluateCompiledTemplate = (
+	compiled: CompiledTemplate,
+	selector: string,
+	declaration: string,
+) => {
+	const { markers, parts } = compiled;
+	let output = parts[0] as string;
+
+	for (let index = 0; index < markers.length; index++) {
+		output +=
+			(markers[index] === "selector" ? selector : declaration) + (parts[index + 1] as string);
 	}
 
 	return output;

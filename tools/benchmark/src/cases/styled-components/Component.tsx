@@ -1,43 +1,32 @@
 import { styled } from "styled-components";
 import { NUMBER_OF_DATA } from "../../constants";
+import { SHADES } from "../constants";
 
-const Table = styled.table`
-	border: 1px solid black;
-`;
-
-const Cell1 = styled.td`
-	background-color: lightcoral;
-	&:hover {
-		background-color: lightyellow;
-	}
-`;
-
-const Cell2 = styled.td`
-	background-color: lightblue;
-	&:hover {
-		background-color: lightyellow;
-	}
+const Cell = styled.td<{ $backgroundColor: string }>`
+	background-color: ${(properties) => {
+		return properties.$backgroundColor;
+	}};
 `;
 
 export const StyledComponentsComponent = () => {
 	return (
-		<Table>
+		<table>
 			<thead>
 				<tr>
 					<th>Column1</th>
-					<th>Column2</th>
 				</tr>
 			</thead>
 			<tbody>
 				{Array.from({ length: NUMBER_OF_DATA }, (_, index) => {
 					return (
 						<tr key={index}>
-							<Cell1>The table body</Cell1>
-							<Cell2>with two columns</Cell2>
+							<Cell $backgroundColor={SHADES[index % SHADES.length] as string}>
+								The table body
+							</Cell>
 						</tr>
 					);
 				})}
 			</tbody>
-		</Table>
+		</table>
 	);
 };

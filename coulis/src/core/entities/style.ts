@@ -1,6 +1,6 @@
 import type { AtRule, Properties as CSSProperties } from "csstype";
 import type { EmptyRecord, UngreedyString } from "./primitive";
-import type { ShortandsLike } from "./shorthand";
+import type { ShorthandsLike } from "./shorthand";
 import type { StatesLike } from "./state";
 
 /**
@@ -20,7 +20,7 @@ export const STYLE_TYPES = Object.freeze([
 
 export type GlobalStyles<
 	P extends PropertiesLike,
-	Shorthands extends ShortandsLike<P> | undefined,
+	Shorthands extends ShorthandsLike<P> | undefined,
 > = Record<
 	string,
 	Record<string, string> | string | WithUngreedyString<Styles<P, Shorthands, undefined>>
@@ -32,7 +32,7 @@ export type PropertiesLike = {
 
 export type Styles<
 	P extends PropertiesLike,
-	Shorthands extends ShortandsLike<P> | undefined,
+	Shorthands extends ShorthandsLike<P> | undefined,
 	States extends StatesLike | undefined,
 > = (Shorthands extends undefined
 	? EmptyRecord

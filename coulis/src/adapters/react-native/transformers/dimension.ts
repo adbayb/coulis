@@ -1,11 +1,33 @@
 import { Dimensions } from "react-native";
-import type { Transform } from "./types";
+
+type Transform = (input: { name: string; value: unknown }) => typeof input;
 
 let windowDimensions = Dimensions.get("window");
 
 Dimensions.addEventListener("change", ({ window }: { window: typeof windowDimensions }) => {
 	windowDimensions = window;
 });
+
+const RELATIVE_UNIT_SCALES: Record<string, () => number> = {
+	em: () => {
+		return 16;
+	},
+	rem: () => {
+		return 16;
+	},
+	vh: () => {
+		return windowDimensions.height / 100;
+	},
+	vmax: () => {
+		return Math.max(windowDimensions.width, windowDimensions.height) / 100;
+	},
+	vmin: () => {
+		return Math.min(windowDimensions.width, windowDimensions.height) / 100;
+	},
+	vw: () => {
+		return windowDimensions.width / 100;
+	},
+};
 
 export const transformDimension: Transform = (input) => {
 	if (typeof input.value !== "string") {
@@ -30,28 +52,14 @@ const getDimensionValue = (input: string) => {
 		return value;
 	}
 
-	if (
-		["em", "rem"].some((unit) => {
-			return input.endsWith(unit);
-		})
-	) {
-		return value * 16;
-	}
-
-	if (
-		["vh", "vmax"].some((unit) => {
-			return input.endsWith(unit);
-		})
-	) {
-		return (value / 100) * windowDimensions.height;
-	}
-
-	if (
-		["vw", "vmin"].some((unit) => {
-			return input.endsWith(unit);
-		})
-	) {
-		return (value / 100) * windowDimensions.width;
+	/*
+	 * Note: `rem` also ends with `em`, but both scale to 16 so order is irrelevant. No other unit
+	 * is a suffix of another (`vmax`/`vmin` don't end with `vh`/`vw`), keeping alphabetical.
+	 */
+	for (const [unit, getUnitScale] of Object.entries(RELATIVE_UNIT_SCALES)) {
+		if (input.endsWith(unit)) {
+			return value * getUnitScale();
+		}
 	}
 
 	return input;

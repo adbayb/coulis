@@ -7,18 +7,18 @@ export const createVirtualStyleSheet: CreateStyleSheet = () => {
 	let cachedContent: string | undefined = undefined;
 
 	return {
+		clear() {
+			ruleByClassName.clear();
+			cachedContent = undefined;
+		},
 		getContent() {
-			return cachedContent ?? minify([...ruleByClassName.getAll()].join(""));
+			return cachedContent ?? minify(ruleByClassName.getValues().join(""));
 		},
 		getHydratedClassNames() {
 			return [];
 		},
-		insert(key, rule) {
-			ruleByClassName.add(key, rule);
-			cachedContent = undefined;
-		},
-		remove() {
-			ruleByClassName.removeAll();
+		setRule(key, rule) {
+			ruleByClassName.set(key, rule);
 			cachedContent = undefined;
 		},
 	};

@@ -1,7 +1,36 @@
-import { describe, expect, test } from "vitest";
+import { beforeAll, describe, expect, test } from "vitest";
 import { createCoulis } from "./createCoulis";
 
 describe("createCoulis (web adapter)", () => {
+	beforeAll(() => {
+		setGlobalStyles({
+			"*,*::before,*::after": {
+				boxSizing: "inherit",
+			},
+			".globalClass+.otherGlobalClass": {
+				colorScheme: "black",
+			},
+			"@charset": '"utf-8"',
+			"@font-face": {
+				fontFamily: "'AliasedHelvetica'",
+				src: "local(Helvetica)",
+			},
+			"@import": "url('https://fonts.googleapis.com/css?family=Open+Sans&display=swap')",
+			"div": {
+				backgroundColor: "red", // Non-theme-based value to check if set properly by `setGlobalStyles`
+			},
+			"html": {
+				boxSizing: "border-box",
+			},
+			"html,body": {
+				backgroundColor: "surfacePrimary",
+				fontFamily: "Open Sans, AliasedHelvetica",
+				margin: 0,
+				padding: 0,
+			},
+		});
+	});
+
 	test("should create keyframes", () => {
 		expect(
 			createKeyframes({
@@ -120,33 +149,5 @@ const { createKeyframes, createStyles, getContract, getMetadata, setGlobalStyles
 			surfaceSecondary: tokens.colors.blue[2],
 		},
 		spacings: tokens.spacings,
-	},
-});
-
-// oxlint-disable-next-line vitest/require-hook
-setGlobalStyles({
-	"*,*::before,*::after": {
-		boxSizing: "inherit",
-	},
-	".globalClass+.otherGlobalClass": {
-		colorScheme: "black",
-	},
-	"@charset": '"utf-8"',
-	"@font-face": {
-		fontFamily: "'AliasedHelvetica'",
-		src: "local(Helvetica)",
-	},
-	"@import": "url('https://fonts.googleapis.com/css?family=Open+Sans&display=swap')",
-	"div": {
-		backgroundColor: "red", // Non-theme-based value to check if set properly by `setGlobalStyles`
-	},
-	"html": {
-		boxSizing: "border-box",
-	},
-	"html,body": {
-		backgroundColor: "surfacePrimary",
-		fontFamily: "Open Sans, AliasedHelvetica",
-		margin: 0,
-		padding: 0,
 	},
 });

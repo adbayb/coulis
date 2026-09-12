@@ -6,8 +6,21 @@ type Case = {
 	handler: () => void;
 };
 
+type CompletedResult = {
+	name: string;
+	latencyMean: number;
+	latencyMedian: number;
+	throughputMean: number;
+	throughputMedian: number;
+};
+
 export const createBenchmark = (cases: Case[]) => {
-	const benchmark = new Bench({ time: 1000 });
+	const benchmark = new Bench({
+		iterations: 16,
+		time: 500,
+		warmupIterations: 5,
+		warmupTime: 100,
+	});
 
 	for (const { name, handler } of cases) {
 		benchmark.add(name, handler);
@@ -16,42 +29,45 @@ export const createBenchmark = (cases: Case[]) => {
 	return {
 		async run() {
 			const tasks = await benchmark.run();
+			const completed: CompletedResult[] = [];
+			let fastestThroughput = 0;
 
-			const results = tasks
-				.map(({ name, result }) => {
-					if (result.state !== "completed") {
-						return undefined;
-					}
+			for (const { name, result } of tasks) {
+				if (result.state !== "completed") {
+					throw new Error(`Benchmark failed for: ${name}`);
+				}
 
-					return {
-						name,
-						"Latency mean (ns)": toFixed(result.latency.mean),
-						"Latency med (ns)": toFixed(result.latency.p50),
-						"Throughput mean (ops/s)": toFixed(result.throughput.mean),
-						"Throughput med (ops/s)": toFixed(result.throughput.p50),
-					};
-				})
-				.filter(Boolean) as BenchmarkOutput[];
+				const throughputMean = result.throughput.mean;
 
-			const fastestCase =
-				cases[
-					tasks.reduce(
-						(fastestTask, currentTask, index) => {
-							if (currentTask.result.state !== "completed") {
-								return fastestTask;
-							}
+				if (throughputMean > fastestThroughput) {
+					fastestThroughput = throughputMean;
+				}
 
-							const currentThroughput = currentTask.result.throughput.mean;
+				completed.push({
+					name,
+					latencyMean: result.latency.mean,
+					latencyMedian: result.latency.p50,
+					throughputMean,
+					throughputMedian: result.throughput.p50,
+				});
+			}
 
-							if (currentThroughput > fastestTask.throughput) {
-								return { index, throughput: currentThroughput };
-							}
+			const results: BenchmarkOutput[] = completed.map((completedResult) => {
+				return {
+					"name": completedResult.name,
+					"Latency mean (ms)": toFixed(completedResult.latencyMean),
+					"Latency med (ms)": toFixed(completedResult.latencyMedian),
+					"Slower than fastest": `${toFixed(((fastestThroughput - completedResult.throughputMean) / fastestThroughput) * 100)}%`,
+					"Throughput mean (ops/s)": toFixed(completedResult.throughputMean),
+					"Throughput med (ops/s)": toFixed(completedResult.throughputMedian),
+				};
+			});
 
-							return fastestTask;
-						},
-						{ index: 0, throughput: 0 },
-					).index
-				];
+			const sortedResults = results.toSorted((a, b) => {
+				return b["Throughput mean (ops/s)"] - a["Throughput mean (ops/s)"];
+			});
+
+			const [fastestCase] = sortedResults;
 
 			if (!fastestCase) {
 				throw new Error("Unable to find fastest case");
@@ -59,7 +75,7 @@ export const createBenchmark = (cases: Case[]) => {
 
 			return {
 				fastestCase: fastestCase.name,
-				results,
+				results: sortedResults,
 			};
 		},
 	};

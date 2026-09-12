@@ -1,6 +1,7 @@
 import { describe, expect, test } from "vitest";
 import {
 	createClassName,
+	createCompiledTemplate,
 	createCustomProperties,
 	createDeclaration,
 	escape,
@@ -85,30 +86,67 @@ describe(createCustomProperties, () => {
 
 		expect(collected[0]?.[0]).toBe("--spacings-1-5");
 	});
+
+	test("should handle deeply nested themes with sibling branches", () => {
+		const collected: [string, unknown][] = [];
+
+		const output = createCustomProperties(
+			{
+				a: { nested: { x: "1px" }, sibling: "2px" },
+				b: { y: "3px" },
+			},
+			(name, value) => {
+				collected.push([name, value]);
+			},
+		);
+
+		expect(collected).toContainEqual(["--a-nested-x", "1px"]);
+		expect(collected).toContainEqual(["--a-sibling", "2px"]);
+		expect(collected).toContainEqual(["--b-y", "3px"]);
+		expect(output.a.nested.x).toBe("var(--a-nested-x)");
+		expect(output.b.y).toBe("var(--b-y)");
+	});
+});
+
+describe(createCompiledTemplate, () => {
+	test("should compile markers and static parts", () => {
+		const compiled = createCompiledTemplate("coulis[selector]:hover{coulis[declaration]}");
+
+		expect(compiled.markers).toStrictEqual(["selector", "declaration"]);
+		expect(compiled.parts).toStrictEqual(["", ":hover{", "}"]);
+		expect(compiled.isAtRule).toBe(false);
+		expect(compiled.needsRuntimeAtCheck).toBe(false);
+	});
+
+	test("should detect at-rules and declaration-first templates", () => {
+		expect(
+			createCompiledTemplate("@media{coulis[selector]{coulis[declaration]}}").isAtRule,
+		).toBe(true);
+
+		expect(
+			createCompiledTemplate("coulis[declaration]@media{coulis[selector]}")
+				.needsRuntimeAtCheck,
+		).toBe(true);
+	});
 });
 
 describe(getEvaluatedTemplate, () => {
 	test("should replace coulis[selector] and coulis[declaration] markers", () => {
-		const template = "coulis[selector]:hover{coulis[declaration]}";
+		const compiled = createCompiledTemplate("coulis[selector]:hover{coulis[declaration]}");
 
-		expect(
-			getEvaluatedTemplate(template, {
-				declaration: "color:red;",
-				selector: ".c123",
-			}),
-		).toBe(".c123:hover{color:red;}");
+		expect(getEvaluatedTemplate(compiled, ".c123", "color:red;")).toBe(
+			".c123:hover{color:red;}",
+		);
 	});
 
 	test("should replace multiple occurrences", () => {
-		const template =
-			"coulis[selector][alt]{coulis[declaration]}coulis[selector]{coulis[declaration]}";
+		const compiled = createCompiledTemplate(
+			"coulis[selector][alt]{coulis[declaration]}coulis[selector]{coulis[declaration]}",
+		);
 
-		expect(
-			getEvaluatedTemplate(template, {
-				declaration: "color:red;",
-				selector: ".c123",
-			}),
-		).toBe(".c123[alt]{color:red;}.c123{color:red;}");
+		expect(getEvaluatedTemplate(compiled, ".c123", "color:red;")).toBe(
+			".c123[alt]{color:red;}.c123{color:red;}",
+		);
 	});
 });
 

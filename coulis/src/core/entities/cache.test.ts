@@ -5,7 +5,7 @@ describe(createSetCache, () => {
 	test("should add and find a key", () => {
 		const cache = createSetCache<string>();
 
-		cache.add("key1");
+		cache.set("key1");
 		expect(cache.has("key1")).toBe(true);
 	});
 
@@ -18,37 +18,37 @@ describe(createSetCache, () => {
 	test("should deduplicate identical keys", () => {
 		const cache = createSetCache<string>();
 
-		cache.add("key1");
-		cache.add("key1");
-		expect(cache.getAll()).toStrictEqual(["key1"]);
+		cache.set("key1");
+		cache.set("key1");
+		expect(cache.getValues()).toStrictEqual(["key1"]);
 	});
 
 	test("should return all keys in insertion order", () => {
 		const cache = createSetCache<string>();
 
-		cache.add("a");
-		cache.add("b");
-		cache.add("c");
-		expect(cache.getAll()).toStrictEqual(["a", "b", "c"]);
+		cache.set("a");
+		cache.set("b");
+		cache.set("c");
+		expect(cache.getValues()).toStrictEqual(["a", "b", "c"]);
 	});
 
-	test("should remove a specific key", () => {
+	test("should delete a specific key", () => {
 		const cache = createSetCache<string>();
 
-		cache.add("key1");
-		cache.add("key2");
-		cache.remove("key1");
+		cache.set("key1");
+		cache.set("key2");
+		cache.delete("key1");
 		expect(cache.has("key1")).toBe(false);
 		expect(cache.has("key2")).toBe(true);
 	});
 
-	test("should remove all keys", () => {
+	test("should clear all keys", () => {
 		const cache = createSetCache<string>();
 
-		cache.add("key1");
-		cache.add("key2");
-		cache.removeAll();
-		expect(cache.getAll()).toStrictEqual([]);
+		cache.set("key1");
+		cache.set("key2");
+		cache.clear();
+		expect(cache.getValues()).toStrictEqual([]);
 	});
 });
 
@@ -56,7 +56,7 @@ describe(createMapCache, () => {
 	test("should add and retrieve a value", () => {
 		const cache = createMapCache<string, number>();
 
-		cache.add("key1", 42);
+		cache.set("key1", 42);
 		expect(cache.get("key1")).toBe(42);
 	});
 
@@ -75,36 +75,36 @@ describe(createMapCache, () => {
 	test("should overwrite an existing key", () => {
 		const cache = createMapCache<string, number>();
 
-		cache.add("key1", 1);
-		cache.add("key1", 99);
+		cache.set("key1", 1);
+		cache.set("key1", 99);
 		expect(cache.get("key1")).toBe(99);
 	});
 
 	test("should return all values in insertion order", () => {
 		const cache = createMapCache<string, number>();
 
-		cache.add("a", 1);
-		cache.add("b", 2);
-		cache.add("c", 3);
-		expect(cache.getAll()).toStrictEqual([1, 2, 3]);
+		cache.set("a", 1);
+		cache.set("b", 2);
+		cache.set("c", 3);
+		expect(cache.getValues()).toStrictEqual([1, 2, 3]);
 	});
 
-	test("should remove a specific key", () => {
+	test("should delete a specific key", () => {
 		const cache = createMapCache<string, number>();
 
-		cache.add("key1", 1);
-		cache.add("key2", 2);
-		cache.remove("key1");
+		cache.set("key1", 1);
+		cache.set("key2", 2);
+		cache.delete("key1");
 		expect(cache.has("key1")).toBe(false);
 		expect(cache.has("key2")).toBe(true);
 	});
 
-	test("should remove all keys", () => {
+	test("should clear all keys", () => {
 		const cache = createMapCache<string, number>();
 
-		cache.add("key1", 1);
-		cache.add("key2", 2);
-		cache.removeAll();
-		expect(cache.getAll()).toStrictEqual([]);
+		cache.set("key1", 1);
+		cache.set("key2", 2);
+		cache.clear();
+		expect(cache.getValues()).toStrictEqual([]);
 	});
 });

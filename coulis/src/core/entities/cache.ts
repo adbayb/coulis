@@ -1,9 +1,9 @@
 export type SetCache<Key extends string> = {
-	add: (key: Key) => void;
-	getAll: () => Key[];
+	clear: () => void;
+	delete: (key: Key) => void;
+	getValues: () => Key[];
 	has: (key: Key) => boolean;
-	remove: (key: Key) => void;
-	removeAll: () => void;
+	set: (key: Key) => void;
 };
 
 /**
@@ -11,43 +11,39 @@ export type SetCache<Key extends string> = {
  *
  * @example
  * 	const cache = createSetCache();
- * 	cache.add("key");
+ * 	cache.set("key");
  *
  * @returns The cache instance.
  */
 export const createSetCache = <Key extends string>(): SetCache<Key> => {
 	const cache = new Set<Key>();
 
-	const getAll: SetCache<Key>["getAll"] = () => {
-		return [...cache];
-	};
-
-	const remove: SetCache<Key>["remove"] = (key) => {
-		cache.delete(key);
-	};
-
 	return {
-		add(key) {
-			cache.add(key);
+		clear() {
+			cache.clear();
 		},
-		getAll,
+		delete(key) {
+			cache.delete(key);
+		},
+		getValues() {
+			return [...cache];
+		},
 		has(key) {
 			return cache.has(key);
 		},
-		remove,
-		removeAll() {
-			cache.clear();
+		set(key) {
+			cache.add(key);
 		},
 	};
 };
 
 export type MapCache<Key extends string, Value> = {
-	add: (key: Key, value: Value) => void;
+	clear: () => void;
+	delete: (key: Key) => void;
 	get: (key: Key) => undefined | Value;
-	getAll: () => Value[];
+	getValues: () => Value[];
 	has: (key: Key) => boolean;
-	remove: (key: Key) => void;
-	removeAll: () => void;
+	set: (key: Key, value: Value) => void;
 };
 
 /**
@@ -55,35 +51,31 @@ export type MapCache<Key extends string, Value> = {
  *
  * @example
  * 	const cache = createMapCache();
- * 	cache.add("key", "value");
+ * 	cache.set("key", "value");
  *
  * @returns The cache instance.
  */
 export const createMapCache = <Key extends string, Value>(): MapCache<Key, Value> => {
 	const cache = new Map<Key, Value>();
 
-	const getAll: MapCache<Key, Value>["getAll"] = () => {
-		return [...cache.values()];
-	};
-
-	const remove: MapCache<Key, Value>["remove"] = (key) => {
-		cache.delete(key);
-	};
-
 	return {
-		add(key, value) {
-			cache.set(key, value);
+		clear() {
+			cache.clear();
+		},
+		delete(key) {
+			cache.delete(key);
 		},
 		get(key) {
 			return cache.get(key);
 		},
-		getAll,
+		getValues() {
+			return [...cache.values()];
+		},
 		has(key) {
 			return cache.has(key);
 		},
-		remove,
-		removeAll() {
-			cache.clear();
+		set(key, value) {
+			cache.set(key, value);
 		},
 	};
 };

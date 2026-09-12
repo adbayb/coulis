@@ -21,7 +21,7 @@ export const createClassName = (input: string) => {
 	 * Base-36 encoding keeps class names short (up to 7 chars vs up to 10 in decimal), shrinking
 	 * HTML class attributes, generated CSS selectors and cache metadata.
 	 */
-	return `c${hashWithDjb2(input).toString(36)}`;
+	return `c${getDjb2Hash(input).toString(36)}`;
 };
 
 /**
@@ -30,7 +30,7 @@ export const createClassName = (input: string) => {
  * @param input - The input string to hash.
  * @returns The computed hash value.
  */
-const hashWithDjb2 = (input: string) => {
+const getDjb2Hash = (input: string) => {
 	let hash = 5381; // Initial hash value
 
 	for (let i = 0; i < input.length; i++) {
@@ -44,35 +44,26 @@ const hashWithDjb2 = (input: string) => {
 export const createCustomProperties = <Theme extends RecordLike>(
 	theme: Theme,
 	onCreateProperty: (name: string, value: unknown) => void,
-	customPropertyNameParts: (keyof Theme)[] = [],
+	path: string[] = [],
 	output: WithNewLeafNodes<Theme, string> = {} as typeof output,
 ) => {
-	const tokenNames = Object.keys(theme) as (keyof typeof output)[];
-
-	for (const tokenName of tokenNames) {
+	for (const tokenName of Object.keys(theme) as (keyof Theme)[]) {
 		const value = theme[tokenName];
-
-		customPropertyNameParts.push(tokenName);
-		output[tokenName] = {} as (typeof output)[keyof typeof output];
+		const tokenPath = [...path, String(tokenName)];
 
 		if (isObject(value)) {
-			createCustomProperties(
-				value as Theme,
-				onCreateProperty,
-				customPropertyNameParts,
-				output[tokenName] as unknown as typeof output,
-			);
+			const nestedOutput = ((output as RecordLike)[tokenName as string] ??=
+				{}) as typeof output;
 
-			customPropertyNameParts = [];
+			createCustomProperties(value as Theme, onCreateProperty, tokenPath, nestedOutput);
 
 			continue;
 		}
 
-		const name = `--${escape(customPropertyNameParts.join("-"))}`;
+		const name = `--${escape(tokenPath.join("-"))}`;
 
-		output[tokenName] = `var(${name})` as (typeof output)[keyof typeof output];
+		(output as RecordLike)[tokenName as string] = `var(${name})`;
 		onCreateProperty(name, value);
-		customPropertyNameParts.pop();
 	}
 
 	return output;
@@ -84,7 +75,7 @@ export const createCustomProperties = <Theme extends RecordLike>(
  */
 const kebabNameCache = new Map<string, string>();
 
-const toKebabName = (name: string) => {
+const getKebabName = (name: string) => {
 	let kebabName = kebabNameCache.get(name);
 
 	if (kebabName === undefined) {
@@ -106,7 +97,7 @@ export const createDeclaration = ({
 	name: keyof RecordLike;
 	value: RecordLike[keyof RecordLike];
 }) => {
-	const transformedPropertyName = toKebabName(name);
+	const transformedPropertyName = getKebabName(name);
 
 	// Format value to follow CSS specs (unitless number)
 	const transformedPropertyValue =
@@ -115,41 +106,6 @@ export const createDeclaration = ({
 			: `${String(value)}px`;
 
 	return `${transformedPropertyName}:${transformedPropertyValue};`;
-};
-
-export const createDeclarationBlock = (properties: RecordLike) => {
-	let declarationBlock = "";
-	const propertyNames = Object.keys(properties);
-
-	for (const propertyName of propertyNames) {
-		const value = properties[propertyName];
-
-		if (value === undefined) {
-			continue;
-		}
-
-		declarationBlock += createDeclaration({
-			name: propertyName,
-			value,
-		});
-	}
-
-	return declarationBlock;
-};
-
-export const getEvaluatedTemplate = (
-	template: string,
-	variables: Record<"declaration" | "selector", string>,
-) => {
-	let output = template;
-
-	for (const [key, value] of Object.entries(variables)) {
-		output = output.replaceAll(`coulis[${key}]`, () => {
-			return value;
-		});
-	}
-
-	return output;
 };
 
 export type CompiledTemplate = {
@@ -172,7 +128,7 @@ export type CompiledTemplate = {
  * @param template - The state template with `coulis[selector]`/`coulis[declaration]` markers.
  * @returns The compiled template.
  */
-export const compileTemplate = (template: string): CompiledTemplate => {
+export const createCompiledTemplate = (template: string): CompiledTemplate => {
 	const pattern = /coulis\[(selector|declaration)\]/gu;
 	const markers: CompiledTemplate["markers"] = [];
 	const parts: string[] = [];
@@ -196,7 +152,7 @@ export const compileTemplate = (template: string): CompiledTemplate => {
 		isAtRule:
 			startsWithSelectorMarker || startsWithDeclarationMarker
 				? false
-				: template.codePointAt(0) === 64, // `@`
+				: template.startsWith("@"),
 		markers,
 		needsRuntimeAtCheck: startsWithDeclarationMarker,
 		parts,
@@ -205,14 +161,14 @@ export const compileTemplate = (template: string): CompiledTemplate => {
 
 /**
  * Evaluates a precompiled template by concatenating static parts with the given selector and
- * declaration. Equivalent to `getEvaluatedTemplate` without any regex/`replaceAll` overhead.
+ * declaration.
  *
- * @param compiled - The template compiled with `compileTemplate`.
+ * @param compiled - The template compiled with `createCompiledTemplate`.
  * @param selector - The value for the `coulis[selector]` marker.
  * @param declaration - The value for the `coulis[declaration]` marker.
  * @returns The evaluated rule.
  */
-export const evaluateCompiledTemplate = (
+export const getEvaluatedTemplate = (
 	compiled: CompiledTemplate,
 	selector: string,
 	declaration: string,

@@ -1,4 +1,4 @@
-import type { CreateStyleSheet } from "../types";
+import type { ClassName, CreateStyleSheet } from "../types";
 
 export const createDomStyleSheet: CreateStyleSheet = (type) => {
 	let element = document.querySelector<HTMLStyleElement>(`style[data-coulis-type="${type}"]`);
@@ -11,6 +11,7 @@ export const createDomStyleSheet: CreateStyleSheet = (type) => {
 	}
 
 	let pendingRules = "";
+	let pendingClassNames: ClassName[] = [];
 	let isFlushScheduled = false;
 
 	const flush = () => {
@@ -25,11 +26,26 @@ export const createDomStyleSheet: CreateStyleSheet = (type) => {
 		 */
 		// oxlint-disable-next-line unicorn/prefer-modern-dom-apis
 		element.insertAdjacentText("beforeend", pendingRules);
+
+		// Keep the hydration cache in sync so later instances can reuse these class names.
+		const cachedClassNames = element.dataset.coulisCache;
+
+		element.dataset.coulisCache = cachedClassNames
+			? `${cachedClassNames},${pendingClassNames.join(",")}`
+			: pendingClassNames.join(",");
+
 		pendingRules = "";
+		pendingClassNames = [];
 		isFlushScheduled = false;
 	};
 
 	return {
+		clear() {
+			pendingRules = "";
+			pendingClassNames = [];
+			isFlushScheduled = false;
+			element.remove();
+		},
 		getContent() {
 			/**
 			 * `textContent` is more performant than `innerText` (no layout reflow).
@@ -47,8 +63,9 @@ export const createDomStyleSheet: CreateStyleSheet = (type) => {
 
 			return source.split(",");
 		},
-		insert(_, rule) {
+		setRule(className, rule) {
 			pendingRules += rule;
+			pendingClassNames.push(className);
 
 			if (!isFlushScheduled) {
 				isFlushScheduled = true;
@@ -59,11 +76,6 @@ export const createDomStyleSheet: CreateStyleSheet = (type) => {
 				 */
 				queueMicrotask(flush);
 			}
-		},
-		remove() {
-			pendingRules = "";
-			isFlushScheduled = false;
-			element.remove();
 		},
 	};
 };

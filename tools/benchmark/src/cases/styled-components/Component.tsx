@@ -1,6 +1,8 @@
 import { styled } from "styled-components";
-import { NUMBER_OF_DATA } from "../../constants";
-import { SHADES } from "../constants";
+import { BACKGROUND_COLORS, createRowIndexes } from "../constants";
+import { TableShell } from "../table";
+
+const rowIndexes = createRowIndexes();
 
 const Cell = styled.td<{ $backgroundColor: string }>`
 	background-color: ${(properties) => {
@@ -10,23 +12,19 @@ const Cell = styled.td<{ $backgroundColor: string }>`
 
 export const StyledComponentsComponent = () => {
 	return (
-		<table>
-			<thead>
-				<tr>
-					<th>Column1</th>
-				</tr>
-			</thead>
-			<tbody>
-				{Array.from({ length: NUMBER_OF_DATA }, (_, index) => {
-					return (
-						<tr key={index}>
-							<Cell $backgroundColor={SHADES[index % SHADES.length] as string}>
-								The table body
-							</Cell>
-						</tr>
-					);
-				})}
-			</tbody>
-		</table>
+		<TableShell>
+			{rowIndexes.map((index) => {
+				const backgroundColor = BACKGROUND_COLORS[
+					index % BACKGROUND_COLORS.length
+				] as string;
+
+				return (
+					<tr key={index}>
+						<Cell $backgroundColor={backgroundColor}>The table body</Cell>
+						<Cell $backgroundColor={backgroundColor}>with two columns</Cell>
+					</tr>
+				);
+			})}
+		</TableShell>
 	);
 };

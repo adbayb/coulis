@@ -1,12 +1,10 @@
-import type { SetCache } from "../../core/entities/cache";
-import { createMapCache, createSetCache } from "../../core/entities/cache";
 import type { RecordLike } from "../../core/entities/primitive";
 import { isNumeric, isObject } from "../../core/entities/primitive";
 import type { StatesLike } from "../../core/entities/state";
 import type { StyleType } from "../../core/entities/style";
 import { STYLE_TYPES } from "../../core/entities/style";
 import type { CreateCoulis } from "../../core/ports/createCoulis";
-import { IS_SERVER_ENVIRONMENT } from "./constants";
+import { IS_SERVER_ENVIRONMENT, SHORTHAND_PROPERTIES } from "./constants";
 import type { CompiledTemplate } from "./helpers";
 import {
 	createClassName,
@@ -14,7 +12,7 @@ import {
 	createCustomProperties,
 	createDeclaration,
 	getEvaluatedTemplate,
-	isShorthandProperty,
+	getKebabName,
 } from "./helpers";
 import { createDomStyleSheet } from "./stylesheet/dom";
 import { createVirtualStyleSheet } from "./stylesheet/virtual";
@@ -28,6 +26,7 @@ type PropertyInfo = {
 	 */
 	declarations: Map<unknown, string>;
 	isCSSShorthand: boolean;
+	kebabName: string;
 	resolverFn: ((input: never) => unknown) | undefined;
 	resolverKind: PropertyResolverKind;
 	resolverMap: Record<string, unknown> | undefined;
@@ -78,7 +77,7 @@ export const createCoulis: CreateCoulis<{
 		return createStyleSheet(type);
 	});
 
-	const classNameByTypeCache = createMapCache<StyleType, SetCache<ClassName>>();
+	const classNameByTypeCache = new Map<StyleType, Set<ClassName>>();
 
 	const hydratedClassNameCache = new Set(
 		Object.values(styleSheetByType).flatMap((styleSheet) => {
@@ -142,7 +141,8 @@ export const createCoulis: CreateCoulis<{
 
 			info = {
 				declarations: new Map(),
-				isCSSShorthand: isShorthandProperty(name),
+				isCSSShorthand: SHORTHAND_PROPERTIES.has(name),
+				kebabName: getKebabName(name),
 				resolverFn,
 				resolverKind,
 				resolverMap,
@@ -167,11 +167,7 @@ export const createCoulis: CreateCoulis<{
 		let declaration = declarations.get(value);
 
 		if (declaration === undefined) {
-			declaration = createDeclaration({
-				name,
-				value: getResolvedValue(info, value),
-			});
-
+			declaration = createDeclaration(info.kebabName, name, getResolvedValue(info, value));
 			declarations.set(value, declaration);
 		}
 
@@ -196,12 +192,12 @@ export const createCoulis: CreateCoulis<{
 			let cache = classNameByTypeCache.get(type);
 
 			if (!cache) {
-				cache = createSetCache();
+				cache = new Set();
 				classNameByTypeCache.set(type, cache);
 			}
 
 			if (!cache.has(className)) {
-				cache.set(className);
+				cache.add(className);
 				styleSheetByType[type].setRule(className, rule);
 			}
 		}
@@ -253,18 +249,6 @@ export const createCoulis: CreateCoulis<{
 		return declarationBlock;
 	};
 
-	const getCachedType = (cacheInput: string) => {
-		for (const type of STYLE_TYPES) {
-			const className = classNameByInputByType[type].get(cacheInput);
-
-			if (className !== undefined) {
-				return { className, type };
-			}
-		}
-
-		return undefined;
-	};
-
 	const getOrCreateAtomicClassName = (
 		declaration: string,
 		info: PropertyInfo,
@@ -294,31 +278,13 @@ export const createCoulis: CreateCoulis<{
 
 		const cacheInput = `${stateKey}${declaration}`;
 
-		if (!compiledState.needsRuntimeAtCheck) {
-			return getOrCreateClassName({
-				cacheInput,
-				createRule({ className }) {
-					return getEvaluatedTemplate(compiledState, `.${className}`, declaration);
-				},
-				type: getStyleType(info.isCSSShorthand, compiledState.isAtRule),
-			});
-		}
-
-		/*
-		 * Template starts with the declaration marker: the at-rule status depends on the
-		 * declaration itself, so evaluate first, then commit to the resolved type.
-		 */
-		const cachedType = getCachedType(cacheInput);
-
-		if (cachedType !== undefined) {
-			return cachedType.className;
-		}
-
-		const className = createClassName(cacheInput);
-		const rule = getEvaluatedTemplate(compiledState, `.${className}`, declaration);
-		const resolvedType = getStyleType(info.isCSSShorthand, rule.startsWith("@"));
-
-		return setRule(resolvedType, cacheInput, className, rule);
+		return getOrCreateClassName({
+			cacheInput,
+			createRule({ className }) {
+				return getEvaluatedTemplate(compiledState, `.${className}`, declaration);
+			},
+			type: getStyleType(info.isCSSShorthand, compiledState.isAtRule),
+		});
 	};
 
 	getOrCreateClassName({
@@ -453,12 +419,11 @@ export const createCoulis: CreateCoulis<{
 		getMetadata() {
 			const metadata = STYLE_TYPES.map((type) => {
 				const { getContent } = styleSheetByType[type];
-				const cachedClassNames = classNameByTypeCache.get(type);
 				const content = getContent();
 
 				return {
 					attributes: {
-						"data-coulis-cache": (cachedClassNames?.getValues() ?? []).join(","),
+						"data-coulis-cache": [...(classNameByTypeCache.get(type) ?? [])].join(","),
 						"data-coulis-type": type,
 					},
 					content,

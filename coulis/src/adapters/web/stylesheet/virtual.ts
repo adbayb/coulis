@@ -1,9 +1,8 @@
-import { createMapCache } from "../../../core/entities/cache";
 import { minify } from "../helpers";
 import type { ClassName, CreateStyleSheet, Rule } from "../types";
 
 export const createVirtualStyleSheet: CreateStyleSheet = () => {
-	const ruleByClassName = createMapCache<ClassName, Rule>();
+	const ruleByClassName = new Map<ClassName, Rule>();
 	let cachedContent: string | undefined = undefined;
 
 	return {
@@ -12,7 +11,7 @@ export const createVirtualStyleSheet: CreateStyleSheet = () => {
 			cachedContent = undefined;
 		},
 		getContent() {
-			return cachedContent ?? minify(ruleByClassName.getValues().join(""));
+			return cachedContent ?? minify([...ruleByClassName.values()].join(""));
 		},
 		getHydratedClassNames() {
 			return [];

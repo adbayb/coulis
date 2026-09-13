@@ -10,13 +10,13 @@ import type { StatesLike } from "./state";
  * conditional-shorthand (e.g @media { background }) < conditional-longhand (e.g @media {
  * background-color }) properties.
  */
-export const STYLE_TYPES = Object.freeze([
+export const STYLE_TYPES = [
 	"global",
 	"shorthand",
 	"longhand",
 	"atShorthand",
 	"atLonghand",
-] as const);
+] as const;
 
 export type GlobalStyles<
 	P extends PropertiesLike,

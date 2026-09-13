@@ -4,30 +4,23 @@ type Transform = (input: { name: string; value: unknown }) => typeof input;
 
 let windowDimensions = Dimensions.get("window");
 
+const createUnitScales = () => {
+	return {
+		em: 16,
+		rem: 16,
+		vh: windowDimensions.height / 100,
+		vmax: Math.max(windowDimensions.width, windowDimensions.height) / 100,
+		vmin: Math.min(windowDimensions.width, windowDimensions.height) / 100,
+		vw: windowDimensions.width / 100,
+	};
+};
+
+let unitScales = createUnitScales();
+
 Dimensions.addEventListener("change", ({ window }: { window: typeof windowDimensions }) => {
 	windowDimensions = window;
+	unitScales = createUnitScales();
 });
-
-const RELATIVE_UNIT_SCALES: Record<string, () => number> = {
-	em: () => {
-		return 16;
-	},
-	rem: () => {
-		return 16;
-	},
-	vh: () => {
-		return windowDimensions.height / 100;
-	},
-	vmax: () => {
-		return Math.max(windowDimensions.width, windowDimensions.height) / 100;
-	},
-	vmin: () => {
-		return Math.min(windowDimensions.width, windowDimensions.height) / 100;
-	},
-	vw: () => {
-		return windowDimensions.width / 100;
-	},
-};
 
 export const transformDimension: Transform = (input) => {
 	if (typeof input.value !== "string") {
@@ -56,9 +49,9 @@ const getDimensionValue = (input: string) => {
 	 * Note: `rem` also ends with `em`, but both scale to 16 so order is irrelevant. No other unit
 	 * is a suffix of another (`vmax`/`vmin` don't end with `vh`/`vw`), keeping alphabetical.
 	 */
-	for (const [unit, getUnitScale] of Object.entries(RELATIVE_UNIT_SCALES)) {
+	for (const [unit, scale] of Object.entries(unitScales)) {
 		if (input.endsWith(unit)) {
-			return value * getUnitScale();
+			return value * scale;
 		}
 	}
 

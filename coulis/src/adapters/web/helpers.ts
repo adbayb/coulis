@@ -1,6 +1,6 @@
 import type { RecordLike, WithNewLeafNodes } from "../../core/entities/primitive";
 import { isObject } from "../../core/entities/primitive";
-import { SHORTHAND_PROPERTIES, UNITLESS_PROPERTIES } from "./constants";
+import { UNITLESS_PROPERTIES } from "./constants";
 
 /**
  * Escape invalid CSS characters to generate usable property names.
@@ -70,53 +70,37 @@ export const createCustomProperties = <Theme extends RecordLike>(
 };
 
 /**
- * Cache for camelCase to kebab-case conversions. Property names come from a finite set (the
- * contract), so each conversion is computed once and reused for every declaration.
+ * Converts a JS camelCase property name to CSS kebab-case. Runs once per property name at setup
+ * (the result is stored on `PropertyInfo`), so no caching is needed here.
+ *
+ * @param name - The JS property name.
+ * @returns The CSS kebab-case name.
  */
-const kebabNameCache = new Map<string, string>();
-
-const getKebabName = (name: string) => {
-	let kebabName = kebabNameCache.get(name);
-
-	if (kebabName === undefined) {
-		// From JS camelCase to CSS kebab-case
-		kebabName = name.replaceAll(/([A-Z])/gu, (matched) => {
-			return `-${matched.toLowerCase()}`;
-		});
-
-		kebabNameCache.set(name, kebabName);
-	}
-
-	return kebabName;
+export const getKebabName = (name: string) => {
+	// From JS camelCase to CSS kebab-case
+	return name.replaceAll(/([A-Z])/gu, (matched) => {
+		return `-${matched.toLowerCase()}`;
+	});
 };
 
-export const createDeclaration = ({
-	name,
-	value,
-}: {
-	name: keyof RecordLike;
-	value: RecordLike[keyof RecordLike];
-}) => {
-	const transformedPropertyName = getKebabName(name);
-
+export const createDeclaration = (kebabName: string, name: string, value: unknown) => {
 	// Format value to follow CSS specs (unitless number)
 	const transformedPropertyValue =
 		typeof value === "string" || UNITLESS_PROPERTIES.has(name)
 			? String(value)
 			: `${String(value)}px`;
 
-	return `${transformedPropertyName}:${transformedPropertyValue};`;
+	return `${kebabName}:${transformedPropertyValue};`;
 };
 
 export type CompiledTemplate = {
 	/**
-	 * Whether the evaluated rule starts with an at-rule marker (`@`). Precomputed from the template
-	 * first character, except when the template starts with the declaration marker in which case it
-	 * must be derived from the evaluated rule at runtime (`needsRuntimeAtCheck`).
+	 * Whether the evaluated rule is an at-rule (starts with `@`). Markers always evaluate to
+	 * selectors (`.c...`) or declarations (`name:value;`), neither of which starts with `@`, so the
+	 * template first character alone determines the outcome.
 	 */
 	isAtRule: boolean;
 	markers: ("declaration" | "selector")[];
-	needsRuntimeAtCheck: boolean;
 	parts: string[];
 };
 
@@ -143,18 +127,9 @@ export const createCompiledTemplate = (template: string): CompiledTemplate => {
 
 	parts.push(template.slice(lastIndex));
 
-	const startsWithSelectorMarker = template.startsWith("coulis[selector]");
-
-	const startsWithDeclarationMarker =
-		!startsWithSelectorMarker && template.startsWith("coulis[declaration]");
-
 	return {
-		isAtRule:
-			startsWithSelectorMarker || startsWithDeclarationMarker
-				? false
-				: template.startsWith("@"),
+		isAtRule: template.startsWith("@"),
 		markers,
-		needsRuntimeAtCheck: startsWithDeclarationMarker,
 		parts,
 	};
 };
@@ -182,10 +157,6 @@ export const getEvaluatedTemplate = (
 	}
 
 	return output;
-};
-
-export const isShorthandProperty = (input: string) => {
-	return SHORTHAND_PROPERTIES.has(input);
 };
 
 export const minify = (input: string) => {

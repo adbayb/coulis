@@ -7,9 +7,6 @@ export const UNITLESS_PROPERTIES = new Set([
 	"borderImageOutset",
 	"borderImageSlice",
 	"borderImageWidth",
-	"boxFlex",
-	"boxFlexGroup",
-	"boxOrdinalGroup",
 	"columnCount",
 	"columns",
 	// SVG properties

@@ -6,6 +6,7 @@ import {
 	createDeclaration,
 	escape,
 	getEvaluatedTemplate,
+	getKebabName,
 	minify,
 } from "./helpers";
 
@@ -37,23 +38,33 @@ describe(createClassName, () => {
 	});
 });
 
-describe(createDeclaration, () => {
+describe(getKebabName, () => {
 	test("should convert camelCase property to kebab-case", () => {
-		expect(createDeclaration({ name: "backgroundColor", value: "red" })).toBe(
+		expect(getKebabName("backgroundColor")).toBe("background-color");
+	});
+
+	test("should leave lowercase properties unchanged", () => {
+		expect(getKebabName("display")).toBe("display");
+	});
+});
+
+describe(createDeclaration, () => {
+	test("should create a declaration from a kebab-case property name", () => {
+		expect(createDeclaration("background-color", "backgroundColor", "red")).toBe(
 			"background-color:red;",
 		);
 	});
 
 	test("should append px unit to numeric values for dimensional properties", () => {
-		expect(createDeclaration({ name: "width", value: 100 })).toBe("width:100px;");
+		expect(createDeclaration("width", "width", 100)).toBe("width:100px;");
 	});
 
 	test("should not append px for unitless properties", () => {
-		expect(createDeclaration({ name: "opacity", value: 0.5 })).toBe("opacity:0.5;");
+		expect(createDeclaration("opacity", "opacity", 0.5)).toBe("opacity:0.5;");
 	});
 
 	test("should keep string values as-is", () => {
-		expect(createDeclaration({ name: "display", value: "flex" })).toBe("display:flex;");
+		expect(createDeclaration("display", "display", "flex")).toBe("display:flex;");
 	});
 });
 
@@ -115,18 +126,16 @@ describe(createCompiledTemplate, () => {
 		expect(compiled.markers).toStrictEqual(["selector", "declaration"]);
 		expect(compiled.parts).toStrictEqual(["", ":hover{", "}"]);
 		expect(compiled.isAtRule).toBe(false);
-		expect(compiled.needsRuntimeAtCheck).toBe(false);
 	});
 
-	test("should detect at-rules and declaration-first templates", () => {
+	test("should detect at-rules from the template first character", () => {
 		expect(
 			createCompiledTemplate("@media{coulis[selector]{coulis[declaration]}}").isAtRule,
 		).toBe(true);
 
-		expect(
-			createCompiledTemplate("coulis[declaration]@media{coulis[selector]}")
-				.needsRuntimeAtCheck,
-		).toBe(true);
+		expect(createCompiledTemplate("coulis[declaration]@media{coulis[selector]}").isAtRule).toBe(
+			false,
+		);
 	});
 });
 

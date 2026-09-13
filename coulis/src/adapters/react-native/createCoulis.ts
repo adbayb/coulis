@@ -1,4 +1,3 @@
-import { createMapCache } from "../../core/entities/cache";
 import { isObject } from "../../core/entities/primitive";
 import type { CreateCoulis } from "../../core/ports/createCoulis";
 import { createUnsupportedLogger } from "./helpers";
@@ -17,7 +16,7 @@ export const createCoulis: CreateCoulis<{
 	);
 
 	const shorthands = (contract.shorthands ?? {}) as NonNullable<typeof contract.shorthands>;
-	const stylesCache = createMapCache<string, CreateCoulisOutput>();
+	const stylesCache = new Map<string, CreateCoulisOutput>();
 
 	const getResolvedPropertyValue = (name: string, styleValue: unknown) => {
 		const propertyValue: unknown = properties[name as keyof typeof properties];

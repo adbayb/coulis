@@ -1,1 +1,1 @@
-export const NUMBER_OF_DATA = 1000;
+export const ROW_COUNT = 1000;

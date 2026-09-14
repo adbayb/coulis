@@ -55,6 +55,20 @@ describe(transformDimension, () => {
 		});
 	});
 
+	test("should convert vmax using the largest window dimension", () => {
+		expect(transformDimension({ name: "width", value: "50vmax" })).toStrictEqual({
+			name: "width",
+			value: 400,
+		});
+	});
+
+	test("should convert vmin using the smallest window dimension", () => {
+		expect(transformDimension({ name: "width", value: "50vmin" })).toStrictEqual({
+			name: "width",
+			value: 200,
+		});
+	});
+
 	test("should convert vw using window width", () => {
 		expect(transformDimension({ name: "width", value: "100vw" })).toStrictEqual({
 			name: "width",

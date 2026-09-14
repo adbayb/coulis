@@ -24,7 +24,7 @@ describe(createDomStyleSheet, () => {
 	test("should getContent include pending rules before flush", () => {
 		const sheet = createDomStyleSheet("longhand");
 
-		sheet.insert("c1", redColorRule);
+		sheet.setRule("c1", redColorRule);
 		expect(sheet.getContent()).toContain(redColorRule);
 	});
 
@@ -32,8 +32,8 @@ describe(createDomStyleSheet, () => {
 		const sheet = createDomStyleSheet("longhand");
 		const element = document.head.querySelector<HTMLStyleElement>(longhandSelector);
 
-		sheet.insert("c1", redColorRule);
-		sheet.insert("c2", ".c2{display:flex;}");
+		sheet.setRule("c1", redColorRule);
+		sheet.setRule("c2", ".c2{display:flex;}");
 		expect(element?.textContent).toBe("");
 		await Promise.resolve(); // Flush microtasks
 		expect(element?.textContent).toContain(redColorRule);
@@ -48,15 +48,26 @@ describe(createDomStyleSheet, () => {
 			"insertAdjacentText",
 		);
 
-		sheet.insert("c1", redColorRule);
-		sheet.insert("c2", ".c2{display:flex;}");
-		sheet.insert("c3", ".c3{margin:0;}");
+		sheet.setRule("c1", redColorRule);
+		sheet.setRule("c2", ".c2{display:flex;}");
+		sheet.setRule("c3", ".c3{margin:0;}");
 		await Promise.resolve();
 
 		expect(spy).toHaveBeenCalledExactlyOnceWith(
 			"beforeend",
 			".c1{color:red;}.c2{display:flex;}.c3{margin:0;}",
 		);
+	});
+
+	test("should record inserted class names in data-coulis-cache on flush", async () => {
+		const sheet = createDomStyleSheet("longhand");
+		const element = document.head.querySelector<HTMLStyleElement>(longhandSelector);
+
+		sheet.setRule("c1", redColorRule);
+		sheet.setRule("c2", ".c2{display:flex;}");
+		await Promise.resolve();
+		expect(element?.dataset.coulisCache).toBe("c1,c2");
+		expect(sheet.getHydratedClassNames()).toStrictEqual(["c1", "c2"]);
 	});
 
 	test("should getHydratedClassNames should return empty array when data-coulis-cache is empty", () => {
@@ -77,11 +88,11 @@ describe(createDomStyleSheet, () => {
 		expect(sheet.getHydratedClassNames()).toStrictEqual(["c1", "c2", "c3"]);
 	});
 
-	test("should remove detach the element and clear pending rules", async () => {
+	test("should clear detach the element and drop pending rules", async () => {
 		const sheet = createDomStyleSheet("longhand");
 
-		sheet.insert("c1", redColorRule);
-		sheet.remove();
+		sheet.setRule("c1", redColorRule);
+		sheet.clear();
 		await Promise.resolve();
 		expect(document.head.querySelector(longhandSelector)).toBeNull();
 	});

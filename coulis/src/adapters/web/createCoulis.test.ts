@@ -1,7 +1,36 @@
-import { describe, expect, test } from "vitest";
+import { beforeAll, describe, expect, test } from "vitest";
 import { createCoulis } from "./createCoulis";
 
 describe("createCoulis (web adapter)", () => {
+	beforeAll(() => {
+		setGlobalStyles({
+			"*,*::before,*::after": {
+				boxSizing: "inherit",
+			},
+			".globalClass+.otherGlobalClass": {
+				colorScheme: "black",
+			},
+			"@charset": '"utf-8"',
+			"@font-face": {
+				fontFamily: "'AliasedHelvetica'",
+				src: "local(Helvetica)",
+			},
+			"@import": "url('https://fonts.googleapis.com/css?family=Open+Sans&display=swap')",
+			"div": {
+				backgroundColor: "red", // Non-theme-based value to check if set properly by `setGlobalStyles`
+			},
+			"html": {
+				boxSizing: "border-box",
+			},
+			"html,body": {
+				backgroundColor: "surfacePrimary",
+				fontFamily: "Open Sans, AliasedHelvetica",
+				margin: 0,
+				padding: 0,
+			},
+		});
+	});
+
 	test("should create keyframes", () => {
 		expect(
 			createKeyframes({
@@ -18,7 +47,7 @@ describe("createCoulis (web adapter)", () => {
 					transform: "scale(1)",
 				},
 			}),
-		).toBe("c536858007");
+		).toBe("c8vmqaf");
 	});
 
 	test("should create styles", () => {
@@ -34,7 +63,7 @@ describe("createCoulis (web adapter)", () => {
 					base: 0,
 				},
 			}),
-		).toBe("c108636029 c1773386706 c2226867080 c3330267095 c1906900862");
+		).toBe("c1sog3h ctbttxu c10tthmw c1j2r6jb cvjbi4e");
 	});
 
 	test("should extract styles", () => {
@@ -120,33 +149,5 @@ const { createKeyframes, createStyles, getContract, getMetadata, setGlobalStyles
 			surfaceSecondary: tokens.colors.blue[2],
 		},
 		spacings: tokens.spacings,
-	},
-});
-
-// oxlint-disable-next-line vitest/require-hook
-setGlobalStyles({
-	"*,*::before,*::after": {
-		boxSizing: "inherit",
-	},
-	".globalClass+.otherGlobalClass": {
-		colorScheme: "black",
-	},
-	"@charset": '"utf-8"',
-	"@font-face": {
-		fontFamily: "'AliasedHelvetica'",
-		src: "local(Helvetica)",
-	},
-	"@import": "url('https://fonts.googleapis.com/css?family=Open+Sans&display=swap')",
-	"div": {
-		backgroundColor: "red", // Non-theme-based value to check if set properly by `setGlobalStyles`
-	},
-	"html": {
-		boxSizing: "border-box",
-	},
-	"html,body": {
-		backgroundColor: "surfacePrimary",
-		fontFamily: "Open Sans, AliasedHelvetica",
-		margin: 0,
-		padding: 0,
 	},
 });

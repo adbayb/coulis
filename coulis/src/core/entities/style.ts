@@ -1,6 +1,6 @@
 import type { AtRule, Properties as CSSProperties } from "csstype";
 import type { EmptyRecord, UngreedyString } from "./primitive";
-import type { ShortandsLike } from "./shorthand";
+import type { ShorthandsLike } from "./shorthand";
 import type { StatesLike } from "./state";
 
 /**
@@ -10,17 +10,17 @@ import type { StatesLike } from "./state";
  * conditional-shorthand (e.g @media { background }) < conditional-longhand (e.g @media {
  * background-color }) properties.
  */
-export const STYLE_TYPES = Object.freeze([
+export const STYLE_TYPES = [
 	"global",
 	"shorthand",
 	"longhand",
 	"atShorthand",
 	"atLonghand",
-] as const);
+] as const;
 
 export type GlobalStyles<
 	P extends PropertiesLike,
-	Shorthands extends ShortandsLike<P> | undefined,
+	Shorthands extends ShorthandsLike<P> | undefined,
 > = Record<
 	string,
 	Record<string, string> | string | WithUngreedyString<Styles<P, Shorthands, undefined>>
@@ -32,7 +32,7 @@ export type PropertiesLike = {
 
 export type Styles<
 	P extends PropertiesLike,
-	Shorthands extends ShortandsLike<P> | undefined,
+	Shorthands extends ShorthandsLike<P> | undefined,
 	States extends StatesLike | undefined,
 > = (Shorthands extends undefined
 	? EmptyRecord

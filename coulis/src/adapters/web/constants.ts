@@ -7,9 +7,6 @@ export const UNITLESS_PROPERTIES = new Set([
 	"borderImageOutset",
 	"borderImageSlice",
 	"borderImageWidth",
-	"boxFlex",
-	"boxFlexGroup",
-	"boxOrdinalGroup",
 	"columnCount",
 	"columns",
 	// SVG properties
@@ -45,10 +42,6 @@ export const UNITLESS_PROPERTIES = new Set([
 	"zoom",
 ]);
 
-/*
- * From PREACT:
- * export const IS_NON_DIMENSIONAL = /acit|ex(?:s|g|n|p|$)|rph|grid|ows|mnc|ntw|ine[ch]|zoo|^ord/i;
- */
 export const SHORTHAND_PROPERTIES = new Set([
 	"animation",
 	"background",

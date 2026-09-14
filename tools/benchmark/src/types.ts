@@ -1,7 +1,9 @@
 export type BenchmarkOutput = {
 	"name": string;
-	"Latency mean (ns)": number;
-	"Latency med (ns)": number;
+	"Latency mean (ms)": number;
+	"Latency med (ms)": number;
+	"Overhead vs baseline": string;
+	"Slower than fastest": string;
 	"Throughput mean (ops/s)": number;
 	"Throughput med (ops/s)": number;
 };

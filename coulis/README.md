@@ -164,7 +164,7 @@ export const renderHtml = () => {
 			${headContent}
 		</head>
 		<body>
-			<div id="root>${bodyContent}</div>
+			<div id="root">${bodyContent}</div>
 		</body>
 	</html>`;
 };
@@ -174,8 +174,8 @@ For more server-side integration recipes, the following examples can be checked:
 
 - **React**
     - [Next.js with the app router](./examples/nextjs-app-router/), more specifically, [this snippet](./examples/nextjs-app-router/src/components/CoulisRegistry.tsx).
-    - [Next.js with the pages router](./examples/nextjs-pages-router/), more specifically, [this snippet](examples/nextjs-pages-router/src/pages/_document.tsx).
-    - [Vite.js with server-side rendering](./examples/vite-ssr-react/), more specifically, [this snippet](examples/vite-ssr-react/src/entry-server.tsx).
+    - [Next.js with the pages router](./examples/nextjs-pages-router/), more specifically, [this snippet](./examples/nextjs-pages-router/src/pages/_document.tsx).
+    - [Vite.js with server-side rendering](./examples/vite-ssr-react/), more specifically, [this snippet](./examples/vite-ssr-react/src/entry-server.tsx).
 - **Angular**
     - Welcome to any contribution.
 - **Vue**
@@ -206,14 +206,14 @@ Theme values are passed as-is (raw values, not CSS custom properties).
 
 ## 🔭 Examples
 
-Working integrations are available in the [`examples/`](../examples/) directory:
+Working integrations are available in the [`examples/`](https://github.com/adbayb/coulis/tree/main/examples) directory:
 
-| Example                                                 | Description                         |
-| ------------------------------------------------------- | ----------------------------------- |
-| [vite-csr-react](../examples/vite-csr-react/)           | Vite + React, client-side rendering |
-| [vite-ssr-react](../examples/vite-ssr-react/)           | Vite + React, server-side rendering |
-| [nextjs-app-router](../examples/nextjs-app-router/)     | Next.js with the App Router         |
-| [nextjs-pages-router](../examples/nextjs-pages-router/) | Next.js with the Pages Router       |
-| [expo](../examples/expo/)                               | React Native via Expo               |
+| Example                                                                                        | Description                         |
+| ---------------------------------------------------------------------------------------------- | ----------------------------------- |
+| [vite-csr-react](https://github.com/adbayb/coulis/tree/main/examples/vite-csr-react)           | Vite + React, client-side rendering |
+| [vite-ssr-react](https://github.com/adbayb/coulis/tree/main/examples/vite-ssr-react)           | Vite + React, server-side rendering |
+| [nextjs-app-router](https://github.com/adbayb/coulis/tree/main/examples/nextjs-app-router)     | Next.js with the App Router         |
+| [nextjs-pages-router](https://github.com/adbayb/coulis/tree/main/examples/nextjs-pages-router) | Next.js with the Pages Router       |
+| [expo](https://github.com/adbayb/coulis/tree/main/examples/expo)                               | React Native via Expo               |
 
 <br>

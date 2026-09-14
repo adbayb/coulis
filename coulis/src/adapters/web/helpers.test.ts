@@ -1,10 +1,12 @@
 import { describe, expect, test } from "vitest";
 import {
 	createClassName,
+	createCompiledTemplate,
 	createCustomProperties,
 	createDeclaration,
 	escape,
 	getEvaluatedTemplate,
+	getKebabName,
 	minify,
 } from "./helpers";
 
@@ -24,7 +26,7 @@ describe(escape, () => {
 
 describe(createClassName, () => {
 	test("should return a string starting with 'c'", () => {
-		expect(createClassName("any-input")).toMatch(/^c[\da-f]+$/u);
+		expect(createClassName("any-input")).toMatch(/^c[\da-z]+$/u);
 	});
 
 	test("should be deterministic for the same input", () => {
@@ -36,23 +38,33 @@ describe(createClassName, () => {
 	});
 });
 
-describe(createDeclaration, () => {
+describe(getKebabName, () => {
 	test("should convert camelCase property to kebab-case", () => {
-		expect(createDeclaration({ name: "backgroundColor", value: "red" })).toBe(
+		expect(getKebabName("backgroundColor")).toBe("background-color");
+	});
+
+	test("should leave lowercase properties unchanged", () => {
+		expect(getKebabName("display")).toBe("display");
+	});
+});
+
+describe(createDeclaration, () => {
+	test("should create a declaration from a kebab-case property name", () => {
+		expect(createDeclaration("background-color", "backgroundColor", "red")).toBe(
 			"background-color:red;",
 		);
 	});
 
 	test("should append px unit to numeric values for dimensional properties", () => {
-		expect(createDeclaration({ name: "width", value: 100 })).toBe("width:100px;");
+		expect(createDeclaration("width", "width", 100)).toBe("width:100px;");
 	});
 
 	test("should not append px for unitless properties", () => {
-		expect(createDeclaration({ name: "opacity", value: 0.5 })).toBe("opacity:0.5;");
+		expect(createDeclaration("opacity", "opacity", 0.5)).toBe("opacity:0.5;");
 	});
 
 	test("should keep string values as-is", () => {
-		expect(createDeclaration({ name: "display", value: "flex" })).toBe("display:flex;");
+		expect(createDeclaration("display", "display", "flex")).toBe("display:flex;");
 	});
 });
 
@@ -85,30 +97,65 @@ describe(createCustomProperties, () => {
 
 		expect(collected[0]?.[0]).toBe("--spacings-1-5");
 	});
+
+	test("should handle deeply nested themes with sibling branches", () => {
+		const collected: [string, unknown][] = [];
+
+		const output = createCustomProperties(
+			{
+				a: { nested: { x: "1px" }, sibling: "2px" },
+				b: { y: "3px" },
+			},
+			(name, value) => {
+				collected.push([name, value]);
+			},
+		);
+
+		expect(collected).toContainEqual(["--a-nested-x", "1px"]);
+		expect(collected).toContainEqual(["--a-sibling", "2px"]);
+		expect(collected).toContainEqual(["--b-y", "3px"]);
+		expect(output.a.nested.x).toBe("var(--a-nested-x)");
+		expect(output.b.y).toBe("var(--b-y)");
+	});
+});
+
+describe(createCompiledTemplate, () => {
+	test("should compile markers and static parts", () => {
+		const compiled = createCompiledTemplate("coulis[selector]:hover{coulis[declaration]}");
+
+		expect(compiled.markers).toStrictEqual(["selector", "declaration"]);
+		expect(compiled.parts).toStrictEqual(["", ":hover{", "}"]);
+		expect(compiled.isAtRule).toBe(false);
+	});
+
+	test("should detect at-rules from the template first character", () => {
+		expect(
+			createCompiledTemplate("@media{coulis[selector]{coulis[declaration]}}").isAtRule,
+		).toBe(true);
+
+		expect(createCompiledTemplate("coulis[declaration]@media{coulis[selector]}").isAtRule).toBe(
+			false,
+		);
+	});
 });
 
 describe(getEvaluatedTemplate, () => {
 	test("should replace coulis[selector] and coulis[declaration] markers", () => {
-		const template = "coulis[selector]:hover{coulis[declaration]}";
+		const compiled = createCompiledTemplate("coulis[selector]:hover{coulis[declaration]}");
 
-		expect(
-			getEvaluatedTemplate(template, {
-				declaration: "color:red;",
-				selector: ".c123",
-			}),
-		).toBe(".c123:hover{color:red;}");
+		expect(getEvaluatedTemplate(compiled, ".c123", "color:red;")).toBe(
+			".c123:hover{color:red;}",
+		);
 	});
 
 	test("should replace multiple occurrences", () => {
-		const template =
-			"coulis[selector][alt]{coulis[declaration]}coulis[selector]{coulis[declaration]}";
+		const compiled = createCompiledTemplate(
+			"coulis[selector][alt]{coulis[declaration]}coulis[selector]{coulis[declaration]}",
+		);
 
-		expect(
-			getEvaluatedTemplate(template, {
-				declaration: "color:red;",
-				selector: ".c123",
-			}),
-		).toBe(".c123[alt]{color:red;}.c123{color:red;}");
+		expect(getEvaluatedTemplate(compiled, ".c123", "color:red;")).toBe(
+			".c123[alt]{color:red;}.c123{color:red;}",
+		);
 	});
 });
 

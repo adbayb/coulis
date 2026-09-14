@@ -1,43 +1,24 @@
 import { css } from "@emotion/css";
-import { NUMBER_OF_DATA } from "../../constants";
+import { BACKGROUND_COLORS, createRowIndexes } from "../constants";
+import { TableShell } from "../table";
 
-const tableClassName = css`
-	border: 1px solid black;
-`;
-
-const firstTdClassName = css`
-	background-color: lightcoral;
-	&:hover {
-		background-color: lightyellow;
-	}
-`;
-
-const secondTdClassName = css`
-	background-color: lightblue;
-	&:hover {
-		background-color: lightyellow;
-	}
-`;
+const rowIndexes = createRowIndexes();
 
 export const EmotionComponent = () => {
 	return (
-		<table className={tableClassName}>
-			<thead>
-				<tr>
-					<th>Column1</th>
-					<th>Column2</th>
-				</tr>
-			</thead>
-			<tbody>
-				{Array.from({ length: NUMBER_OF_DATA }, (_, index) => {
-					return (
-						<tr key={index}>
-							<td className={firstTdClassName}>The table body</td>
-							<td className={secondTdClassName}>with two columns</td>
-						</tr>
-					);
-				})}
-			</tbody>
-		</table>
+		<TableShell>
+			{rowIndexes.map((index) => {
+				const className = css`
+					background-color: ${BACKGROUND_COLORS[index % BACKGROUND_COLORS.length]};
+				`;
+
+				return (
+					<tr key={index}>
+						<td className={className}>The table body</td>
+						<td className={className}>with two columns</td>
+					</tr>
+				);
+			})}
+		</TableShell>
 	);
 };

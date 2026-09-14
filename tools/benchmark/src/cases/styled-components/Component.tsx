@@ -1,43 +1,30 @@
 import { styled } from "styled-components";
-import { NUMBER_OF_DATA } from "../../constants";
+import { BACKGROUND_COLORS, createRowIndexes } from "../constants";
+import { TableShell } from "../table";
 
-const Table = styled.table`
-	border: 1px solid black;
-`;
+const rowIndexes = createRowIndexes();
 
-const Cell1 = styled.td`
-	background-color: lightcoral;
-	&:hover {
-		background-color: lightyellow;
-	}
-`;
-
-const Cell2 = styled.td`
-	background-color: lightblue;
-	&:hover {
-		background-color: lightyellow;
-	}
+const Cell = styled.td<{ $backgroundColor: string }>`
+	background-color: ${(properties) => {
+		return properties.$backgroundColor;
+	}};
 `;
 
 export const StyledComponentsComponent = () => {
 	return (
-		<Table>
-			<thead>
-				<tr>
-					<th>Column1</th>
-					<th>Column2</th>
-				</tr>
-			</thead>
-			<tbody>
-				{Array.from({ length: NUMBER_OF_DATA }, (_, index) => {
-					return (
-						<tr key={index}>
-							<Cell1>The table body</Cell1>
-							<Cell2>with two columns</Cell2>
-						</tr>
-					);
-				})}
-			</tbody>
-		</Table>
+		<TableShell>
+			{rowIndexes.map((index) => {
+				const backgroundColor = BACKGROUND_COLORS[
+					index % BACKGROUND_COLORS.length
+				] as string;
+
+				return (
+					<tr key={index}>
+						<Cell $backgroundColor={backgroundColor}>The table body</Cell>
+						<Cell $backgroundColor={backgroundColor}>with two columns</Cell>
+					</tr>
+				);
+			})}
+		</TableShell>
 	);
 };

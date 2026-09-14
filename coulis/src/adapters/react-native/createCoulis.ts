@@ -1,8 +1,7 @@
-import { createMapCache } from "../../core/entities/cache";
-import { compose, isObject } from "../../core/entities/primitive";
+import { isObject } from "../../core/entities/primitive";
 import type { CreateCoulis } from "../../core/ports/createCoulis";
 import { createUnsupportedLogger } from "./helpers";
-import { transformDimension } from "./transformers";
+import { transformDimension } from "./transformers/dimension";
 
 type CreateCoulisOutput = Record<string, unknown>;
 
@@ -17,48 +16,35 @@ export const createCoulis: CreateCoulis<{
 	);
 
 	const shorthands = (contract.shorthands ?? {}) as NonNullable<typeof contract.shorthands>;
-	const shorthandNames = Object.keys(shorthands);
-	const stylesCache = createMapCache<string, CreateCoulisOutput>();
+	const stylesCache = new Map<string, CreateCoulisOutput>();
 
-	const isCustomShorthandProperty = (name: string) => {
-		return shorthandNames.includes(name);
+	const getResolvedPropertyValue = (name: string, styleValue: unknown) => {
+		const propertyValue: unknown = properties[name as keyof typeof properties];
+		let value: unknown = styleValue;
+
+		if (typeof propertyValue === "function") {
+			// oxlint-disable-next-line typescript/no-unsafe-call
+			value = propertyValue(styleValue);
+		} else if (isObject(propertyValue)) {
+			value = propertyValue[styleValue as string] ?? styleValue;
+		}
+
+		return transformDimension({ name, value }).value;
 	};
 
 	const getStyleValue = (name: string, value: unknown) => {
-		const getValue = (styleValue: unknown): unknown => {
-			const transform = compose(transformDimension);
-			const propertyValue = properties[name as keyof typeof properties];
-
-			if (typeof propertyValue === "function") {
-				return transform({
-					name,
-					// oxlint-disable-next-line typescript/no-unsafe-call
-					value: propertyValue(styleValue),
-				}).value;
-			}
-
-			const finalValue = isObject(propertyValue)
-				? propertyValue[styleValue as string]
-				: styleValue;
-
-			return transform({
-				name,
-				value: finalValue,
-			}).value;
-		};
-
 		if (isObject(value)) {
-			unsupportedLogger.behavior("States are not supported, ignoring non-base values.");
+			unsupportedLogger.warn("States are not supported, ignoring non-base values.");
 
-			return getValue(value.base);
+			return getResolvedPropertyValue(name, value.base);
 		}
 
-		return getValue(value);
+		return getResolvedPropertyValue(name, value);
 	};
 
 	return {
 		createKeyframes() {
-			unsupportedLogger.method("createKeyframes");
+			unsupportedLogger.warnUnsupportedMethod("createKeyframes");
 
 			return {};
 		},
@@ -75,44 +61,34 @@ export const createCoulis: CreateCoulis<{
 			for (const propertyName of Object.keys(input)) {
 				const value = input[propertyName as keyof typeof input];
 
-				if (isCustomShorthandProperty(propertyName)) {
-					const shorthandedPropertyNames = shorthands[propertyName] as
-						| string[]
-						| undefined;
+				const expandedPropertyNames = (shorthands[propertyName] ?? [
+					propertyName,
+				]) as string[];
 
-					if (shorthandedPropertyNames === undefined) {
-						continue;
-					}
-
-					for (const shorthandedPropertyName of shorthandedPropertyNames) {
-						styles[shorthandedPropertyName] = getStyleValue(
-							shorthandedPropertyName,
-							value,
-						);
-					}
-				} else {
-					styles[propertyName] = getStyleValue(propertyName, value);
+				for (const expandedPropertyName of expandedPropertyNames) {
+					styles[expandedPropertyName] = getStyleValue(expandedPropertyName, value);
 				}
 			}
 
-			stylesCache.add(cacheKey, styles);
+			stylesCache.set(cacheKey, styles);
 
 			return styles;
 		},
 		getContract() {
 			return {
-				propertyNames: [...shorthandNames, ...Object.keys(properties)] as ReturnType<
-					typeof this.getContract
-				>["propertyNames"],
+				propertyNames: [
+					...Object.keys(shorthands),
+					...Object.keys(properties),
+				] as ReturnType<typeof this.getContract>["propertyNames"],
 			};
 		},
 		getMetadata() {
-			unsupportedLogger.method("getMetadata");
+			unsupportedLogger.warnUnsupportedMethod("getMetadata");
 
 			return [];
 		},
 		setGlobalStyles() {
-			unsupportedLogger.method("setGlobalStyles");
+			unsupportedLogger.warnUnsupportedMethod("setGlobalStyles");
 		},
 	};
 };

@@ -13,12 +13,12 @@ import type { JSX } from "react";
 import { flushSync } from "react-dom";
 import { createRoot } from "react-dom/client";
 import { createBenchmark } from "../helpers";
-import { CoulisComponent } from "./coulis/Component";
-import { CoulisStaticComponent } from "./coulis/StaticComponent";
-import { EmotionComponent } from "./emotion/Component";
-import { EmotionStaticComponent } from "./emotion/StaticComponent";
-import { StyledComponentsComponent } from "./styled-components/Component";
-import { StyledComponentsStaticComponent } from "./styled-components/StaticComponent";
+import { CoulisComponent } from "./coulis/component";
+import { CoulisStaticComponent } from "./coulis/static-component";
+import { EmotionComponent } from "./emotion/component";
+import { EmotionStaticComponent } from "./emotion/static-component";
+import { StyledComponentsComponent } from "./styled-components/component";
+import { StyledComponentsStaticComponent } from "./styled-components/static-component";
 
 let sharedRoot: ReturnType<typeof createRoot> | undefined;
 

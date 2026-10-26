@@ -1,1 +1,1 @@
-export { createCoulis } from "./createCoulis";
+export { createCoulis } from "./create-coulis";

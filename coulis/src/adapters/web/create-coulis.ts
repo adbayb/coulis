@@ -3,7 +3,7 @@ import { isNumeric, isObject } from "../../core/entities/primitive";
 import type { StatesLike } from "../../core/entities/state";
 import type { StyleType } from "../../core/entities/style";
 import { STYLE_TYPES } from "../../core/entities/style";
-import type { CreateCoulis } from "../../core/ports/createCoulis";
+import type { CreateCoulis } from "../../core/ports/create-coulis";
 import { IS_SERVER_ENVIRONMENT, SHORTHAND_PROPERTIES } from "./constants";
 import type { CompiledTemplate } from "./helpers";
 import {

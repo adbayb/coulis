@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, test } from "vitest";
-import { createCoulis } from "./createCoulis";
+import { createCoulis } from "./create-coulis";
 
 describe("createCoulis (web adapter)", () => {
 	beforeAll(() => {

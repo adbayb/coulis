@@ -1,6 +1,6 @@
 import { renderToString } from "react-dom/server";
 import { ServerStyleSheet } from "styled-components";
-import { StyledComponentsComponent } from "./Component";
+import { StyledComponentsComponent } from "./component";
 
 export const StyledComponentsCase = () => {
 	const sheet = new ServerStyleSheet();

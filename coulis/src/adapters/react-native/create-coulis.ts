@@ -1,5 +1,5 @@
 import { isObject } from "../../core/entities/primitive";
-import type { CreateCoulis } from "../../core/ports/createCoulis";
+import type { CreateCoulis } from "../../core/ports/create-coulis";
 import { createUnsupportedLogger } from "./helpers";
 import { transformDimension } from "./transformers/dimension";
 

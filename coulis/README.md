@@ -152,8 +152,8 @@ Here's a vanilla React integration example generating HTML content:
 
 ```tsx
 import { renderToString } from "react-dom/server";
-import { coulis } from "./helpers/coulis"; // Factory instance created via `createCoulis` (see quickstart guide)
 import { App } from "./App"; // Main component entry point (depending on your project specificities).
+import { coulis } from "./helpers/coulis"; // Factory instance created via `createCoulis` (see quickstart guide)
 
 export const renderHtml = () => {
 	const bodyContent = renderToString(<App />);

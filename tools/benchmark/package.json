@@ -22,13 +22,13 @@
 		"@emotion/css": "11.13.5",
 		"@emotion/server": "11.11.0",
 		"coulis": "workspace:*",
-		"playwright": "1.63.0",
-		"quickbundle": "3.2.0",
-		"react": "19.2.8",
-		"react-dom": "19.2.8",
-		"styled-components": "6.5.3",
-		"tinybench": "6.1.6",
-		"tsx": "4.23.13",
-		"typescript": "6.0.3"
+		"playwright": "1.64.1",
+		"quickbundle": "3.2.2",
+		"react": "19.3.1",
+		"react-dom": "19.3.1",
+		"styled-components": "6.6.0",
+		"tinybench": "6.2.2",
+		"tsx": "4.23.15",
+		"typescript": "7.0.2"
 	}
 }

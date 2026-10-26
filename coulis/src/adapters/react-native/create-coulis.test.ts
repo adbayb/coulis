@@ -1,6 +1,6 @@
 import type { MockInstance } from "vitest";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
-import { createCoulis } from "./createCoulis";
+import { createCoulis } from "./create-coulis";
 
 // @ts-expect-error Partial mocking for testing purposes
 vi.mock(import("react-native"), (): { Dimensions: Dimensions } => {

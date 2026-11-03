@@ -1,5 +1,6 @@
 import type { AtRule, Properties as CSSProperties } from "csstype";
 import type { EmptyRecord, UngreedyString } from "./primitive";
+import { isObject } from "./primitive";
 import type { ShorthandsLike } from "./shorthand";
 import type { StatesLike } from "./state";
 
@@ -45,6 +46,27 @@ export type Styles<
 };
 
 export type StyleType = (typeof STYLE_TYPES)[number];
+
+/**
+ * Resolves a style value against its contract property definition: functions are invoked, records
+ * act as lookup maps (falling back to the raw value), anything else (`true`, arrays) passes the
+ * value through.
+ *
+ * @param definition - The property definition from the contract `properties`.
+ * @param value - The raw style value.
+ * @returns The resolved value.
+ */
+export const resolvePropertyValue = (definition: unknown, value: unknown): unknown => {
+	if (typeof definition === "function") {
+		return (definition as (input: unknown) => unknown)(value);
+	}
+
+	if (isObject(definition)) {
+		return definition[value as string] ?? value;
+	}
+
+	return value;
+};
 
 type CreatePropertyValue<Value, S extends StatesLike | undefined> =
 	| (S extends Record<infer State, unknown>

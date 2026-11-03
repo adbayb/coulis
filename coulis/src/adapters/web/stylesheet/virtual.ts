@@ -6,10 +6,6 @@ export const createVirtualStyleSheet: CreateStyleSheet = () => {
 	let cachedContent: string | undefined = undefined;
 
 	return {
-		clear() {
-			ruleByClassName.clear();
-			cachedContent = undefined;
-		},
 		getContent() {
 			return cachedContent ?? minify([...ruleByClassName.values()].join(""));
 		},

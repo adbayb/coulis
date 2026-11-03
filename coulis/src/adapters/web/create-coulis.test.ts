@@ -1,4 +1,4 @@
-import { beforeAll, describe, expect, test } from "vitest";
+import { beforeAll, describe, expect, test, vi } from "vitest";
 import { createCoulis } from "./create-coulis";
 
 describe("createCoulis (web adapter)", () => {
@@ -63,7 +63,7 @@ describe("createCoulis (web adapter)", () => {
 					base: 0,
 				},
 			}),
-		).toBe("c1sog3h ctbttxu c10tthmw c1j2r6jb cvjbi4e");
+		).toBe("c1uv4w8k ctbttxu c1lmv6o7 c1j2r6jb cvjbi4e");
 	});
 
 	test("should extract styles", () => {
@@ -91,6 +91,104 @@ describe("createCoulis (web adapter)", () => {
 				"width",
 			],
 		});
+	});
+
+	test("should not reuse class names for ambiguous state and declaration pairs", () => {
+		const { createStyles, getMetadata } = createCoulis({
+			properties() {
+				return {
+					transform: true,
+					WebkitTransform: true,
+				};
+			},
+			states: {
+				"h": "coulis[selector]:hover{coulis[declaration]}",
+				"h-webkit-": "coulis[selector]:focus{coulis[declaration]}",
+			},
+		});
+
+		const hoverClassNames = createStyles({
+			WebkitTransform: { base: "rotate(0deg)", h: "rotate(1deg)" },
+		}).split(" ");
+
+		const focusClassNames = createStyles({
+			transform: { "base": "rotate(0deg)", "h-webkit-": "rotate(1deg)" },
+		}).split(" ");
+
+		const cssContent = getMetadata()
+			.map(({ content }) => {
+				return content;
+			})
+			.join("");
+
+		expect(focusClassNames[1]).not.toBe(hoverClassNames[1]);
+
+		expect(cssContent).toContain(
+			`.${hoverClassNames[1]}:hover{-webkit-transform:rotate(1deg);}`,
+		);
+
+		expect(cssContent).toContain(`.${focusClassNames[1]}:focus{transform:rotate(1deg);}`);
+	});
+
+	test("should retry style creation after a property resolver throws", () => {
+		const resolveColor = vi
+			.fn((value: string) => {
+				return value;
+			})
+			.mockImplementationOnce(() => {
+				throw new Error("Transient resolver failure");
+			});
+
+		const { createStyles, getMetadata } = createCoulis({
+			properties() {
+				return {
+					color: resolveColor,
+				};
+			},
+		});
+
+		const input = { color: "red" };
+
+		expect(() => {
+			return createStyles(input);
+		}).toThrow("Transient resolver failure");
+
+		const className = createStyles(input);
+
+		const metadataContent = getMetadata()
+			.map(({ content: stylesheetContent }) => {
+				return stylesheetContent;
+			})
+			.join("");
+
+		expect(createStyles(input)).toBe(className);
+		expect(metadataContent).toContain(`.${className}{color:red;}`);
+	});
+
+	test("should escape style text in metadata and its HTML string", () => {
+		const { createStyles, getMetadata } = createCoulis({
+			properties() {
+				return { color: true };
+			},
+		});
+
+		createStyles({ color: "red</style><script>globalThis.auditXss=1</script>" });
+
+		const metadata = getMetadata();
+
+		const metadataContent = metadata
+			.map(({ content: stylesheetContent }) => {
+				return stylesheetContent;
+			})
+			.join("");
+
+		const serializedMetadata = String(metadata);
+		const escapedStyleText = String.raw`red\3C /style>\3C script>globalThis.auditXss=1\3C /script>`;
+
+		expect(metadataContent).toContain(escapedStyleText);
+		expect(metadataContent).not.toContain("<script>");
+		expect(serializedMetadata).toContain(escapedStyleText);
+		expect(serializedMetadata).not.toContain("<script>");
 	});
 });
 

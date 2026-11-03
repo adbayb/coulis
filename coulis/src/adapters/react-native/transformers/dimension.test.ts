@@ -20,66 +20,17 @@ vi.mock(import("react-native"), (): { Dimensions: Dimensions } => {
 });
 
 describe(transformDimension, () => {
-	test("should pass through non-string values unchanged", () => {
-		expect(transformDimension({ name: "width", value: 42 })).toStrictEqual({
-			name: "width",
-			value: 42,
-		});
-	});
-
-	test("should strip px and return a number", () => {
-		expect(transformDimension({ name: "width", value: "16px" })).toStrictEqual({
-			name: "width",
-			value: 16,
-		});
-	});
-
-	test("should convert em to pixels (× 16)", () => {
-		expect(transformDimension({ name: "fontSize", value: "1em" })).toStrictEqual({
-			name: "fontSize",
-			value: 16,
-		});
-	});
-
-	test("should convert rem to pixels (× 16)", () => {
-		expect(transformDimension({ name: "fontSize", value: "1.5rem" })).toStrictEqual({
-			name: "fontSize",
-			value: 24,
-		});
-	});
-
-	test("should convert vh using window height", () => {
-		expect(transformDimension({ name: "height", value: "50vh" })).toStrictEqual({
-			name: "height",
-			value: 800 / 2,
-		});
-	});
-
-	test("should convert vmax using the largest window dimension", () => {
-		expect(transformDimension({ name: "width", value: "50vmax" })).toStrictEqual({
-			name: "width",
-			value: 400,
-		});
-	});
-
-	test("should convert vmin using the smallest window dimension", () => {
-		expect(transformDimension({ name: "width", value: "50vmin" })).toStrictEqual({
-			name: "width",
-			value: 200,
-		});
-	});
-
-	test("should convert vw using window width", () => {
-		expect(transformDimension({ name: "width", value: "100vw" })).toStrictEqual({
-			name: "width",
-			value: 400,
-		});
-	});
-
-	test("should return unknown units as-is", () => {
-		expect(transformDimension({ name: "width", value: "50%" })).toStrictEqual({
-			name: "width",
-			value: "50%",
-		});
+	test.each([
+		{ expected: { name: "width", value: 42 }, input: { name: "width", value: 42 } },
+		{ expected: { name: "width", value: 16 }, input: { name: "width", value: "16px" } },
+		{ expected: { name: "fontSize", value: 16 }, input: { name: "fontSize", value: "1em" } },
+		{ expected: { name: "fontSize", value: 24 }, input: { name: "fontSize", value: "1.5rem" } },
+		{ expected: { name: "height", value: 400 }, input: { name: "height", value: "50vh" } },
+		{ expected: { name: "width", value: 400 }, input: { name: "width", value: "50vmax" } },
+		{ expected: { name: "width", value: 200 }, input: { name: "width", value: "50vmin" } },
+		{ expected: { name: "width", value: 400 }, input: { name: "width", value: "100vw" } },
+		{ expected: { name: "width", value: "50%" }, input: { name: "width", value: "50%" } },
+	])("should transform $input.value", ({ expected, input }) => {
+		expect(transformDimension(input)).toStrictEqual(expected);
 	});
 });

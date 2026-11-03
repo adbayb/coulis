@@ -1,10 +1,17 @@
 import { isObject } from "../../core/entities/primitive";
+import { resolvePropertyValue } from "../../core/entities/style";
 import type { CreateCoulis } from "../../core/ports/create-coulis";
 import { createUnsupportedLogger } from "./helpers";
 import { transformDimension } from "./transformers/dimension";
 
 type CreateCoulisOutput = Record<string, unknown>;
 
+/**
+ * Creates a React Native instance that resolves styles to native values and dimensions.
+ *
+ * @param contract - Style properties, theme, states, and shorthand definitions.
+ * @returns React Native styling methods for the configured contract.
+ */
 export const createCoulis: CreateCoulis<{
 	Input: { WithCSSVariables: false };
 	Output: CreateCoulisOutput;
@@ -18,18 +25,11 @@ export const createCoulis: CreateCoulis<{
 	const shorthands = (contract.shorthands ?? {}) as NonNullable<typeof contract.shorthands>;
 	const stylesCache = new Map<string, CreateCoulisOutput>();
 
-	const getResolvedPropertyValue = (name: string, styleValue: unknown) => {
-		const propertyValue: unknown = properties[name as keyof typeof properties];
-		let value: unknown = styleValue;
-
-		if (typeof propertyValue === "function") {
-			// oxlint-disable-next-line typescript/no-unsafe-call
-			value = propertyValue(styleValue);
-		} else if (isObject(propertyValue)) {
-			value = propertyValue[styleValue as string] ?? styleValue;
-		}
-
-		return transformDimension({ name, value }).value;
+	const getResolvedPropertyValue = (name: string, value: unknown) => {
+		return transformDimension({
+			name,
+			value: resolvePropertyValue(properties[name as keyof typeof properties], value),
+		}).value;
 	};
 
 	const getStyleValue = (name: string, value: unknown) => {
@@ -53,7 +53,8 @@ export const createCoulis: CreateCoulis<{
 			const cachedStyles = stylesCache.get(cacheKey);
 
 			if (cachedStyles) {
-				return cachedStyles;
+				// Return a copy so callers cannot mutate the object stored in the cache.
+				return { ...cachedStyles };
 			}
 
 			const styles: CreateCoulisOutput = {};
@@ -72,7 +73,8 @@ export const createCoulis: CreateCoulis<{
 
 			stylesCache.set(cacheKey, styles);
 
-			return styles;
+			// Return a copy so callers cannot mutate the object stored in the cache.
+			return { ...styles };
 		},
 		getContract() {
 			return {

@@ -1,9 +1,21 @@
 // @vitest-environment happy-dom
 import { afterEach, describe, expect, test, vi } from "vitest";
+import { createCoulis } from "../create-coulis";
 import { createDomStyleSheet } from "./dom";
 
 const longhandSelector = 'style[data-coulis-type="longhand"]';
 const redColorRule = ".c1{color:red;}";
+
+const createStatefulWebInstance = () => {
+	return createCoulis({
+		properties() {
+			return { color: true };
+		},
+		states: {
+			"": "@media print{coulis[selector]{coulis[declaration]}}",
+		},
+	});
+};
 
 describe(createDomStyleSheet, () => {
 	afterEach(() => {
@@ -70,6 +82,22 @@ describe(createDomStyleSheet, () => {
 		expect(sheet.getHydratedClassNames()).toStrictEqual(["c1", "c2"]);
 	});
 
+	test("should only reuse hydrated class names from the matching stylesheet", async () => {
+		const server = createStatefulWebInstance();
+
+		server.createStyles({ color: { "": "red", "base": "blue" } });
+		await Promise.resolve();
+
+		const client = createStatefulWebInstance();
+		const className = client.createStyles({ color: "red" });
+
+		await Promise.resolve();
+
+		const longhandContent = document.head.querySelector(longhandSelector)?.textContent;
+
+		expect(longhandContent).toContain(`.${className}{color:red;}`);
+	});
+
 	test("should getHydratedClassNames should return empty array when data-coulis-cache is empty", () => {
 		const sheet = createDomStyleSheet("longhand");
 
@@ -86,14 +114,5 @@ describe(createDomStyleSheet, () => {
 		const sheet = createDomStyleSheet("shorthand");
 
 		expect(sheet.getHydratedClassNames()).toStrictEqual(["c1", "c2", "c3"]);
-	});
-
-	test("should clear detach the element and drop pending rules", async () => {
-		const sheet = createDomStyleSheet("longhand");
-
-		sheet.setRule("c1", redColorRule);
-		sheet.clear();
-		await Promise.resolve();
-		expect(document.head.querySelector(longhandSelector)).toBeNull();
 	});
 });

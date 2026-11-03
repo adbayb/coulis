@@ -1,14 +1,8 @@
 import type { ReactNode } from "react";
 
-export const TableShell = ({
-	children,
-	className,
-}: {
-	children: ReactNode;
-	className?: string;
-}) => {
+export const TableShell = ({ children }: { children: ReactNode }) => {
 	return (
-		<table className={className}>
+		<table>
 			<thead>
 				<tr>
 					<th>Column1</th>

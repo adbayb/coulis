@@ -123,8 +123,7 @@ describe(createCompiledTemplate, () => {
 	test("should compile markers and static parts", () => {
 		const compiled = createCompiledTemplate("coulis[selector]:hover{coulis[declaration]}");
 
-		expect(compiled.markers).toStrictEqual(["selector", "declaration"]);
-		expect(compiled.parts).toStrictEqual(["", ":hover{", "}"]);
+		expect(compiled.parts).toStrictEqual(["", "selector", ":hover{", "declaration", "}"]);
 		expect(compiled.isAtRule).toBe(false);
 	});
 
@@ -155,6 +154,16 @@ describe(getEvaluatedTemplate, () => {
 
 		expect(getEvaluatedTemplate(compiled, ".c123", "color:red;")).toBe(
 			".c123[alt]{color:red;}.c123{color:red;}",
+		);
+	});
+
+	test("should preserve literal text and replacement values around adjacent markers", () => {
+		const compiled = createCompiledTemplate(
+			"coulis[unknown]coulis[selector]coulis[declaration]",
+		);
+
+		expect(getEvaluatedTemplate(compiled, ".c123", 'content:"coulis[selector]";')).toBe(
+			'coulis[unknown].c123content:"coulis[selector]";',
 		);
 	});
 });

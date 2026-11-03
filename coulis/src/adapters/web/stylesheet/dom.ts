@@ -40,12 +40,6 @@ export const createDomStyleSheet: CreateStyleSheet = (type) => {
 	};
 
 	return {
-		clear() {
-			pendingRules = "";
-			pendingClassNames = [];
-			isFlushScheduled = false;
-			element.remove();
-		},
 		getContent() {
 			/**
 			 * `textContent` is more performant than `innerText` (no layout reflow).

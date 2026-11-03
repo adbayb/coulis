@@ -204,6 +204,34 @@ Theme values are passed as-is (raw values, not CSS custom properties).
 
 <br>
 
+## 📊 Benchmarks
+
+### Runtime performance
+
+Single-run results from `pnpm --filter @coulis/benchmark benchmark`, rendering a 1,000-row React table. Higher throughput is better; dynamic styles are created during each render.
+
+| Runtime                       | Coulis |           Emotion |             Goober | styled-components |
+| ----------------------------- | -----: | ----------------: | -----------------: | ----------------: |
+| Browser (ops/s)               |  1,634 | 799 (2.0x slower) |  440 (3.7x slower) | 433 (3.8x slower) |
+| Server-side rendering (ops/s) |    154 | 138 (1.1x slower) | 153 (1.01x slower) |  72 (2.1x slower) |
+
+These results are hardware- and runtime-dependent. The benchmark also reports static-style baselines for context.
+
+### Bundle size
+
+Minified, tree-shaken browser ESM bundles measured with esbuild 0.28.2 (`bundle: true`, `minify: true`, `target: "es2020"`) and Node.js gzip at level 9, with `process.env.NODE_ENV` set to `"production"` and React/React DOM excluded. Sizes include bundled dependencies and use decimal kB (1 kB = 1,000 bytes).
+
+| Library                  | Version   | Minified + gzip |
+| ------------------------ | --------- | --------------: |
+| Coulis                   | workspace |         2.32 kB |
+| Emotion (`@emotion/css`) | 11.13.5   |         6.28 kB |
+| Goober                   | 2.1.19    |         1.11 kB |
+| styled-components        | 6.6.0     |        10.99 kB |
+
+Each bundle re-exports `createCoulis` (Coulis), `css` (Emotion and Goober), or `styled` (styled-components). Coulis includes its web factory's styling and metadata APIs; these libraries have different feature sets. Application bundles vary with imports, bundler settings, and library versions.
+
+<br>
+
 ## 🔭 Examples
 
 Working integrations are available in the [`examples/`](https://github.com/adbayb/coulis/tree/main/examples) directory:

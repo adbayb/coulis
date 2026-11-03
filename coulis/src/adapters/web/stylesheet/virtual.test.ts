@@ -57,23 +57,4 @@ describe(createVirtualStyleSheet, () => {
 
 		expect(sheet.getHydratedClassNames()).toStrictEqual([]);
 	});
-
-	test("should clear all rules on clear", () => {
-		const sheet = createVirtualStyleSheet("longhand");
-
-		sheet.setRule("c1", redColorRule);
-		sheet.clear();
-		expect(sheet.getContent()).toBe("");
-	});
-
-	test("should invalidate cache on clear", () => {
-		const sheet = createVirtualStyleSheet("longhand");
-
-		sheet.setRule("c1", redColorRule);
-
-		const before = sheet.getContent();
-
-		sheet.clear();
-		expect(sheet.getContent()).not.toBe(before);
-	});
 });

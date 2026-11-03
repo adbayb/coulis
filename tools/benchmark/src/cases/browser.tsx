@@ -2,12 +2,7 @@
  * @file This file is bundled as a self-contained script and injected into a headless browser page
  *   by `browser.spec.ts` via `page.addScriptTag`. Keep it standalone: do not merge it in
  *   `browser.spec.ts` or rely on any module that cannot be bundled into the single
- *   `dist/browser.js` output. Note on interpreting results: dynamic cases create styles during
- *   render and are the ones comparing actual library performance (`fastestCase` / `Slower than
- *   fastest` only rank them). Static vs dynamic: static baselines hoist styles to module scope, so
- *   styles are evaluated once at startup (outside the measured iterations) and each iteration only
- *   re-renders, measuring the theoretical ceiling per library; use `Overhead vs baseline` to read
- *   how far each dynamic case is from its static computation.
+ *   `dist/browser.js` output.
  */
 import type { JSX } from "react";
 import { flushSync } from "react-dom";
@@ -17,6 +12,8 @@ import { CoulisComponent } from "./coulis/component";
 import { CoulisStaticComponent } from "./coulis/static-component";
 import { EmotionComponent } from "./emotion/component";
 import { EmotionStaticComponent } from "./emotion/static-component";
+import { GooberComponent } from "./goober/component";
+import { GooberStaticComponent } from "./goober/static-component";
 import { StyledComponentsComponent } from "./styled-components/component";
 import { StyledComponentsStaticComponent } from "./styled-components/static-component";
 
@@ -51,33 +48,23 @@ const createHandler = (Component: () => JSX.Element) => {
 const benchmark = createBenchmark([
 	{
 		name: "coulis",
+		baseline: createHandler(CoulisStaticComponent),
 		handler: createHandler(CoulisComponent),
 	},
 	{
 		name: "emotion",
+		baseline: createHandler(EmotionStaticComponent),
 		handler: createHandler(EmotionComponent),
 	},
 	{
+		name: "goober",
+		baseline: createHandler(GooberStaticComponent),
+		handler: createHandler(GooberComponent),
+	},
+	{
 		name: "styled-components",
+		baseline: createHandler(StyledComponentsStaticComponent),
 		handler: createHandler(StyledComponentsComponent),
-	},
-	{
-		name: "coulis (baseline)",
-		baseline: true,
-		baselineFor: "coulis",
-		handler: createHandler(CoulisStaticComponent),
-	},
-	{
-		name: "emotion (baseline)",
-		baseline: true,
-		baselineFor: "emotion",
-		handler: createHandler(EmotionStaticComponent),
-	},
-	{
-		name: "styled-components (baseline)",
-		baseline: true,
-		baselineFor: "styled-components",
-		handler: createHandler(StyledComponentsStaticComponent),
 	},
 ]);
 

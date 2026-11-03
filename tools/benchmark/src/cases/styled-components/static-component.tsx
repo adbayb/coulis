@@ -1,8 +1,6 @@
 import { styled } from "styled-components";
-import { BACKGROUND_COLORS, createRowIndexes } from "../constants";
+import { BACKGROUND_COLORS, ROW_INDEXES } from "../constants";
 import { TableShell } from "../table";
-
-const rowIndexes = createRowIndexes();
 
 /**
  * Baseline: same DOM as `StyledComponentsComponent` but styled components hoisted to module scope
@@ -18,7 +16,7 @@ const StaticCells = BACKGROUND_COLORS.map((backgroundColor) => {
 export const StyledComponentsStaticComponent = () => {
 	return (
 		<TableShell>
-			{rowIndexes.map((index) => {
+			{ROW_INDEXES.map((index) => {
 				const Cell = StaticCells[
 					index % StaticCells.length
 				] as (typeof StaticCells)[number];

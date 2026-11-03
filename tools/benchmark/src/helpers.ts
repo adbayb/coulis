@@ -4,21 +4,15 @@ import type { BenchmarkOutput } from "./types";
 type Case = {
 	name: string;
 	/**
-	 * Baseline cases (styles hoisted to module scope) measure the theoretical ceiling for a given
-	 * library. They are reported for `Overhead vs baseline` computation only and are excluded from
-	 * `fastestCase` / `Slower than fastest` ranking. Static vs dynamic: static evaluates styles
-	 * once at startup (module scope, outside the measured iterations) so each iteration only
-	 * re-renders, while dynamic creates styles during render and pays the per-render library cost.
+	 * Optional static counterpart, excluded from the dynamic ranking and used to calculate
+	 * `Overhead vs baseline`.
 	 */
-	baseline?: boolean;
-	/** Name of the dynamic case this baseline belongs to. Required when `baseline` is true. */
-	baselineFor?: string;
+	baseline?: () => void;
 	handler: () => void;
 };
 
-type CompletedResult = {
+type Measure = {
 	name: string;
-	baseline: boolean;
 	baselineFor: string | undefined;
 	latencyMean: number;
 	latencyMedian: number;
@@ -34,121 +28,111 @@ export const createBenchmark = (cases: Case[]) => {
 		warmupTime: 100,
 	});
 
-	for (const { name, handler } of cases) {
-		benchmark.add(name, handler);
-	}
+	const baselineForByName = new Map<string, string>();
 
-	const caseByName = new Map(
-		cases.map((current) => {
-			return [current.name, current];
-		}),
-	);
+	for (const { name, baseline, handler } of cases) {
+		benchmark.add(name, handler);
+
+		if (baseline) {
+			const baselineName = `${name} (baseline)`;
+
+			benchmark.add(baselineName, baseline);
+			baselineForByName.set(baselineName, name);
+		}
+	}
 
 	return {
 		async run() {
 			const tasks = await benchmark.run();
-			const completed: CompletedResult[] = [];
-			let fastestThroughput = 0;
 
-			for (const { name, result } of tasks) {
+			const measures: Measure[] = tasks.map(({ name, result }) => {
 				if (result.state !== "completed") {
 					throw new Error(`Benchmark failed for: ${name}`);
 				}
 
-				const meta = caseByName.get(name);
-
-				if (meta?.baseline && !meta.baselineFor) {
-					throw new Error(`Baseline case missing "baselineFor": ${name}`);
-				}
-
-				const throughputMean = result.throughput.mean;
-				const isBaseline = meta?.baseline ?? false;
-
-				if (!isBaseline && throughputMean > fastestThroughput) {
-					fastestThroughput = throughputMean;
-				}
-
-				completed.push({
+				return {
 					name,
-					baseline: isBaseline,
-					baselineFor: meta?.baselineFor,
+					baselineFor: baselineForByName.get(name),
 					latencyMean: result.latency.mean,
 					latencyMedian: result.latency.p50,
-					throughputMean,
+					throughputMean: result.throughput.mean,
 					throughputMedian: result.throughput.p50,
-				});
-			}
-
-			const baselineThroughputByDynamicName = new Map<string, number>();
-
-			for (const completedResult of completed) {
-				if (completedResult.baseline && completedResult.baselineFor) {
-					baselineThroughputByDynamicName.set(
-						completedResult.baselineFor,
-						completedResult.throughputMean,
-					);
-				}
-			}
-
-			const results: BenchmarkOutput[] = completed.map((completedResult) => {
-				if (completedResult.baseline) {
-					return {
-						"name": completedResult.name,
-						"Latency mean (ms)": toFixed(completedResult.latencyMean),
-						"Latency med (ms)": toFixed(completedResult.latencyMedian),
-						"Overhead vs baseline": "— (baseline)",
-						"Slower than fastest": "— (baseline)",
-						"Throughput mean (ops/s)": toFixed(completedResult.throughputMean),
-						"Throughput med (ops/s)": toFixed(completedResult.throughputMedian),
-					};
-				}
-
-				const baselineThroughput = baselineThroughputByDynamicName.get(
-					completedResult.name,
-				);
-
-				return {
-					"name": completedResult.name,
-					"Latency mean (ms)": toFixed(completedResult.latencyMean),
-					"Latency med (ms)": toFixed(completedResult.latencyMedian),
-					"Overhead vs baseline":
-						baselineThroughput === undefined
-							? "n/a"
-							: `${toFixed(((baselineThroughput - completedResult.throughputMean) / baselineThroughput) * 100)}%`,
-					"Slower than fastest": `${toFixed(((fastestThroughput - completedResult.throughputMean) / fastestThroughput) * 100)}%`,
-					"Throughput mean (ops/s)": toFixed(completedResult.throughputMean),
-					"Throughput med (ops/s)": toFixed(completedResult.throughputMedian),
 				};
 			});
 
-			const dynamicResults = results
-				.filter((result) => {
-					return !caseByName.get(result.name)?.baseline;
+			const dynamicMeasures = measures
+				.filter(({ baselineFor }) => {
+					return baselineFor === undefined;
 				})
-				.toSorted((a, b) => {
-					return b["Throughput mean (ops/s)"] - a["Throughput mean (ops/s)"];
-				});
+				.toSorted(byThroughputDescending);
 
-			const baselineResults = results
-				.filter((result) => {
-					return caseByName.get(result.name)?.baseline;
+			const baselineMeasures = measures
+				.filter(({ baselineFor }) => {
+					return baselineFor !== undefined;
 				})
-				.toSorted((a, b) => {
-					return b["Throughput mean (ops/s)"] - a["Throughput mean (ops/s)"];
-				});
+				.toSorted(byThroughputDescending);
 
-			const sortedResults = [...dynamicResults, ...baselineResults];
-			const [fastestCase] = dynamicResults;
+			const [fastestMeasure] = dynamicMeasures;
 
-			if (!fastestCase) {
+			if (!fastestMeasure) {
 				throw new Error("Unable to find fastest case");
 			}
 
+			const baselineThroughputByName = new Map(
+				baselineMeasures.map(({ baselineFor, throughputMean }) => {
+					return [baselineFor, throughputMean];
+				}),
+			);
+
 			return {
-				fastestCase: fastestCase.name,
-				results: sortedResults,
+				fastestCase: fastestMeasure.name,
+				results: [
+					...dynamicMeasures.map((measure) => {
+						const baselineThroughput = baselineThroughputByName.get(measure.name);
+
+						return toOutput(measure, {
+							overheadVsBaseline:
+								baselineThroughput === undefined
+									? "n/a"
+									: getSlowdown(baselineThroughput, measure.throughputMean),
+							slowerThanFastest: getSlowdown(
+								fastestMeasure.throughputMean,
+								measure.throughputMean,
+							),
+						});
+					}),
+					...baselineMeasures.map((measure) => {
+						return toOutput(measure, {
+							overheadVsBaseline: "— (baseline)",
+							slowerThanFastest: "— (baseline)",
+						});
+					}),
+				],
 			};
 		},
+	};
+};
+
+const byThroughputDescending = (a: Measure, b: Measure) => {
+	return b.throughputMean - a.throughputMean;
+};
+
+const getSlowdown = (referenceThroughput: number, throughput: number) => {
+	return `${toFixed(((referenceThroughput - throughput) / referenceThroughput) * 100)}%`;
+};
+
+const toOutput = (
+	measure: Measure,
+	comparison: { overheadVsBaseline: string; slowerThanFastest: string },
+): BenchmarkOutput => {
+	return {
+		"name": measure.name,
+		"Latency mean (ms)": toFixed(measure.latencyMean),
+		"Latency med (ms)": toFixed(measure.latencyMedian),
+		"Overhead vs baseline": comparison.overheadVsBaseline,
+		"Slower than fastest": comparison.slowerThanFastest,
+		"Throughput mean (ops/s)": toFixed(measure.throughputMean),
+		"Throughput med (ops/s)": toFixed(measure.throughputMedian),
 	};
 };
 

@@ -23,8 +23,6 @@ export const BACKGROUND_COLORS = [
 	"cornsilk",
 ] as const;
 
-export const createRowIndexes = () => {
-	return Array.from({ length: ROW_COUNT }, (_, index) => {
-		return index;
-	});
-};
+export const ROW_INDEXES = Array.from({ length: ROW_COUNT }, (_, index) => {
+	return index;
+});

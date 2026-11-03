@@ -1,8 +1,6 @@
 import { styled } from "styled-components";
-import { BACKGROUND_COLORS, createRowIndexes } from "../constants";
+import { BACKGROUND_COLORS, ROW_INDEXES } from "../constants";
 import { TableShell } from "../table";
-
-const rowIndexes = createRowIndexes();
 
 const Cell = styled.td<{ $backgroundColor: string }>`
 	background-color: ${(properties) => {
@@ -13,7 +11,7 @@ const Cell = styled.td<{ $backgroundColor: string }>`
 export const StyledComponentsComponent = () => {
 	return (
 		<TableShell>
-			{rowIndexes.map((index) => {
+			{ROW_INDEXES.map((index) => {
 				const backgroundColor = BACKGROUND_COLORS[
 					index % BACKGROUND_COLORS.length
 				] as string;

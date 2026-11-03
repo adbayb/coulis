@@ -1,13 +1,11 @@
-import { BACKGROUND_COLORS, createRowIndexes } from "../constants";
+import { BACKGROUND_COLORS, ROW_INDEXES } from "../constants";
 import { TableShell } from "../table";
 import { createStyles } from "./helpers";
-
-const rowIndexes = createRowIndexes();
 
 export const CoulisComponent = () => {
 	return (
 		<TableShell>
-			{rowIndexes.map((index) => {
+			{ROW_INDEXES.map((index) => {
 				const className = createStyles({
 					backgroundColor: BACKGROUND_COLORS[index % BACKGROUND_COLORS.length],
 				});

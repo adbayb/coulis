@@ -1,8 +1,6 @@
-import { BACKGROUND_COLORS, createRowIndexes } from "../constants";
+import { BACKGROUND_COLORS, ROW_INDEXES } from "../constants";
 import { TableShell } from "../table";
 import { createStyles } from "./helpers";
-
-const rowIndexes = createRowIndexes();
 
 /**
  * Baseline: same DOM as `CoulisComponent` but styles hoisted to module scope. Each iteration only
@@ -16,7 +14,7 @@ const staticClassNames = BACKGROUND_COLORS.map((backgroundColor) => {
 export const CoulisStaticComponent = () => {
 	return (
 		<TableShell>
-			{rowIndexes.map((index) => {
+			{ROW_INDEXES.map((index) => {
 				const className = staticClassNames[index % staticClassNames.length] as string;
 
 				return (

@@ -173,7 +173,7 @@ export const renderHtml = () => {
 For more server-side integration recipes, the following examples can be checked:
 
 - **React**
-    - [Next.js with the app router](./examples/nextjs-app-router/), more specifically, [this snippet](./examples/nextjs-app-router/src/components/CoulisRegistry.tsx).
+    - [Next.js with the app router](./examples/nextjs-app-router/), more specifically, [this snippet](./examples/nextjs-app-router/src/components/coulis-registry.tsx).
     - [Next.js with the pages router](./examples/nextjs-pages-router/), more specifically, [this snippet](./examples/nextjs-pages-router/src/pages/_document.tsx).
     - [Vite.js with server-side rendering](./examples/vite-ssr-react/), more specifically, [this snippet](./examples/vite-ssr-react/src/entry-server.tsx).
 - **Angular**
@@ -210,10 +210,10 @@ Theme values are passed as-is (raw values, not CSS custom properties).
 
 Single-run results from `pnpm --filter @coulis/benchmark benchmark`, rendering a 1,000-row React table. Higher throughput is better; dynamic styles are created during each render.
 
-| Runtime                       | Coulis |           Emotion |             Goober | styled-components |
-| ----------------------------- | -----: | ----------------: | -----------------: | ----------------: |
-| Browser (ops/s)               |  1,634 | 799 (2.0x slower) |  440 (3.7x slower) | 433 (3.8x slower) |
-| Server-side rendering (ops/s) |    154 | 138 (1.1x slower) | 153 (1.01x slower) |  72 (2.1x slower) |
+| Runtime         | Coulis |           Emotion |             Goober | styled-components |
+| --------------- | -----: | ----------------: | -----------------: | ----------------: |
+| Browser (ops/s) |  1,631 | 819 (2.0x slower) |  609 (2.7x slower) | 468 (3.5x slower) |
+| Server (ops/s)  |    162 | 144 (1.1x slower) | 156 (1.04x slower) |  76 (2.1x slower) |
 
 These results are hardware- and runtime-dependent. The benchmark also reports static-style baselines for context.
 
@@ -223,7 +223,7 @@ Minified, tree-shaken browser ESM bundles measured with esbuild 0.28.2 (`bundle:
 
 | Library                  | Version   | Minified + gzip |
 | ------------------------ | --------- | --------------: |
-| Coulis                   | workspace |         2.32 kB |
+| Coulis                   | workspace |         2.34 kB |
 | Emotion (`@emotion/css`) | 11.13.5   |         6.28 kB |
 | Goober                   | 2.1.19    |         1.11 kB |
 | styled-components        | 6.6.0     |        10.99 kB |

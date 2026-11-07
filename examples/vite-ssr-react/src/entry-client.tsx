@@ -1,6 +1,6 @@
 import { StrictMode } from "react";
 import { hydrateRoot } from "react-dom/client";
-import App from "./App";
+import App from "./app";
 
 const element = document.querySelector("#root");
 

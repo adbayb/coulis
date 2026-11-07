@@ -152,19 +152,19 @@ Here's a vanilla React integration example generating HTML content:
 
 ```tsx
 import { renderToString } from "react-dom/server";
-import { coulis } from "./helpers/coulis"; // Factory instance created via `createCoulis` (see quickstart guide)
 import { App } from "./App"; // Main component entry point (depending on your project specificities).
+import { coulis } from "./helpers/coulis"; // Factory instance created via `createCoulis` (see quickstart guide)
 
 export const renderHtml = () => {
 	const bodyContent = renderToString(<App />);
-	const headContent = String(getMetadata()); // Must be get after the `renderToString` traversal to retrieve generated styles.
+	const headContent = String(coulis.getMetadata()); // Must be get after the `renderToString` traversal to retrieve generated styles.
 
 	return `<html>
 		<head>
 			${headContent}
 		</head>
 		<body>
-			<div id="root>${bodyContent}</div>
+			<div id="root">${bodyContent}</div>
 		</body>
 	</html>`;
 };
@@ -174,8 +174,8 @@ For more server-side integration recipes, the following examples can be checked:
 
 - **React**
     - [Next.js with the app router](./examples/nextjs-app-router/), more specifically, [this snippet](./examples/nextjs-app-router/src/components/CoulisRegistry.tsx).
-    - [Next.js with the pages router](./examples/nextjs-pages-router/), more specifically, [this snippet](examples/nextjs-pages-router/src/pages/_document.tsx).
-    - [Vite.js with server-side rendering](./examples/vite-ssr-react/), more specifically, [this snippet](examples/vite-ssr-react/src/entry-server.tsx).
+    - [Next.js with the pages router](./examples/nextjs-pages-router/), more specifically, [this snippet](./examples/nextjs-pages-router/src/pages/_document.tsx).
+    - [Vite.js with server-side rendering](./examples/vite-ssr-react/), more specifically, [this snippet](./examples/vite-ssr-react/src/entry-server.tsx).
 - **Angular**
     - Welcome to any contribution.
 - **Vue**
@@ -204,16 +204,44 @@ Theme values are passed as-is (raw values, not CSS custom properties).
 
 <br>
 
+## 📊 Benchmarks
+
+### Runtime performance
+
+Single-run results from `pnpm --filter @coulis/benchmark benchmark`, rendering a 1,000-row React table. Higher throughput is better; dynamic styles are created during each render.
+
+| Runtime                       | Coulis |           Emotion |             Goober | styled-components |
+| ----------------------------- | -----: | ----------------: | -----------------: | ----------------: |
+| Browser (ops/s)               |  1,634 | 799 (2.0x slower) |  440 (3.7x slower) | 433 (3.8x slower) |
+| Server-side rendering (ops/s) |    154 | 138 (1.1x slower) | 153 (1.01x slower) |  72 (2.1x slower) |
+
+These results are hardware- and runtime-dependent. The benchmark also reports static-style baselines for context.
+
+### Bundle size
+
+Minified, tree-shaken browser ESM bundles measured with esbuild 0.28.2 (`bundle: true`, `minify: true`, `target: "es2020"`) and Node.js gzip at level 9, with `process.env.NODE_ENV` set to `"production"` and React/React DOM excluded. Sizes include bundled dependencies and use decimal kB (1 kB = 1,000 bytes).
+
+| Library                  | Version   | Minified + gzip |
+| ------------------------ | --------- | --------------: |
+| Coulis                   | workspace |         2.32 kB |
+| Emotion (`@emotion/css`) | 11.13.5   |         6.28 kB |
+| Goober                   | 2.1.19    |         1.11 kB |
+| styled-components        | 6.6.0     |        10.99 kB |
+
+Each bundle re-exports `createCoulis` (Coulis), `css` (Emotion and Goober), or `styled` (styled-components). Coulis includes its web factory's styling and metadata APIs; these libraries have different feature sets. Application bundles vary with imports, bundler settings, and library versions.
+
+<br>
+
 ## 🔭 Examples
 
-Working integrations are available in the [`examples/`](../examples/) directory:
+Working integrations are available in the [`examples/`](https://github.com/adbayb/coulis/tree/main/examples) directory:
 
-| Example                                                 | Description                         |
-| ------------------------------------------------------- | ----------------------------------- |
-| [vite-csr-react](../examples/vite-csr-react/)           | Vite + React, client-side rendering |
-| [vite-ssr-react](../examples/vite-ssr-react/)           | Vite + React, server-side rendering |
-| [nextjs-app-router](../examples/nextjs-app-router/)     | Next.js with the App Router         |
-| [nextjs-pages-router](../examples/nextjs-pages-router/) | Next.js with the Pages Router       |
-| [expo](../examples/expo/)                               | React Native via Expo               |
+| Example                                                                                        | Description                         |
+| ---------------------------------------------------------------------------------------------- | ----------------------------------- |
+| [vite-csr-react](https://github.com/adbayb/coulis/tree/main/examples/vite-csr-react)           | Vite + React, client-side rendering |
+| [vite-ssr-react](https://github.com/adbayb/coulis/tree/main/examples/vite-ssr-react)           | Vite + React, server-side rendering |
+| [nextjs-app-router](https://github.com/adbayb/coulis/tree/main/examples/nextjs-app-router)     | Next.js with the App Router         |
+| [nextjs-pages-router](https://github.com/adbayb/coulis/tree/main/examples/nextjs-pages-router) | Next.js with the Pages Router       |
+| [expo](https://github.com/adbayb/coulis/tree/main/examples/expo)                               | React Native via Expo               |
 
 <br>

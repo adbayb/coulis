@@ -18,6 +18,13 @@ publicHoistPattern:
     - "*turbo*"
     - "*typescript*"
     - "*types*"
-allowBuilds:
-    "@swc/core": true
-    esbuild: true
+permissions:
+    "@adbayb/stack":
+        skills: true
+    "@swc/core":
+        build: true
+    esbuild:
+        build: true
+skills:
+    dirs:
+        - .agents/skills

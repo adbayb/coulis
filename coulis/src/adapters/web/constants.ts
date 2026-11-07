@@ -1,4 +1,3 @@
-// oxlint-disable-next-line unicorn/prefer-global-this
 export const IS_SERVER_ENVIRONMENT = typeof window === "undefined";
 
 // Taken from https://raw.githubusercontent.com/facebook/react/b98adb648a27640db8467064e537b238b8c306ce/packages/react-dom/src/shared/CSSProperty.js
@@ -7,9 +6,6 @@ export const UNITLESS_PROPERTIES = new Set([
 	"borderImageOutset",
 	"borderImageSlice",
 	"borderImageWidth",
-	"boxFlex",
-	"boxFlexGroup",
-	"boxOrdinalGroup",
 	"columnCount",
 	"columns",
 	// SVG properties
@@ -45,10 +41,6 @@ export const UNITLESS_PROPERTIES = new Set([
 	"zoom",
 ]);
 
-/*
- * From PREACT:
- * export const IS_NON_DIMENSIONAL = /acit|ex(?:s|g|n|p|$)|rph|grid|ows|mnc|ntw|ine[ch]|zoo|^ord/i;
- */
 export const SHORTHAND_PROPERTIES = new Set([
 	"animation",
 	"background",

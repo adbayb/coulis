@@ -1,6 +1,6 @@
 import type { Keyframes } from "../entities/keyframe";
 import type { RecordLike, WithNewLeafNodes } from "../entities/primitive";
-import type { ShortandsLike } from "../entities/shorthand";
+import type { ShorthandsLike } from "../entities/shorthand";
 import type { StatesLike } from "../entities/state";
 import type { GlobalStyles, PropertiesLike, Styles } from "../entities/style";
 import type { ThemeLike } from "../entities/theme";
@@ -19,18 +19,12 @@ export type CreateCoulis<
 	},
 > = <
 	const Properties extends PropertiesLike, // `const` needed to not widen strict type (for example, to avoid `width: [50, 100]` being inferred as `width: number`).
-	Shorthands extends ShortandsLike<Properties> | undefined = undefined,
+	Shorthands extends ShorthandsLike<Properties> | undefined = undefined,
 	States extends StatesLike | undefined = undefined,
 	Theme extends ThemeLike | undefined = undefined,
 >(contract: {
 	properties: (
-		theme: CreateCoulisGeneric["Input"]["WithCSSVariables"] extends false
-			? Theme extends RecordLike
-				? Theme
-				: undefined
-			: Theme extends RecordLike
-				? WithNewLeafNodes<Theme, string>
-				: undefined,
+		theme: ResolveTheme<CreateCoulisGeneric["Input"]["WithCSSVariables"], Theme>,
 	) => Properties;
 	shorthands?: Shorthands;
 	states?: States;
@@ -47,3 +41,9 @@ export type CreateCoulis<
 	}[] & { toString: () => string };
 	setGlobalStyles: (input: GlobalStyles<Properties, Shorthands>) => void;
 };
+
+type ResolveTheme<WithCSSVariables extends boolean, Theme> = Theme extends RecordLike
+	? WithCSSVariables extends false
+		? Theme
+		: WithNewLeafNodes<Theme, string>
+	: undefined;

@@ -1,6 +1,7 @@
 import type { AtRule, Properties as CSSProperties } from "csstype";
 import type { EmptyRecord, UngreedyString } from "./primitive";
-import type { ShortandsLike } from "./shorthand";
+import { isObject } from "./primitive";
+import type { ShorthandsLike } from "./shorthand";
 import type { StatesLike } from "./state";
 
 /**
@@ -10,17 +11,17 @@ import type { StatesLike } from "./state";
  * conditional-shorthand (e.g @media { background }) < conditional-longhand (e.g @media {
  * background-color }) properties.
  */
-export const STYLE_TYPES = Object.freeze([
+export const STYLE_TYPES = [
 	"global",
 	"shorthand",
 	"longhand",
 	"atShorthand",
 	"atLonghand",
-] as const);
+] as const;
 
 export type GlobalStyles<
 	P extends PropertiesLike,
-	Shorthands extends ShortandsLike<P> | undefined,
+	Shorthands extends ShorthandsLike<P> | undefined,
 > = Record<
 	string,
 	Record<string, string> | string | WithUngreedyString<Styles<P, Shorthands, undefined>>
@@ -32,7 +33,7 @@ export type PropertiesLike = {
 
 export type Styles<
 	P extends PropertiesLike,
-	Shorthands extends ShortandsLike<P> | undefined,
+	Shorthands extends ShorthandsLike<P> | undefined,
 	States extends StatesLike | undefined,
 > = (Shorthands extends undefined
 	? EmptyRecord
@@ -45,6 +46,27 @@ export type Styles<
 };
 
 export type StyleType = (typeof STYLE_TYPES)[number];
+
+/**
+ * Resolves a style value against its contract property definition: functions are invoked, records
+ * act as lookup maps (falling back to the raw value), anything else (`true`, arrays) passes the
+ * value through.
+ *
+ * @param definition - The property definition from the contract `properties`.
+ * @param value - The raw style value.
+ * @returns The resolved value.
+ */
+export const resolvePropertyValue = (definition: unknown, value: unknown): unknown => {
+	if (typeof definition === "function") {
+		return (definition as (input: unknown) => unknown)(value);
+	}
+
+	if (isObject(definition)) {
+		return definition[value as string] ?? value;
+	}
+
+	return value;
+};
 
 type CreatePropertyValue<Value, S extends StatesLike | undefined> =
 	| (S extends Record<infer State, unknown>

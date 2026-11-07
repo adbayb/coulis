@@ -1,10 +1,5 @@
 // oxlint-disable-next-line typescript/no-empty-object-type
 export type EmptyRecord = {};
-
-export type Exactify<Value, AllowedKeys extends number | string | symbol> = {
-	[K in keyof Value]: K extends AllowedKeys ? Value[K] : never;
-};
-
 export type RecordLike = Record<string, unknown>;
 export type UngreedyString = Ungreedify<string>;
 
@@ -28,19 +23,12 @@ export type WithNewLeafNodes<Object_ extends RecordLike, LeafType> = {
  */
 type Ungreedify<U extends number | string> = Record<never, never> & U;
 
-export const compose = <Value>(
-	startingFunction: (input: Value) => Value,
-	...restFunctions: ((input: Value) => Value)[]
-) => {
-	return restFunctions.reduce((previousFunction, nextFunction) => {
-		return (value) => {
-			return previousFunction(nextFunction(value));
-		};
-	}, startingFunction);
-};
+export const isNumeric = (input: unknown): boolean => {
+	if (typeof input === "number") {
+		return true;
+	}
 
-export const isNumber = (input: unknown): input is number => {
-	return typeof input === "number" || !Number.isNaN(Number(input));
+	return typeof input === "string" && input.trim() !== "" && !Number.isNaN(Number(input));
 };
 
 export const isObject = (input: unknown): input is Record<string, unknown> => {

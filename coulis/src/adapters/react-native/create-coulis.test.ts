@@ -1,6 +1,6 @@
 import type { MockInstance } from "vitest";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
-import { createCoulis } from "./createCoulis";
+import { createCoulis } from "./create-coulis";
 
 // @ts-expect-error Partial mocking for testing purposes
 vi.mock(import("react-native"), (): { Dimensions: Dimensions } => {
@@ -72,13 +72,13 @@ describe("createCoulis (react-native adapter)", () => {
 		);
 	});
 
-	test("should return the same object reference for identical inputs (cache)", () => {
+	test("should not share mutable results for identical inputs (cache)", () => {
 		const { createStyles } = createInstance();
 		const input = { width: "100px" };
 		const first = createStyles(input);
-		const second = createStyles(input);
 
-		expect(first).toBe(second);
+		first.width = 200;
+		expect(createStyles(input)).toStrictEqual({ width: 100 });
 	});
 
 	test("should return property names from getContract", () => {

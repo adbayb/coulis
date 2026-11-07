@@ -10,17 +10,18 @@
 		"clean": "stack clean",
 		"fix": "stack fix",
 		"install": "stack install",
-		"release:log": "stack release --log",
+		"release:changelog": "stack release --changelog",
 		"release:publish": "stack release --publish",
-		"release:version": "stack release --tag",
+		"release:snapshot": "stack release --snapshot",
+		"release:version": "stack release --bump",
 		"start": "stack start",
 		"start:native": "pnpm --filter coulis start & pnpm --filter @coulis/example-expo start:ios",
 		"test": "stack test",
 		"watch": "stack watch"
 	},
 	"devDependencies": {
-		"@adbayb/stack": "3.3.0",
-		"@types/node": "24.13.3"
+		"@adbayb/stack": "3.6.0",
+		"@types/node": "26.6.6"
 	},
 	"devEngines": {
 		"packageManager": {
@@ -30,7 +31,7 @@
 		},
 		"runtime": {
 			"name": "node",
-			"version": "^24.0.0",
+			"version": "^26.0.0",
 			"onFail": "error"
 		}
 	}

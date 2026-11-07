@@ -8,25 +8,35 @@ import type { JSX } from "react";
 import { flushSync } from "react-dom";
 import { createRoot } from "react-dom/client";
 import { createBenchmark } from "../helpers";
-import { CoulisComponent } from "./coulis/Component";
-import { EmotionComponent } from "./emotion/Component";
-import { StyledComponentsComponent } from "./styled-components/Component";
+import { CoulisComponent } from "./coulis/component";
+import { EmotionComponent } from "./emotion/component";
+import { GooberComponent } from "./goober/component";
+import { StyledComponentsComponent } from "./styled-components/component";
+
+let sharedRoot: ReturnType<typeof createRoot> | undefined;
+
+const getSharedRoot = () => {
+	if (!sharedRoot) {
+		document.body.innerHTML = "";
+
+		const rootElement = document.createElement("div");
+
+		document.body.append(rootElement);
+		sharedRoot = createRoot(rootElement);
+	}
+
+	return sharedRoot;
+};
 
 const createHandler = (Component: () => JSX.Element) => {
-	const rootElement = document.createElement("div");
-
-	document.body.append(rootElement);
-
-	const root = createRoot(rootElement);
-
 	return () => {
 		/**
-		 * FlushSync wraps root.render() to force each render to complete synchronously before
-		 * tinybench proceeds to the next iteration, preventing thousands of pending React
-		 * MessageChannel tasks from flooding the event loop and crashing the browser.
+		 * All cases render into the same container so only one table lives in the DOM at a time.
+		 * FlushSync forces each render to complete synchronously before tinybench proceeds to the
+		 * next iteration, preventing pending React tasks from flooding the event loop.
 		 */
 		flushSync(() => {
-			root.render(<Component />);
+			getSharedRoot().render(<Component />);
 		});
 	};
 };
@@ -39,6 +49,10 @@ const benchmark = createBenchmark([
 	{
 		name: "emotion",
 		handler: createHandler(EmotionComponent),
+	},
+	{
+		name: "goober",
+		handler: createHandler(GooberComponent),
 	},
 	{
 		name: "styled-components",

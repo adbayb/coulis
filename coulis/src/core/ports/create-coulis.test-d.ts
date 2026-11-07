@@ -1,5 +1,5 @@
 import { describe, expect, expectTypeOf, test } from "vitest";
-import type { CreateCoulis } from "./createCoulis";
+import type { CreateCoulis } from "./create-coulis";
 
 describe("createCoulis (port)", () => {
 	test("should type `createCoulis`", () => {

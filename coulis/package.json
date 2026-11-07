@@ -59,8 +59,8 @@
 		"csstype": "3.2.3",
 		"happy-dom": "21.0.4",
 		"quickbundle": "3.2.2",
-		"react-native": "0.88.0",
-		"vitest": "5.0.5"
+		"react-native": "0.88.1",
+		"vitest": "5.1.0"
 	},
 	"peerDependencies": {
 		"react-native": "^0.80.0 || <1.0.0"

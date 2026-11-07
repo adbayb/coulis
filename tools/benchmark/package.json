@@ -23,12 +23,12 @@
 		"@emotion/server": "11.11.0",
 		"coulis": "workspace:*",
 		"goober": "2.1.19",
-		"playwright": "1.64.1",
+		"playwright": "1.65.0",
 		"quickbundle": "3.2.2",
 		"react": "19.3.1",
 		"react-dom": "19.3.1",
 		"styled-components": "6.6.0",
-		"tinybench": "6.2.2",
+		"tinybench": "6.2.3",
 		"tsx": "4.23.15",
 		"typescript": "7.0.2"
 	}

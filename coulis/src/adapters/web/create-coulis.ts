@@ -19,34 +19,6 @@ import { createDomStyleSheet } from "./stylesheet/dom";
 import { createVirtualStyleSheet } from "./stylesheet/virtual";
 import type { ClassName, Rule, StyleSheet } from "./types";
 
-type CachedStyleSheet = {
-	classNames: Map<string, ClassName>;
-	hydrated: Set<ClassName>;
-	inserted: ClassName[];
-	sheet: StyleSheet;
-};
-
-type Property = {
-	/**
-	 * Memoized `raw value -> declaration` builder: repeated values skip value resolution and string
-	 * building entirely.
-	 */
-	getDeclaration: (value: unknown) => string;
-	isCSSShorthand: boolean;
-};
-
-const getStyleType = (isCSSShorthand: boolean, isAtRule: boolean): StyleType => {
-	if (isAtRule) {
-		return isCSSShorthand ? "atShorthand" : "atLonghand";
-	}
-
-	return isCSSShorthand ? "shorthand" : "longhand";
-};
-
-const escapeStyleContent = (content: string) => {
-	return content.replaceAll("<", String.raw`\3C `);
-};
-
 /**
  * Creates a web instance that generates atomic CSS rules for browser injection and server-side
  * rendering.
@@ -375,4 +347,32 @@ export const createCoulis: CreateCoulis<{
 			});
 		},
 	};
+};
+
+type CachedStyleSheet = {
+	classNames: Map<string, ClassName>;
+	hydrated: Set<ClassName>;
+	inserted: ClassName[];
+	sheet: StyleSheet;
+};
+
+type Property = {
+	/**
+	 * Memoized `raw value -> declaration` builder: repeated values skip value resolution and string
+	 * building entirely.
+	 */
+	getDeclaration: (value: unknown) => string;
+	isCSSShorthand: boolean;
+};
+
+const getStyleType = (isCSSShorthand: boolean, isAtRule: boolean): StyleType => {
+	if (isAtRule) {
+		return isCSSShorthand ? "atShorthand" : "atLonghand";
+	}
+
+	return isCSSShorthand ? "shorthand" : "longhand";
+};
+
+const escapeStyleContent = (content: string) => {
+	return content.replaceAll("<", String.raw`\3C `);
 };

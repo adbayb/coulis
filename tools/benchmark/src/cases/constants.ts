@@ -1,5 +1,3 @@
-import { ROW_COUNT } from "../constants";
-
 export const BACKGROUND_COLORS = [
 	"lightcoral",
 	"lightblue",
@@ -23,6 +21,6 @@ export const BACKGROUND_COLORS = [
 	"cornsilk",
 ] as const;
 
-export const ROW_INDEXES = Array.from({ length: ROW_COUNT }, (_, index) => {
+export const ROW_INDEXES = Array.from({ length: 1000 }, (_, index) => {
 	return index;
 });

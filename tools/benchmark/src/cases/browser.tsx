@@ -9,13 +9,9 @@ import { flushSync } from "react-dom";
 import { createRoot } from "react-dom/client";
 import { createBenchmark } from "../helpers";
 import { CoulisComponent } from "./coulis/component";
-import { CoulisStaticComponent } from "./coulis/static-component";
 import { EmotionComponent } from "./emotion/component";
-import { EmotionStaticComponent } from "./emotion/static-component";
 import { GooberComponent } from "./goober/component";
-import { GooberStaticComponent } from "./goober/static-component";
 import { StyledComponentsComponent } from "./styled-components/component";
-import { StyledComponentsStaticComponent } from "./styled-components/static-component";
 
 let sharedRoot: ReturnType<typeof createRoot> | undefined;
 
@@ -48,22 +44,18 @@ const createHandler = (Component: () => JSX.Element) => {
 const benchmark = createBenchmark([
 	{
 		name: "coulis",
-		baseline: createHandler(CoulisStaticComponent),
 		handler: createHandler(CoulisComponent),
 	},
 	{
 		name: "emotion",
-		baseline: createHandler(EmotionStaticComponent),
 		handler: createHandler(EmotionComponent),
 	},
 	{
 		name: "goober",
-		baseline: createHandler(GooberStaticComponent),
 		handler: createHandler(GooberComponent),
 	},
 	{
 		name: "styled-components",
-		baseline: createHandler(StyledComponentsStaticComponent),
 		handler: createHandler(StyledComponentsComponent),
 	},
 ]);

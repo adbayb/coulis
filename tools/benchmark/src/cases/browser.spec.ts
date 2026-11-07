@@ -11,7 +11,7 @@ test("browser", async ({ page }) => {
 		return globalThis.__RUN_BENCHMARK__();
 	});
 
-	assert.equal(output.results.length, 8);
+	assert.equal(output.results.length, 4);
 	assert.ok(typeof output.fastestCase === "string" && output.fastestCase.length > 0);
 	console.log(`Fastest is ${output.fastestCase} ✨`);
 	console.table(output.results);

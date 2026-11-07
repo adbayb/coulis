@@ -32,7 +32,7 @@ Common types: `feat`, `fix`, `docs`, `chore`, `refactor`, `test`, `perf`.
 Every change that affects the public API of the `coulis` package must include a changelog entry:
 
 ```sh
-pnpm release:log
+pnpm release:changelog
 ```
 
 Choose `patch` for bug fixes and internal improvements, `minor` for new features or behaviour changes, and `major` for breaking changes.

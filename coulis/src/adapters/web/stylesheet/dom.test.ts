@@ -3,20 +3,6 @@ import { afterEach, describe, expect, test, vi } from "vitest";
 import { createCoulis } from "../create-coulis";
 import { createDomStyleSheet } from "./dom";
 
-const longhandSelector = 'style[data-coulis-type="longhand"]';
-const redColorRule = ".c1{color:red;}";
-
-const createStatefulWebInstance = () => {
-	return createCoulis({
-		properties() {
-			return { color: true };
-		},
-		states: {
-			"": "@media print{coulis[selector]{coulis[declaration]}}",
-		},
-	});
-};
-
 describe(createDomStyleSheet, () => {
 	afterEach(() => {
 		document.head.innerHTML = "";
@@ -82,20 +68,38 @@ describe(createDomStyleSheet, () => {
 		expect(sheet.getHydratedClassNames()).toStrictEqual(["c1", "c2"]);
 	});
 
-	test("should only reuse hydrated class names from the matching stylesheet", async () => {
+	test("should not reinsert styles hydrated from server metadata", async () => {
 		const server = createStatefulWebInstance();
+		const className = server.createStyles({ color: "red" });
 
-		server.createStyles({ color: { "": "red", "base": "blue" } });
 		await Promise.resolve();
 
-		const client = createStatefulWebInstance();
-		const className = client.createStyles({ color: "red" });
+		const serverMetadata = server.getMetadata();
 
+		document.head.innerHTML = "";
+
+		for (const { attributes, content } of serverMetadata) {
+			const element = document.createElement("style");
+
+			element.dataset.coulisCache = attributes["data-coulis-cache"];
+			element.dataset.coulisType = attributes["data-coulis-type"];
+			element.textContent = content;
+			document.head.append(element);
+		}
+
+		const client = createStatefulWebInstance();
+
+		expect(client.createStyles({ color: "red" })).toBe(className);
 		await Promise.resolve();
 
 		const longhandContent = document.head.querySelector(longhandSelector)?.textContent;
 
-		expect(longhandContent).toContain(`.${className}{color:red;}`);
+		const serverLonghandContent = serverMetadata.find(({ attributes }) => {
+			return attributes["data-coulis-type"] === "longhand";
+		})?.content;
+
+		expect(serverLonghandContent).toContain(`.${className}{color:red;}`);
+		expect(longhandContent).toBe(serverLonghandContent);
 	});
 
 	test("should getHydratedClassNames should return empty array when data-coulis-cache is empty", () => {
@@ -116,3 +120,17 @@ describe(createDomStyleSheet, () => {
 		expect(sheet.getHydratedClassNames()).toStrictEqual(["c1", "c2", "c3"]);
 	});
 });
+
+const longhandSelector = 'style[data-coulis-type="longhand"]';
+const redColorRule = ".c1{color:red;}";
+
+const createStatefulWebInstance = () => {
+	return createCoulis({
+		properties() {
+			return { color: true };
+		},
+		states: {
+			"": "@media print{coulis[selector]{coulis[declaration]}}",
+		},
+	});
+};

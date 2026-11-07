@@ -66,8 +66,8 @@ app.use("*all", async (request, response) => {
 		response.status(200).set({ "Content-Type": "text/html" }).send(html);
 	} catch (error) {
 		vite?.ssrFixStacktrace(error);
-		console.log(error.stack);
-		response.status(500).end(error.stack);
+		console.error(error);
+		response.status(500).send("Internal Server Error");
 	}
 });
 

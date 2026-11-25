@@ -11,7 +11,7 @@ class MyDocument extends Document {
 			styles: (
 				<>
 					{initialProps.styles}
-					{getMetadata().map(({ attributes, content }) => {
+					{getMetadata(initialProps.html).map(({ attributes, content }) => {
 						return (
 							<style
 								{...attributes}

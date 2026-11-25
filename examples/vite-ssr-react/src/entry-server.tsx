@@ -10,5 +10,5 @@ export const renderHtml = (_url: string) => {
 		</StrictMode>,
 	);
 
-	return { head: String(getMetadata()), html: bodyContent };
+	return { head: String(getMetadata(bodyContent)), html: bodyContent };
 };

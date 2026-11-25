@@ -165,6 +165,105 @@ describe("createCoulis (web adapter)", () => {
 		expect(metadataContent).toContain(`.${className}{color:red;}`);
 	});
 
+	test("should only extract the atomic rules used in a given HTML", () => {
+		const { createKeyframes, createStyles, getMetadata, setGlobalStyles } = createCoulis({
+			properties() {
+				return { animation: true, color: true, display: true };
+			},
+			states: {
+				hover: "coulis[selector]:hover{coulis[declaration]}",
+			},
+		});
+
+		setGlobalStyles({ body: { display: "block" } });
+
+		const animationName = createKeyframes({ to: { color: "red" } });
+		const usedClassName = createStyles({ color: { base: "red", hover: "blue" } });
+		const unusedClassName = createStyles({ display: "flex" });
+		const metadata = getMetadata(`<div class="other ${usedClassName}"></div>`);
+
+		const content = metadata
+			.map(({ content: sheetContent }) => {
+				return sheetContent;
+			})
+			.join("");
+
+		const cachedClassNames = metadata.flatMap(({ attributes }) => {
+			return attributes["data-coulis-cache"].split(",");
+		});
+
+		expect(content).toContain("body{display:block;}");
+		expect(content).toContain(`@keyframes ${animationName}`);
+		expect(content).toContain(":hover{color:blue;}");
+		expect(content).not.toContain("display:flex");
+		expect(cachedClassNames).toStrictEqual(expect.arrayContaining(usedClassName.split(" ")));
+		expect(cachedClassNames).not.toContain(unusedClassName);
+		expect(String(getMetadata())).toContain("display:flex");
+	});
+
+	test("should remove global styles once every caller has removed them", () => {
+		const { getMetadata, setGlobalStyles } = createCoulis({
+			properties() {
+				return { color: true };
+			},
+		});
+
+		const getContent = () => {
+			return getMetadata()
+				.map(({ content }) => {
+					return content;
+				})
+				.join("");
+		};
+
+		const input = { body: { color: "red" } };
+		const removeFirst = setGlobalStyles(input);
+		const removeSecond = setGlobalStyles(input);
+
+		removeFirst();
+		expect(getContent()).toBe("body{color:red;}");
+		removeSecond();
+		expect(getContent()).toBe("");
+		setGlobalStyles(input);
+		expect(getContent()).toBe("body{color:red;}");
+	});
+
+	test("should not create a :root rule without theme", () => {
+		const { getMetadata } = createCoulis({
+			properties() {
+				return { color: true };
+			},
+		});
+
+		expect(String(getMetadata())).not.toContain(":root");
+	});
+
+	test("should prefix properties declared as shorthands", () => {
+		const { createStyles, getMetadata, setGlobalStyles } = createCoulis({
+			properties() {
+				return {
+					textSizeAdjust: true,
+					userSelect: true,
+					WebkitTextSizeAdjust: true,
+					WebkitUserSelect: true,
+				};
+			},
+			shorthands: {
+				textSizeAdjust: ["WebkitTextSizeAdjust", "textSizeAdjust"],
+				userSelect: ["WebkitUserSelect", "userSelect"],
+			},
+		});
+
+		setGlobalStyles({ html: { textSizeAdjust: "100%" } });
+		createStyles({ userSelect: "none" });
+
+		const content = String(getMetadata());
+
+		expect(content).toContain("html{-webkit-text-size-adjust:100%;text-size-adjust:100%;}");
+		expect(content).toContain("{-webkit-user-select:none;}");
+		expect(content).toContain("{user-select:none;}");
+	});
+
 	test("should escape style text in metadata and its HTML string", () => {
 		const { createStyles, getMetadata } = createCoulis({
 			properties() {

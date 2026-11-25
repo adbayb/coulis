@@ -91,6 +91,10 @@ export const createCoulis: CreateCoulis<{
 		},
 		setGlobalStyles() {
 			unsupportedLogger.warnUnsupportedMethod("setGlobalStyles");
+
+			return () => {
+				// Nothing to remove.
+			};
 		},
 	};
 };

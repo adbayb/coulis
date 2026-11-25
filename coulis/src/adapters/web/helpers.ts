@@ -73,7 +73,7 @@ export const createCustomProperties = <Theme extends RecordLike>(
 ) => {
 	for (const tokenName of Object.keys(theme) as (keyof Theme)[]) {
 		const value = theme[tokenName];
-		const tokenPath = [...path, String(tokenName)];
+		const tokenPath = [...path, tokenName as string];
 
 		if (isObject(value)) {
 			const nestedOutput = ((output as RecordLike)[tokenName as string] ??=
@@ -102,19 +102,14 @@ export const createCustomProperties = <Theme extends RecordLike>(
  */
 export const getKebabName = (name: string) => {
 	// From JS camelCase to CSS kebab-case
-	return name.replaceAll(/([A-Z])/gu, (matched) => {
-		return `-${matched.toLowerCase()}`;
-	});
+	return name.replaceAll(/[A-Z]/gu, "-$&").toLowerCase();
 };
 
 export const createDeclaration = (kebabName: string, name: string, value: unknown) => {
 	// Format value to follow CSS specs (unitless number)
-	const transformedPropertyValue =
-		typeof value === "string" || UNITLESS_PROPERTIES.has(name)
-			? String(value)
-			: `${String(value)}px`;
+	const unit = typeof value === "string" || UNITLESS_PROPERTIES.has(name) ? "" : "px";
 
-	return `${kebabName}:${transformedPropertyValue};`;
+	return `${kebabName}:${value as string}${unit};`;
 };
 
 export type CompiledTemplate = {
@@ -167,6 +162,12 @@ export const getEvaluatedTemplate = (
 	return output;
 };
 
-export const minify = (input: string) => {
-	return input.replaceAll(/\s{2,}|\s+(?=\{)|\r?\n/gmu, "");
+/**
+ * Serializes a rule as text: `<` is escaped so the CSS text cannot close its `<style>` element.
+ *
+ * @param rule - The rule to serialize.
+ * @returns The serialized rule.
+ */
+export const serializeRule = (rule: string) => {
+	return rule.replaceAll("<", String.raw`\3C `);
 };

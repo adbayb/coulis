@@ -35,11 +35,11 @@ export type CreateCoulis<
 	getContract: () => {
 		propertyNames: (keyof Properties | keyof Shorthands)[];
 	};
-	getMetadata: () => {
+	getMetadata: (html?: string) => {
 		attributes: Record<"data-coulis-cache" | "data-coulis-type", string>;
 		content: string;
 	}[] & { toString: () => string };
-	setGlobalStyles: (input: GlobalStyles<Properties, Shorthands>) => void;
+	setGlobalStyles: (input: GlobalStyles<Properties, Shorthands>) => () => void;
 };
 
 type ResolveTheme<WithCSSVariables extends boolean, Theme> = Theme extends RecordLike

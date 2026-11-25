@@ -201,6 +201,9 @@ describe("createCoulis (port)", () => {
 	});
 
 	test("should type `getMetadata`", () => {
+		expectTypeOf(coulis.getMetadata).toBeCallableWith();
+		expectTypeOf(coulis.getMetadata).toBeCallableWith('<div class="c1"></div>');
+
 		expectTypeOf(coulis.getMetadata).returns.toEqualTypeOf<
 			{
 				attributes: Record<"data-coulis-cache" | "data-coulis-type", string>;
@@ -210,7 +213,7 @@ describe("createCoulis (port)", () => {
 	});
 
 	test("should type `setGlobalStyles`", () => {
-		expectTypeOf(coulis.setGlobalStyles).returns.toBeVoid();
+		expectTypeOf(coulis.setGlobalStyles).returns.toEqualTypeOf<() => void>();
 
 		coulis.setGlobalStyles({
 			"*,*::before,*::after": {
@@ -275,7 +278,9 @@ const createCoulisFake: CreateCoulis<{
 			return [];
 		},
 		setGlobalStyles() {
-			// No op
+			return () => {
+				// No op
+			};
 		},
 	};
 };

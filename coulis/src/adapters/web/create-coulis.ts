@@ -1,10 +1,10 @@
 import type { RecordLike } from "../../core/entities/primitive";
-import { isNumeric, isObject } from "../../core/entities/primitive";
+import { isObject } from "../../core/entities/primitive";
 import type { StatesLike } from "../../core/entities/state";
 import type { StyleType } from "../../core/entities/style";
 import { resolvePropertyValue, STYLE_TYPES } from "../../core/entities/style";
 import type { CreateCoulis } from "../../core/ports/create-coulis";
-import { IS_SERVER_ENVIRONMENT, SHORTHAND_PROPERTIES } from "./constants";
+import { SHORTHAND_PROPERTIES } from "./constants";
 import type { CompiledTemplate } from "./helpers";
 import {
 	createClassName,
@@ -15,9 +15,9 @@ import {
 	getKebabName,
 	memoize,
 } from "./helpers";
-import { createDomStyleSheet } from "./stylesheet/dom";
-import { createVirtualStyleSheet } from "./stylesheet/virtual";
-import type { ClassName, Rule, StyleSheet } from "./types";
+import type { StyleSheet } from "./stylesheet";
+import { createStyleSheet } from "./stylesheet";
+import type { ClassName, Rule } from "./types";
 
 /**
  * Creates a web instance that generates atomic CSS rules for browser injection and server-side
@@ -34,28 +34,21 @@ export const createCoulis: CreateCoulis<{
 }> = (contract) => {
 	const sheets = Object.fromEntries(
 		STYLE_TYPES.map((type) => {
-			const sheet = IS_SERVER_ENVIRONMENT
-				? createVirtualStyleSheet(type)
-				: createDomStyleSheet(type);
-
-			return [
-				type,
-				{
-					classNames: new Map<string, ClassName>(),
-					hydrated: new Set(sheet.getHydratedClassNames()),
-					inserted: [] as ClassName[],
-					sheet,
-				},
-			];
+			return [type, createStyleSheet(type)];
 		}),
-	) as Record<StyleType, CachedStyleSheet>;
+	) as Record<StyleType, StyleSheet>;
 
+	/**
+	 * Class name by cache input, shared by all style types: cache inputs never collide across types
+	 * (declarations, state-prefixed declarations, and serialized global inputs).
+	 */
+	const classNameByCacheInput = new Map<string, ClassName>();
 	let rootDeclarations = "";
 
 	const properties = contract.properties(
 		(contract.theme &&
 			createCustomProperties(contract.theme, (name, value) => {
-				rootDeclarations += `${name}:${String(value)};`;
+				rootDeclarations += `${name}:${value as string};`;
 			})) as Parameters<typeof contract.properties>[0],
 	);
 
@@ -68,7 +61,7 @@ export const createCoulis: CreateCoulis<{
 	for (const [name, template] of Object.entries(states)) {
 		if (!template.includes("coulis[selector]") || !template.includes("coulis[declaration]")) {
 			throw new Error(
-				`The \`${name}\` state must include \`coulis[selector]\` and \`coulis[declaration]\` template markers.`,
+				`The \`${name}\` state must include \`coulis[selector]\` and \`coulis[declaration]\` markers.`,
 			);
 		}
 
@@ -104,23 +97,15 @@ export const createCoulis: CreateCoulis<{
 		cacheInput: string,
 		createRule: (className: ClassName) => Rule,
 	): ClassName => {
-		const { classNames, hydrated, inserted, sheet } = sheets[type];
-		let className = classNames.get(cacheInput);
+		let className = classNameByCacheInput.get(cacheInput);
 
 		if (className !== undefined) {
 			return className;
 		}
 
 		className = createClassName(cacheInput);
-
-		const rule = createRule(className);
-
-		if (!hydrated.has(className)) {
-			sheet.setRule(className, rule);
-			inserted.push(className);
-		}
-
-		classNames.set(cacheInput, className);
+		sheets[type].setRule(className, createRule);
+		classNameByCacheInput.set(cacheInput, className);
 
 		return className;
 	};
@@ -181,9 +166,13 @@ export const createCoulis: CreateCoulis<{
 		return declarationBlock;
 	};
 
-	getOrCreateClassName("global", rootDeclarations, () => {
-		return `:root{${rootDeclarations}}`;
-	});
+	if (rootDeclarations) {
+		getOrCreateClassName("global", rootDeclarations, () => {
+			return `:root{${rootDeclarations}}`;
+		});
+	}
+
+	const globalReferenceCounts = new Map<ClassName, number>();
 
 	return {
 		/**
@@ -213,7 +202,7 @@ export const createCoulis: CreateCoulis<{
 						continue;
 					}
 
-					const ruleSelector = isNumeric(selector) ? `${selector}%` : selector;
+					const ruleSelector = Number.isNaN(Number(selector)) ? selector : `${selector}%`;
 
 					rule += `${ruleSelector}{${createDeclarationBlock(style)}}`;
 				}
@@ -287,28 +276,50 @@ export const createCoulis: CreateCoulis<{
 		 * Call this **After** rendering your component tree (e.g. After `renderToString`) to
 		 * collect all styles generated during that render.
 		 *
-		 * @example
-		 * 	const html = `<head>${String(getMetadata())}</head><body>${body}</body>`;
+		 * Styles are cached for the instance lifetime (shared by every request on a server). Pass
+		 * the rendered HTML to only keep the atomic rules whose class names are used in it (global
+		 * rules and keyframes are always kept).
 		 *
+		 * @example
+		 * 	const body = renderToString(<App />);
+		 * 	const html = `<head>${String(getMetadata(body))}</head><body>${body}</body>`;
+		 *
+		 * @param html - The rendered HTML to extract the critical styles from.
 		 * @returns Metadata object.
 		 */
-		getMetadata() {
+		getMetadata(html) {
+			// Class attributes repeat a lot: deduplicating them first avoids splitting each occurrence.
+			const usedClassNames =
+				html === undefined
+					? undefined
+					: new Set(
+							[...new Set(html.match(/class="[^"]*/gu))].flatMap((attribute) => {
+								return attribute.slice(7).split(" ");
+							}),
+						);
+
+			let styleElements = "";
+
 			const metadata = STYLE_TYPES.map((type) => {
+				const { classNames, content } = sheets[type].getMetadata(
+					type === "global" ? undefined : usedClassNames,
+				);
+
+				const cache = classNames.join(",");
+
+				styleElements += `<style data-coulis-cache="${cache}" data-coulis-type="${type}">${content}</style>`;
+
 				return {
 					attributes: {
-						"data-coulis-cache": sheets[type].inserted.join(","),
+						"data-coulis-cache": cache,
 						"data-coulis-type": type,
 					},
-					content: escapeStyleContent(sheets[type].sheet.getContent()),
+					content,
 				};
 			});
 
 			metadata.toString = () => {
-				return metadata
-					.map(({ attributes, content }) => {
-						return `<style data-coulis-cache="${attributes["data-coulis-cache"]}" data-coulis-type="${attributes["data-coulis-type"]}">${content}</style>`;
-					})
-					.join("");
+				return styleElements;
 			};
 
 			return metadata;
@@ -318,16 +329,23 @@ export const createCoulis: CreateCoulis<{
 		 * `@charset`, and any other top-level CSS constructs. Rules are deduplicated — calling this
 		 * multiple times with the same input only injects once.
 		 *
+		 * Returns a function removing the rules, to call once. Calls with the same input are
+		 * reference counted: the rules are removed once every caller has removed them (e.g. nested
+		 * providers setting the same theme-dependent rules).
+		 *
 		 * @example
-		 * 	setGlobalStyles({
+		 * 	const removeGlobalStyles = setGlobalStyles({
 		 * 		"html,body": { margin: "none", padding: "none" },
 		 * 		"@import": "url('https://fonts.googleapis.com/css?family=Open+Sans')",
 		 * 	});
 		 *
 		 * @param input - Style properties.
+		 * @returns A function removing the rules.
 		 */
 		setGlobalStyles(input) {
-			getOrCreateClassName("global", JSON.stringify(input), () => {
+			const cacheInput = JSON.stringify(input);
+
+			const createRule = () => {
 				let rule = "";
 
 				for (const selector of Object.keys(input)) {
@@ -344,16 +362,24 @@ export const createCoulis: CreateCoulis<{
 				}
 
 				return rule;
-			});
+			};
+
+			const className = getOrCreateClassName("global", cacheInput, createRule);
+
+			globalReferenceCounts.set(className, (globalReferenceCounts.get(className) ?? 0) + 1);
+
+			return () => {
+				const count = (globalReferenceCounts.get(className) ?? 1) - 1;
+
+				globalReferenceCounts.set(className, count);
+
+				if (count === 0) {
+					classNameByCacheInput.delete(cacheInput);
+					sheets.global.removeRule(className, createRule());
+				}
+			};
 		},
 	};
-};
-
-type CachedStyleSheet = {
-	classNames: Map<string, ClassName>;
-	hydrated: Set<ClassName>;
-	inserted: ClassName[];
-	sheet: StyleSheet;
 };
 
 type Property = {
@@ -365,14 +391,13 @@ type Property = {
 	isCSSShorthand: boolean;
 };
 
+/**
+ * Picks the style type from `STYLE_TYPES` order: (at-)shorthand types precede (at-)longhand ones.
+ *
+ * @param isCSSShorthand - Whether the property is a CSS shorthand.
+ * @param isAtRule - Whether the rule is an at-rule.
+ * @returns The style type.
+ */
 const getStyleType = (isCSSShorthand: boolean, isAtRule: boolean): StyleType => {
-	if (isAtRule) {
-		return isCSSShorthand ? "atShorthand" : "atLonghand";
-	}
-
-	return isCSSShorthand ? "shorthand" : "longhand";
-};
-
-const escapeStyleContent = (content: string) => {
-	return content.replaceAll("<", String.raw`\3C `);
+	return STYLE_TYPES[(isAtRule ? 3 : 1) + Number(!isCSSShorthand)] as StyleType;
 };

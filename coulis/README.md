@@ -157,7 +157,7 @@ import { coulis } from "./helpers/coulis"; // Factory instance created via `crea
 
 export const renderHtml = () => {
 	const bodyContent = renderToString(<App />);
-	const headContent = String(coulis.getMetadata()); // Must be get after the `renderToString` traversal to retrieve generated styles.
+	const headContent = String(coulis.getMetadata(bodyContent)); // Must be get after the `renderToString` traversal to retrieve generated styles.
 
 	return `<html>
 		<head>
@@ -169,6 +169,10 @@ export const renderHtml = () => {
 	</html>`;
 };
 ```
+
+Styles are cached for the instance lifetime, so a server instance shares them across requests. Passing the rendered HTML to `getMetadata` keeps only the atomic rules whose class names are used in it (global rules and keyframes are always kept), so each page ships its own critical CSS. Without an argument (e.g. with streaming rendering, where the full HTML is not available), every style generated so far is returned.
+
+In the browser, rules are inserted synchronously: styles apply as soon as `createStyles` returns, so layout reads made right after (for example, in React layout effects) see the styled layout.
 
 For more server-side integration recipes, the following examples can be checked:
 
@@ -182,6 +186,33 @@ For more server-side integration recipes, the following examples can be checked:
     - Welcome to any contribution.
 - **...**
     - Welcome to any contribution.
+
+### How to update or remove global styles?
+
+`setGlobalStyles` returns a function that removes the rules. Calls with the same input are reference counted: rules are removed once every caller has removed them. It allows, for example, theme-dependent global styles set by nested providers:
+
+```tsx
+useInsertionEffect(() => {
+	return setGlobalStyles({
+		body: { backgroundColor: theme.surface, color: theme.text },
+	});
+}, [theme]);
+```
+
+### How to add vendor prefixes?
+
+Coulis outputs only the declarations you write. Declare prefixed properties and expand them with a shorthand of the same name:
+
+```ts
+const { createStyles } = createCoulis({
+	properties() {
+		return { userSelect: true, WebkitUserSelect: true };
+	},
+	shorthands: {
+		userSelect: ["WebkitUserSelect", "userSelect"], // `userSelect: "none"` outputs `-webkit-user-select:none` and `user-select:none`
+	},
+});
+```
 
 ### How to use Coulis with React Native?
 

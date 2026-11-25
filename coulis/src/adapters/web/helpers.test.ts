@@ -7,7 +7,7 @@ import {
 	escape,
 	getEvaluatedTemplate,
 	getKebabName,
-	minify,
+	serializeRule,
 } from "./helpers";
 
 describe(escape, () => {
@@ -168,16 +168,10 @@ describe(getEvaluatedTemplate, () => {
 	});
 });
 
-describe(minify, () => {
-	test("should remove newlines", () => {
-		expect(minify("a {\n  color: red;\n}")).toBe("a{color: red;}");
-	});
-
-	test("should collapse multiple spaces", () => {
-		expect(minify("a {  color:  red; }")).toBe("a{color:red; }");
-	});
-
-	test("should remove whitespace before opening braces", () => {
-		expect(minify("a {color: red;}")).toBe("a{color: red;}");
+describe(serializeRule, () => {
+	test("should escape `<` to not close the <style> element", () => {
+		expect(serializeRule('a::after{content:"</style>";}')).toBe(
+			String.raw`a::after{content:"\3C /style>";}`,
+		);
 	});
 });

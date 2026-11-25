@@ -6,18 +6,19 @@ export type ClassName = string;
 export type Rule = string;
 
 export type StyleSheet = {
+	/** Removes a rule. Only supported for the `global` sheet: atomic rules are never removed. */
+	removeRule: (className: ClassName, rule: Rule) => void;
 	/**
 	 * Returns the class names and CSS text of the rules inserted by this runtime (rules hydrated
 	 * from server metadata are excluded).
 	 *
 	 * @param usedClassNames - If set, only keeps the rules of these class names (critical styles).
+	 *   Ignored by the `global` sheet, whose rules are always kept.
 	 */
-	getMetadata: (usedClassNames?: Set<ClassName>) => {
+	serialize: (usedClassNames?: Set<ClassName>) => {
 		classNames: ClassName[];
 		content: string;
 	};
-	/** Removes a rule. Only supported for the `global` sheet: atomic rules are never removed. */
-	removeRule: (className: ClassName, rule: Rule) => void;
 	/** Inserts a rule unless its class name is already in the sheet. */
 	setRule: (className: ClassName, createRule: (className: ClassName) => Rule) => void;
 };
@@ -68,19 +69,6 @@ export const createStyleSheet = (type: StyleType): StyleSheet => {
 	}
 
 	return {
-		getMetadata(usedClassNames) {
-			const classNames: ClassName[] = [];
-			let content = "";
-
-			for (const [className, rule] of ruleByClassName) {
-				if (rule && (!usedClassNames || usedClassNames.has(className))) {
-					classNames.push(className);
-					content += rule;
-				}
-			}
-
-			return { classNames, content };
-		},
 		removeRule(className, rule) {
 			ruleByClassName.delete(className);
 
@@ -88,6 +76,22 @@ export const createStyleSheet = (type: StyleType): StyleSheet => {
 				// Hydrated and client-inserted global rules share the same serialization.
 				element.textContent = element.textContent.replace(serializeRule(rule), "");
 			}
+		},
+		serialize(usedClassNames) {
+			const classNames: ClassName[] = [];
+			let content = "";
+
+			for (const [className, rule] of ruleByClassName) {
+				if (
+					rule &&
+					(!usedClassNames || type === "global" || usedClassNames.has(className))
+				) {
+					classNames.push(className);
+					content += rule;
+				}
+			}
+
+			return { classNames, content };
 		},
 		setRule(className, createRule) {
 			if (ruleByClassName.has(className)) {

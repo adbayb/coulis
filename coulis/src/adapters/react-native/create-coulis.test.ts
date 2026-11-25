@@ -90,7 +90,8 @@ describe("createCoulis (react-native adapter)", () => {
 
 	test.each([
 		["createKeyframes", {}],
-		["getMetadata", []],
+		["getCriticalStyleSheets", []],
+		["getStyleSheets", []],
 		["setGlobalStyles", expect.any(Function)],
 	] as const)("should %s log a warning and do nothing", (method, expected) => {
 		const instance = createInstance();

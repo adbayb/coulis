@@ -145,10 +145,16 @@ export const App = () => {
 
 ### How to implement server-side rendering?
 
-Coulis provides a dedicated method called `getMetadata` that allows collecting style instructions for injecting into the `<head />` section of the web page.  
-Its primary use case is server-side rendering. The getter helps prevent the FOUC (Flash Of Unstyled Content) issue, where the user briefly sees the unstyled content before the styles are applied on the browser side.
+Rendering style sheets on the server prevents FOUC (Flash Of Unstyled Content), where the user briefly sees unstyled content before styles apply in the browser. Coulis provides two methods returning the style sheets to render in the `<head />`, as `{ attributes, content }` objects (`String()` on the result gives the `<style>` tags):
 
-Here's a vanilla React integration example generating HTML content:
+| Method                         | Returns                                                                                        | Use when                                                      |
+| ------------------------------ | ---------------------------------------------------------------------------------------------- | ------------------------------------------------------------- |
+| `getCriticalStyleSheets(html)` | The style sheets a rendered HTML needs: its atomic rules, plus every global rule and keyframes | The rendered HTML is available (e.g. `renderToString`)        |
+| `getStyleSheets()`             | Every style sheet generated so far by the instance                                             | The rendered HTML is not available (e.g. streaming rendering) |
+
+Styles are cached for the instance lifetime, so a server instance shares them across requests: prefer `getCriticalStyleSheets` so each page only ships its own CSS.
+
+With the rendered HTML (critical styles):
 
 ```tsx
 import { renderToString } from "react-dom/server";
@@ -157,7 +163,7 @@ import { coulis } from "./helpers/coulis"; // Factory instance created via `crea
 
 export const renderHtml = () => {
 	const bodyContent = renderToString(<App />);
-	const headContent = String(coulis.getMetadata(bodyContent));
+	const headContent = String(coulis.getCriticalStyleSheets(bodyContent));
 
 	return `<html>
 		<head>
@@ -170,7 +176,21 @@ export const renderHtml = () => {
 };
 ```
 
-Styles are cached for the instance lifetime, so a server instance shares them across requests. Passing the rendered HTML to `getMetadata` keeps only the atomic rules whose class names are used in it (global rules and keyframes are always kept), so each page ships its own critical CSS. Without an argument (e.g. with streaming rendering, where the full HTML is not available), every style generated so far is returned.
+With streaming rendering (here, the Next.js app router), call `getStyleSheets` once the styles are generated:
+
+```tsx
+useServerInsertedHTML(() => {
+	return getStyleSheets().map(({ attributes, content }) => {
+		return (
+			<style
+				{...attributes}
+				key={attributes["data-coulis-type"]}
+				dangerouslySetInnerHTML={{ __html: content }}
+			/>
+		);
+	});
+});
+```
 
 In the browser, rules are inserted synchronously: styles apply as soon as `createStyles` returns, so layout reads made right after (for example, in React layout effects) see the styled layout.
 
@@ -224,12 +244,12 @@ import { createCoulis } from "coulis/react-native";
 
 The API is identical to the web adapter with the following differences:
 
-| Method            | Web                                           | React Native                                       |
-| ----------------- | --------------------------------------------- | -------------------------------------------------- |
-| `createStyles`    | Returns a CSS class name string               | Returns a style object (`Record<string, unknown>`) |
-| `createKeyframes` | Injects `@keyframes` rule, returns class name | ⚠️ Not supported — logs a warning and returns `{}` |
-| `setGlobalStyles` | Injects global CSS rules                      | ⚠️ Not supported — logs a warning and does nothing |
-| `getMetadata`     | Returns injected style sheets (for SSR)       | ⚠️ Not supported — logs a warning and returns `[]` |
+| Method                                     | Web                                           | React Native                                       |
+| ------------------------------------------ | --------------------------------------------- | -------------------------------------------------- |
+| `createStyles`                             | Returns a CSS class name string               | Returns a style object (`Record<string, unknown>`) |
+| `createKeyframes`                          | Injects `@keyframes` rule, returns class name | ⚠️ Not supported — logs a warning and returns `{}` |
+| `setGlobalStyles`                          | Injects global CSS rules                      | ⚠️ Not supported — logs a warning and does nothing |
+| `getStyleSheets`, `getCriticalStyleSheets` | Return style sheets to render (for SSR)       | ⚠️ Not supported — logs a warning and returns `[]` |
 
 Theme values are passed as-is (raw values, not CSS custom properties).
 
@@ -239,7 +259,7 @@ Theme values are passed as-is (raw values, not CSS custom properties).
 
 ### Runtime performance
 
-Median of three runs of `pnpm --filter @coulis/benchmark benchmark`, rendering a 1,000-row React table. Higher throughput is better; dynamic styles are created during each render. The server case renders to a string and extracts its styles (critical styles for Coulis with `getMetadata(html)` and for Emotion with `extractCritical`).
+Median of three runs of `pnpm --filter @coulis/benchmark benchmark`, rendering a 1,000-row React table. Higher throughput is better; dynamic styles are created during each render. The server case renders to a string and extracts its styles (critical styles for Coulis with `getCriticalStyleSheets(html)` and for Emotion with `extractCritical`).
 
 | Runtime         | Coulis |           Emotion |             Goober | styled-components |
 | --------------- | -----: | ----------------: | -----------------: | ----------------: |

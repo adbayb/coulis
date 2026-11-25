@@ -3,7 +3,7 @@
 import { useServerInsertedHTML } from "next/navigation";
 import type { ReactNode } from "react";
 import { useRef } from "react";
-import { getMetadata, setGlobalStyles } from "../helpers/coulis";
+import { getStyleSheets, setGlobalStyles } from "../helpers/coulis";
 
 setGlobalStyles({
 	"*,*::before,*::after": {
@@ -41,7 +41,7 @@ export const CoulisRegistry = ({ children }: CoulisRegistryProps): ReactNode => 
 
 		hasBeenInsertedRef.current = true;
 
-		return getMetadata().map(({ attributes, content }) => {
+		return getStyleSheets().map(({ attributes, content }) => {
 			return (
 				<style
 					{...attributes}

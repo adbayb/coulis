@@ -67,11 +67,11 @@ describe("createCoulis (web adapter)", () => {
 	});
 
 	test("should extract styles", () => {
-		expect(getMetadata()).toMatchSnapshot();
+		expect(getStyleSheets()).toMatchSnapshot();
 	});
 
 	test("should extract styles given stringified styles", () => {
-		expect(String(getMetadata())).toMatchSnapshot();
+		expect(String(getStyleSheets())).toMatchSnapshot();
 	});
 
 	test("should get contract", () => {
@@ -94,7 +94,7 @@ describe("createCoulis (web adapter)", () => {
 	});
 
 	test("should not reuse class names for ambiguous state and declaration pairs", () => {
-		const { createStyles, getMetadata } = createCoulis({
+		const { createStyles, getStyleSheets } = createCoulis({
 			properties() {
 				return {
 					transform: true,
@@ -115,7 +115,7 @@ describe("createCoulis (web adapter)", () => {
 			transform: { "base": "rotate(0deg)", "h-webkit-": "rotate(1deg)" },
 		}).split(" ");
 
-		const cssContent = getMetadata()
+		const cssContent = getStyleSheets()
 			.map(({ content }) => {
 				return content;
 			})
@@ -139,7 +139,7 @@ describe("createCoulis (web adapter)", () => {
 				throw new Error("Transient resolver failure");
 			});
 
-		const { createStyles, getMetadata } = createCoulis({
+		const { createStyles, getStyleSheets } = createCoulis({
 			properties() {
 				return {
 					color: resolveColor,
@@ -155,18 +155,24 @@ describe("createCoulis (web adapter)", () => {
 
 		const className = createStyles(input);
 
-		const metadataContent = getMetadata()
+		const styleSheetsContent = getStyleSheets()
 			.map(({ content: stylesheetContent }) => {
 				return stylesheetContent;
 			})
 			.join("");
 
 		expect(createStyles(input)).toBe(className);
-		expect(metadataContent).toContain(`.${className}{color:red;}`);
+		expect(styleSheetsContent).toContain(`.${className}{color:red;}`);
 	});
 
 	test("should only extract the atomic rules used in a given HTML", () => {
-		const { createKeyframes, createStyles, getMetadata, setGlobalStyles } = createCoulis({
+		const {
+			createKeyframes,
+			createStyles,
+			getCriticalStyleSheets,
+			getStyleSheets,
+			setGlobalStyles,
+		} = createCoulis({
 			properties() {
 				return { animation: true, color: true, display: true };
 			},
@@ -180,15 +186,15 @@ describe("createCoulis (web adapter)", () => {
 		const animationName = createKeyframes({ to: { color: "red" } });
 		const usedClassName = createStyles({ color: { base: "red", hover: "blue" } });
 		const unusedClassName = createStyles({ display: "flex" });
-		const metadata = getMetadata(`<div class="other ${usedClassName}"></div>`);
+		const styleSheets = getCriticalStyleSheets(`<div class="other ${usedClassName}"></div>`);
 
-		const content = metadata
+		const content = styleSheets
 			.map(({ content: sheetContent }) => {
 				return sheetContent;
 			})
 			.join("");
 
-		const cachedClassNames = metadata.flatMap(({ attributes }) => {
+		const cachedClassNames = styleSheets.flatMap(({ attributes }) => {
 			return attributes["data-coulis-cache"].split(",");
 		});
 
@@ -198,18 +204,18 @@ describe("createCoulis (web adapter)", () => {
 		expect(content).not.toContain("display:flex");
 		expect(cachedClassNames).toStrictEqual(expect.arrayContaining(usedClassName.split(" ")));
 		expect(cachedClassNames).not.toContain(unusedClassName);
-		expect(String(getMetadata())).toContain("display:flex");
+		expect(String(getStyleSheets())).toContain("display:flex");
 	});
 
 	test("should remove global styles once every caller has removed them", () => {
-		const { getMetadata, setGlobalStyles } = createCoulis({
+		const { getStyleSheets, setGlobalStyles } = createCoulis({
 			properties() {
 				return { color: true };
 			},
 		});
 
 		const getContent = () => {
-			return getMetadata()
+			return getStyleSheets()
 				.map(({ content }) => {
 					return content;
 				})
@@ -236,7 +242,7 @@ describe("createCoulis (web adapter)", () => {
 		["applies property maps", { padding: "small" }, "padding:4px;"],
 		["applies property functions", { margin: 2 }, "margin:2rem;"],
 	])("should create declarations that %s", (_, input, declaration) => {
-		const { createStyles, getMetadata } = createCoulis({
+		const { createStyles, getStyleSheets } = createCoulis({
 			properties() {
 				return {
 					backgroundColor: true,
@@ -251,21 +257,21 @@ describe("createCoulis (web adapter)", () => {
 		});
 
 		createStyles(input as Parameters<typeof createStyles>[0]);
-		expect(String(getMetadata())).toContain(`{${declaration}}`);
+		expect(String(getStyleSheets())).toContain(`{${declaration}}`);
 	});
 
 	test("should not create a :root rule without theme", () => {
-		const { getMetadata } = createCoulis({
+		const { getStyleSheets } = createCoulis({
 			properties() {
 				return { color: true };
 			},
 		});
 
-		expect(String(getMetadata())).not.toContain(":root");
+		expect(String(getStyleSheets())).not.toContain(":root");
 	});
 
 	test("should prefix properties declared as shorthands", () => {
-		const { createStyles, getMetadata, setGlobalStyles } = createCoulis({
+		const { createStyles, getStyleSheets, setGlobalStyles } = createCoulis({
 			properties() {
 				return {
 					textSizeAdjust: true,
@@ -283,14 +289,14 @@ describe("createCoulis (web adapter)", () => {
 		setGlobalStyles({ html: { textSizeAdjust: "100%" } });
 		createStyles({ userSelect: "none" });
 
-		const content = String(getMetadata());
+		const content = String(getStyleSheets());
 
 		expect(content).toContain("html{-webkit-text-size-adjust:100%;text-size-adjust:100%;}");
 		expect(content).toContain("{-webkit-user-select:none;user-select:none;}");
 	});
 
 	test("should create one class name per shorthand and state", () => {
-		const { createStyles, getMetadata } = createCoulis({
+		const { createStyles, getStyleSheets } = createCoulis({
 			properties() {
 				return { paddingLeft: true, paddingRight: true };
 			},
@@ -303,7 +309,7 @@ describe("createCoulis (web adapter)", () => {
 		});
 
 		const classNames = createStyles({ paddingHorizontal: { base: 1, hover: 2 } }).split(" ");
-		const content = String(getMetadata());
+		const content = String(getStyleSheets());
 
 		expect(classNames).toHaveLength(2);
 		expect(content).toContain(`.${classNames[0]}{padding-left:1px;padding-right:1px;}`);
@@ -311,7 +317,7 @@ describe("createCoulis (web adapter)", () => {
 	});
 
 	test("should skip unset values", () => {
-		const { createStyles, getMetadata } = createCoulis({
+		const { createStyles, getStyleSheets } = createCoulis({
 			properties() {
 				return { color: true, width: true };
 			},
@@ -326,11 +332,11 @@ describe("createCoulis (web adapter)", () => {
 		});
 
 		expect(className.split(" ")).toHaveLength(1);
-		expect(String(getMetadata())).not.toContain("undefined");
+		expect(String(getStyleSheets())).not.toContain("undefined");
 	});
 
-	test("should escape style text in metadata and its HTML string", () => {
-		const { createStyles, getMetadata } = createCoulis({
+	test("should escape style text in styleSheets and its HTML string", () => {
+		const { createStyles, getStyleSheets } = createCoulis({
 			properties() {
 				return { color: true };
 			},
@@ -338,19 +344,19 @@ describe("createCoulis (web adapter)", () => {
 
 		createStyles({ color: "red</style><script>globalThis.auditXss=1</script>" });
 
-		const metadata = getMetadata();
+		const styleSheets = getStyleSheets();
 
-		const metadataContent = metadata
+		const styleSheetsContent = styleSheets
 			.map(({ content: stylesheetContent }) => {
 				return stylesheetContent;
 			})
 			.join("");
 
-		const serializedMetadata = String(metadata);
+		const serializedMetadata = String(styleSheets);
 		const escapedStyleText = String.raw`red\3C /style>\3C script>globalThis.auditXss=1\3C /script>`;
 
-		expect(metadataContent).toContain(escapedStyleText);
-		expect(metadataContent).not.toContain("<script>");
+		expect(styleSheetsContent).toContain(escapedStyleText);
+		expect(styleSheetsContent).not.toContain("<script>");
 		expect(serializedMetadata).toContain(escapedStyleText);
 		expect(serializedMetadata).not.toContain("<script>");
 	});
@@ -377,39 +383,40 @@ const tokens = Object.freeze({
 	},
 } as const);
 
-const { createKeyframes, createStyles, getContract, getMetadata, setGlobalStyles } = createCoulis({
-	properties(theme) {
-		return {
-			backgroundColor: theme.colors,
-			boxSizing: true,
-			color: theme.colors,
-			colorScheme(input: "black" | "white") {
-				return input === "black" ? "dark" : "light";
-			},
-			fontFamily: true,
-			height: true,
-			margin: theme.spacings,
-			padding: theme.spacings,
-			src: true,
-			transform: true,
-			width: [50, 100],
-		};
-	},
-	shorthands: {
-		size: ["width"],
-	},
-	states: {
-		alt: "coulis[selector][alt]{coulis[declaration]}",
-		hover: "coulis[selector]{coulis[declaration]}",
-	},
-	theme: {
-		colors: {
-			neutralDark: tokens.colors.black,
-			neutralLight: tokens.colors.white,
-			neutralTransparent: tokens.colors.transparent,
-			surfacePrimary: tokens.colors.blue[4],
-			surfaceSecondary: tokens.colors.blue[2],
+const { createKeyframes, createStyles, getContract, getStyleSheets, setGlobalStyles } =
+	createCoulis({
+		properties(theme) {
+			return {
+				backgroundColor: theme.colors,
+				boxSizing: true,
+				color: theme.colors,
+				colorScheme(input: "black" | "white") {
+					return input === "black" ? "dark" : "light";
+				},
+				fontFamily: true,
+				height: true,
+				margin: theme.spacings,
+				padding: theme.spacings,
+				src: true,
+				transform: true,
+				width: [50, 100],
+			};
 		},
-		spacings: tokens.spacings,
-	},
-});
+		shorthands: {
+			size: ["width"],
+		},
+		states: {
+			alt: "coulis[selector][alt]{coulis[declaration]}",
+			hover: "coulis[selector]{coulis[declaration]}",
+		},
+		theme: {
+			colors: {
+				neutralDark: tokens.colors.black,
+				neutralLight: tokens.colors.white,
+				neutralTransparent: tokens.colors.transparent,
+				surfacePrimary: tokens.colors.blue[4],
+				surfaceSecondary: tokens.colors.blue[2],
+			},
+			spacings: tokens.spacings,
+		},
+	});

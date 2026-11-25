@@ -84,8 +84,13 @@ export const createCoulis: CreateCoulis<{
 				] as ReturnType<typeof this.getContract>["propertyNames"],
 			};
 		},
-		getMetadata() {
-			unsupportedLogger.warnUnsupportedMethod("getMetadata");
+		getCriticalStyleSheets() {
+			unsupportedLogger.warnUnsupportedMethod("getCriticalStyleSheets");
+
+			return [];
+		},
+		getStyleSheets() {
+			unsupportedLogger.warnUnsupportedMethod("getStyleSheets");
 
 			return [];
 		},

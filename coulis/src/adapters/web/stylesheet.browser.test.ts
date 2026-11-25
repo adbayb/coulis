@@ -31,7 +31,7 @@ describe("createStyleSheet (browser)", () => {
 			".c2 { display: flex; }",
 		]);
 
-		expect(sheet.getMetadata()).toStrictEqual({
+		expect(sheet.serialize()).toStrictEqual({
 			classNames: ["c1", "c2"],
 			content: redColorRule + flexDisplayRule,
 		});
@@ -102,7 +102,7 @@ describe("createStyleSheet (browser)", () => {
 
 		sheet.setRule("c1", createRule);
 		expect(createRule).not.toHaveBeenCalled();
-		expect(sheet.getMetadata()).toStrictEqual({ classNames: [], content: "" });
+		expect(sheet.serialize()).toStrictEqual({ classNames: [], content: "" });
 	});
 
 	test("should share inserted rules across sheets of the same element", () => {
@@ -129,11 +129,11 @@ describe("createStyleSheet (browser)", () => {
 	test("should not reinsert styles hydrated from server metadata", () => {
 		const server = createStatefulWebInstance();
 		const className = server.createStyles({ color: "red" });
-		const serverMetadata = server.getMetadata();
+		const serverStyleSheets = server.getStyleSheets();
 
 		document.head.innerHTML = "";
 
-		for (const { attributes, content } of serverMetadata) {
+		for (const { attributes, content } of serverStyleSheets) {
 			appendStyleElement(
 				attributes["data-coulis-type"],
 				attributes["data-coulis-cache"],

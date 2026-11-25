@@ -1,6 +1,6 @@
 import { createCoulis } from "coulis";
 
-export const { createStyles, getMetadata } = createCoulis({
+export const { createStyles, getCriticalStyleSheets } = createCoulis({
 	properties() {
 		return {
 			backgroundColor: true,

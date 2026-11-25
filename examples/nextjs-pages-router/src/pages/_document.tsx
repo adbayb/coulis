@@ -1,6 +1,6 @@
 import type { DocumentContext } from "next/document";
 import Document, { Head, Html, Main, NextScript } from "next/document";
-import { getMetadata } from "../helpers/coulis";
+import { getCriticalStyleSheets } from "../helpers/coulis";
 
 class MyDocument extends Document {
 	public static override async getInitialProps(context: DocumentContext) {
@@ -11,7 +11,7 @@ class MyDocument extends Document {
 			styles: (
 				<>
 					{initialProps.styles}
-					{getMetadata(initialProps.html).map(({ attributes, content }) => {
+					{getCriticalStyleSheets(initialProps.html).map(({ attributes, content }) => {
 						return (
 							<style
 								{...attributes}

@@ -9,7 +9,7 @@ describe("createStyleSheet (server)", () => {
 		sheet.setRule("c2", createFlexDisplayRule);
 		sheet.setRule("c1", createFlexDisplayRule);
 
-		expect(sheet.getMetadata()).toStrictEqual({
+		expect(sheet.serialize()).toStrictEqual({
 			classNames: ["c1", "c2"],
 			content: ".c1{color:red;}.c2{display:flex;}",
 		});
@@ -21,7 +21,7 @@ describe("createStyleSheet (server)", () => {
 		sheet.setRule("c1", createRedColorRule);
 		sheet.setRule("c2", createFlexDisplayRule);
 
-		expect(sheet.getMetadata(new Set(["c2"]))).toStrictEqual({
+		expect(sheet.serialize(new Set(["c2"]))).toStrictEqual({
 			classNames: ["c2"],
 			content: ".c2{display:flex;}",
 		});
@@ -32,7 +32,7 @@ describe("createStyleSheet (server)", () => {
 
 		sheet.setRule("c1", createRedColorRule);
 		sheet.removeRule("c1", ".c1{color:red;}");
-		expect(sheet.getMetadata().content).toBe("");
+		expect(sheet.serialize().content).toBe("");
 	});
 });
 

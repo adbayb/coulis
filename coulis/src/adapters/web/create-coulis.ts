@@ -185,6 +185,31 @@ export const createCoulis: CreateCoulis<{
 
 	const globalReferenceCounts = new Map<ClassName, number>();
 
+	const serializeStyleSheets = (usedClassNames?: Set<ClassName>) => {
+		let styleElements = "";
+
+		const styleSheets = STYLE_TYPES.map((type) => {
+			const { classNames, content } = sheets[type].serialize(usedClassNames);
+			const cache = classNames.join(",");
+
+			styleElements += `<style data-coulis-cache="${cache}" data-coulis-type="${type}">${content}</style>`;
+
+			return {
+				attributes: {
+					"data-coulis-cache": cache,
+					"data-coulis-type": type,
+				},
+				content,
+			};
+		});
+
+		styleSheets.toString = () => {
+			return styleElements;
+		};
+
+		return styleSheets;
+	};
+
 	return {
 		/**
 		 * Creates a CSS `@keyframes` animation rule from a map of keyframe selectors (e.g.
@@ -274,61 +299,43 @@ export const createCoulis: CreateCoulis<{
 			};
 		},
 		/**
-		 * Returns the collected style sheets as an array of metadata objects, each containing the
-		 * `content` (CSS text) and `attributes` to set on the `<style>` element. Calling
-		 * `.toString()` on the result produces a ready-to- inject HTML string of `<style>` tags.
-		 *
-		 * Call this **After** rendering your component tree (e.g. After `renderToString`) to
-		 * collect all styles generated during that render.
-		 *
-		 * Styles are cached for the instance lifetime (shared by every request on a server). Pass
-		 * the rendered HTML to only keep the atomic rules whose class names are used in it (global
-		 * rules and keyframes are always kept).
+		 * Returns the style sheets a rendered HTML needs (critical styles): the atomic rules whose
+		 * class names are used in the HTML, plus every global rule and keyframes. Same output as
+		 * `getStyleSheets`.
 		 *
 		 * @example
 		 * 	const body = renderToString(<App />);
-		 * 	const html = `<head>${String(getMetadata(body))}</head><body>${body}</body>`;
+		 * 	const html = `<head>${String(getCriticalStyleSheets(body))}</head><body>${body}</body>`;
 		 *
-		 * @param html - The rendered HTML to extract the critical styles from.
-		 * @returns Metadata object.
+		 * @param html - The rendered HTML.
+		 * @returns The style sheets.
 		 */
-		getMetadata(html) {
-			// Class attributes repeat a lot: deduplicating them first avoids splitting each occurrence.
-			const usedClassNames =
-				html === undefined
-					? undefined
-					: new Set(
-							[...new Set(html.match(/class="[^"]*/gu))].flatMap((attribute) => {
-								return attribute.slice(7).split(" ");
-							}),
-						);
+		getCriticalStyleSheets(html) {
+			/*
+			 * Class attributes repeat a lot: they are deduplicated before collecting their words (class
+			 * names are base-36 hashes, so words are enough to find them).
+			 */
+			const classAttributes = [...new Set(html.match(/class="[^"]*/gu))].join(" ");
 
-			let styleElements = "";
-
-			const metadata = STYLE_TYPES.map((type) => {
-				const { classNames, content } = sheets[type].getMetadata(
-					type === "global" ? undefined : usedClassNames,
-				);
-
-				const cache = classNames.join(",");
-
-				styleElements += `<style data-coulis-cache="${cache}" data-coulis-type="${type}">${content}</style>`;
-
-				return {
-					attributes: {
-						"data-coulis-cache": cache,
-						"data-coulis-type": type,
-					},
-					content,
-				};
-			});
-
-			metadata.toString = () => {
-				return styleElements;
-			};
-
-			return metadata;
+			return serializeStyleSheets(new Set(classAttributes.match(/\w+/gu)));
 		},
+		/**
+		 * Returns every style sheet generated so far by the instance, as an array of `{ attributes,
+		 * content }` objects to render as `<style>` elements. `String()` on the result gives the
+		 * `<style>` tags.
+		 *
+		 * Styles are cached for the instance lifetime and shared by every request on a server: use
+		 * it when the rendered HTML is not available (e.g. streaming rendering). Call it after
+		 * rendering to include the styles generated during the render.
+		 *
+		 * @example
+		 * 	useServerInsertedHTML(() => {
+		 * 		return <div dangerouslySetInnerHTML={{ __html: String(getStyleSheets()) }} />;
+		 * 	});
+		 *
+		 * @returns The style sheets.
+		 */
+		getStyleSheets: serializeStyleSheets,
 		/**
 		 * Injects global (non-component) CSS rules: element selectors, `@import`, `@font-face`,
 		 * `@charset`, and any other top-level CSS constructs. Rules are deduplicated — calling this

@@ -34,10 +34,8 @@ export type CreateCoulis<
 	getContract: () => {
 		propertyNames: (keyof Properties | keyof Shorthands)[];
 	};
-	getMetadata: (html?: string) => {
-		attributes: Record<"data-coulis-cache" | "data-coulis-type", string>;
-		content: string;
-	}[] & { toString: () => string };
+	getCriticalStyleSheets: (html: string) => StyleSheets;
+	getStyleSheets: () => StyleSheets;
 	setGlobalStyles: (input: GlobalStyles<Properties, Shorthands>) => () => void;
 };
 
@@ -46,3 +44,9 @@ type ResolveTheme<WithCSSVariables extends boolean, Theme> = Theme extends Recor
 		? Theme
 		: WithNewLeafNodes<Theme, string>
 	: undefined;
+
+/** Style sheets to render as `<style>` elements. `String()` gives the `<style>` tags. */
+type StyleSheets = {
+	attributes: Record<"data-coulis-cache" | "data-coulis-type", string>;
+	content: string;
+}[] & { toString: () => string };

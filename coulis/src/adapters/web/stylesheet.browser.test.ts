@@ -9,12 +9,7 @@ describe("createStyleSheet (browser)", () => {
 		document.body.innerHTML = "";
 	});
 
-	test("should create a <style> element in <head>", () => {
-		createStyleSheet("longhand");
-		expect(document.head.querySelector(longhandSelector)).not.toBeNull();
-	});
-
-	test("should reuse an existing <style> element on repeated calls", () => {
+	test("should create one <style> element per type in <head>", () => {
 		createStyleSheet("longhand");
 		createStyleSheet("longhand");
 		expect(document.head.querySelectorAll(longhandSelector)).toHaveLength(1);

@@ -4,20 +4,17 @@ import type { StatesLike } from "../../core/entities/state";
 import type { StyleType } from "../../core/entities/style";
 import { resolvePropertyValue, STYLE_TYPES } from "../../core/entities/style";
 import type { CreateCoulis } from "../../core/ports/create-coulis";
-import { SHORTHAND_PROPERTIES } from "./constants";
+import { SHORTHAND_PROPERTIES, UNITLESS_PROPERTIES } from "./constants";
 import type { CompiledTemplate } from "./helpers";
 import {
 	createClassName,
 	createCompiledTemplate,
 	createCustomProperties,
-	createDeclaration,
 	getEvaluatedTemplate,
-	getKebabName,
 	memoize,
 } from "./helpers";
-import type { StyleSheet } from "./stylesheet";
+import type { ClassName, Rule, StyleSheet } from "./stylesheet";
 import { createStyleSheet } from "./stylesheet";
-import type { ClassName, Rule } from "./types";
 
 /**
  * Creates a web instance that generates atomic CSS rules for browser injection and server-side
@@ -52,7 +49,6 @@ export const createCoulis: CreateCoulis<{
 			})) as Parameters<typeof contract.properties>[0],
 	);
 
-	const definitionByPropertyName = properties as RecordLike;
 	const shorthands = (contract.shorthands ?? {}) as Record<string, readonly string[] | undefined>;
 	const shorthandNames = Object.keys(shorthands);
 	const states: StatesLike = contract.states ?? {};
@@ -69,12 +65,18 @@ export const createCoulis: CreateCoulis<{
 	}
 
 	const getProperty = memoize((name: string): Property => {
-		const kebabName = getKebabName(name);
-		const definition = definitionByPropertyName[name];
+		const definition = (properties as RecordLike)[name];
+		// From JS camelCase to CSS kebab-case.
+		const declarationStart = `${name.replaceAll(/[A-Z]/gu, "-$&").toLowerCase()}:`;
+		// Numbers get a `px` unit unless the property is unitless (CSS specs).
+		const numberUnit = UNITLESS_PROPERTIES.has(name) ? "" : "px";
 
 		return {
 			getDeclaration: memoize((value: unknown) => {
-				return createDeclaration(kebabName, name, resolvePropertyValue(definition, value));
+				const resolvedValue = resolvePropertyValue(definition, value);
+				const unit = typeof resolvedValue === "string" ? "" : numberUnit;
+
+				return `${declarationStart}${resolvedValue as string}${unit};`;
 			}),
 			isCSSShorthand: SHORTHAND_PROPERTIES.has(name),
 		};
@@ -85,7 +87,7 @@ export const createCoulis: CreateCoulis<{
 	 * if any, the property itself otherwise.
 	 */
 	const getExpandedProperties = memoize((name: string): readonly Property[] => {
-		const names = shorthandNames.includes(name) ? (shorthands[name] ?? []) : [name];
+		const names = Object.hasOwn(shorthands, name) ? (shorthands[name] ?? []) : [name];
 
 		return names.map((expandedName) => {
 			return getProperty(expandedName);

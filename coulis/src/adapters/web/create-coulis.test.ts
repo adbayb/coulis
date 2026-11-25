@@ -228,6 +228,32 @@ describe("createCoulis (web adapter)", () => {
 		expect(getContent()).toBe("body{color:red;}");
 	});
 
+	test.each([
+		["kebab-cases property names", { backgroundColor: "red" }, "background-color:red;"],
+		["adds px to numbers", { width: 10 }, "width:10px;"],
+		["keeps unitless numbers", { opacity: 0.5 }, "opacity:0.5;"],
+		["keeps strings", { width: "10%" }, "width:10%;"],
+		["applies property maps", { padding: "small" }, "padding:4px;"],
+		["applies property functions", { margin: 2 }, "margin:2rem;"],
+	])("should create declarations that %s", (_, input, declaration) => {
+		const { createStyles, getMetadata } = createCoulis({
+			properties() {
+				return {
+					backgroundColor: true,
+					margin(value: number) {
+						return `${value}rem`;
+					},
+					opacity: true,
+					padding: { small: "4px" },
+					width: true,
+				};
+			},
+		});
+
+		createStyles(input as Parameters<typeof createStyles>[0]);
+		expect(String(getMetadata())).toContain(`{${declaration}}`);
+	});
+
 	test("should not create a :root rule without theme", () => {
 		const { getMetadata } = createCoulis({
 			properties() {

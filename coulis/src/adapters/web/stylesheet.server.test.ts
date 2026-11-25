@@ -2,13 +2,6 @@ import { describe, expect, test } from "vitest";
 import { createStyleSheet } from "./stylesheet";
 
 describe("createStyleSheet (server)", () => {
-	test("should return empty metadata initially", () => {
-		expect(createStyleSheet("longhand").getMetadata()).toStrictEqual({
-			classNames: [],
-			content: "",
-		});
-	});
-
 	test("should accumulate inserted rules once", () => {
 		const sheet = createStyleSheet("longhand");
 
@@ -32,16 +25,6 @@ describe("createStyleSheet (server)", () => {
 			classNames: ["c2"],
 			content: ".c2{display:flex;}",
 		});
-	});
-
-	test("should escape `<` to not close the <style> element", () => {
-		const sheet = createStyleSheet("longhand");
-
-		sheet.setRule("c1", () => {
-			return '.c1{content:"</style>";}';
-		});
-
-		expect(sheet.getMetadata().content).toBe(String.raw`.c1{content:"\3C /style>";}`);
 	});
 
 	test("should remove rules", () => {

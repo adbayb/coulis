@@ -1,7 +1,9 @@
 import type { StyleType } from "../../core/entities/style";
-import { IS_SERVER_ENVIRONMENT } from "./constants";
-import { serializeRule } from "./helpers";
-import type { ClassName, Rule } from "./types";
+
+const IS_SERVER_ENVIRONMENT = typeof window === "undefined";
+
+export type ClassName = string;
+export type Rule = string;
 
 export type StyleSheet = {
 	/**
@@ -116,4 +118,14 @@ export const createStyleSheet = (type: StyleType): StyleSheet => {
 			ruleByClassName.set(className, rule);
 		},
 	};
+};
+
+/**
+ * Serializes a rule as text: `<` is escaped so the CSS text cannot close its `<style>` element.
+ *
+ * @param rule - The rule to serialize.
+ * @returns The serialized rule.
+ */
+const serializeRule = (rule: string) => {
+	return rule.replaceAll("<", String.raw`\3C `);
 };

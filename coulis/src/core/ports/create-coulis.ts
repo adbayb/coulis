@@ -3,7 +3,6 @@ import type { RecordLike, WithNewLeafNodes } from "../entities/primitive";
 import type { ShorthandsLike } from "../entities/shorthand";
 import type { StatesLike } from "../entities/state";
 import type { GlobalStyles, PropertiesLike, Styles } from "../entities/style";
-import type { ThemeLike } from "../entities/theme";
 
 export type CreateCoulis<
 	CreateCoulisGeneric extends {
@@ -21,7 +20,7 @@ export type CreateCoulis<
 	const Properties extends PropertiesLike, // `const` needed to not widen strict type (for example, to avoid `width: [50, 100]` being inferred as `width: number`).
 	Shorthands extends ShorthandsLike<Properties> | undefined = undefined,
 	States extends StatesLike | undefined = undefined,
-	Theme extends ThemeLike | undefined = undefined,
+	Theme extends RecordLike | undefined = undefined,
 >(contract: {
 	properties: (
 		theme: ResolveTheme<CreateCoulisGeneric["Input"]["WithCSSVariables"], Theme>,

@@ -1,5 +1,3 @@
-export const IS_SERVER_ENVIRONMENT = typeof window === "undefined";
-
 // Taken from https://raw.githubusercontent.com/facebook/react/b98adb648a27640db8467064e537b238b8c306ce/packages/react-dom/src/shared/CSSProperty.js
 export const UNITLESS_PROPERTIES = new Set([
 	"animationIterationCount",

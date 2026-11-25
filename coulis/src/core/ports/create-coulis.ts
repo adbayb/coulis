@@ -3,7 +3,6 @@ import type { RecordLike, WithNewLeafNodes } from "../entities/primitive";
 import type { ShorthandsLike } from "../entities/shorthand";
 import type { StatesLike } from "../entities/state";
 import type { GlobalStyles, PropertiesLike, Styles } from "../entities/style";
-import type { ThemeLike } from "../entities/theme";
 
 export type CreateCoulis<
 	CreateCoulisGeneric extends {
@@ -21,7 +20,7 @@ export type CreateCoulis<
 	const Properties extends PropertiesLike, // `const` needed to not widen strict type (for example, to avoid `width: [50, 100]` being inferred as `width: number`).
 	Shorthands extends ShorthandsLike<Properties> | undefined = undefined,
 	States extends StatesLike | undefined = undefined,
-	Theme extends ThemeLike | undefined = undefined,
+	Theme extends RecordLike | undefined = undefined,
 >(contract: {
 	properties: (
 		theme: ResolveTheme<CreateCoulisGeneric["Input"]["WithCSSVariables"], Theme>,
@@ -35,11 +34,9 @@ export type CreateCoulis<
 	getContract: () => {
 		propertyNames: (keyof Properties | keyof Shorthands)[];
 	};
-	getMetadata: () => {
-		attributes: Record<"data-coulis-cache" | "data-coulis-type", string>;
-		content: string;
-	}[] & { toString: () => string };
-	setGlobalStyles: (input: GlobalStyles<Properties, Shorthands>) => void;
+	getCriticalStyleSheets: (html: string) => StyleSheets;
+	getStyleSheets: () => StyleSheets;
+	setGlobalStyles: (input: GlobalStyles<Properties, Shorthands>) => () => void;
 };
 
 type ResolveTheme<WithCSSVariables extends boolean, Theme> = Theme extends RecordLike
@@ -47,3 +44,9 @@ type ResolveTheme<WithCSSVariables extends boolean, Theme> = Theme extends Recor
 		? Theme
 		: WithNewLeafNodes<Theme, string>
 	: undefined;
+
+/** Style sheets to render as `<style>` elements. `String()` gives the `<style>` tags. */
+type StyleSheets = {
+	attributes: Record<"data-coulis-cache" | "data-coulis-type", string>;
+	content: string;
+}[] & { toString: () => string };

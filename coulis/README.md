@@ -145,10 +145,16 @@ export const App = () => {
 
 ### How to implement server-side rendering?
 
-Coulis provides a dedicated method called `getMetadata` that allows collecting style instructions for injecting into the `<head />` section of the web page.  
-Its primary use case is server-side rendering. The getter helps prevent the FOUC (Flash Of Unstyled Content) issue, where the user briefly sees the unstyled content before the styles are applied on the browser side.
+Rendering style sheets on the server prevents FOUC (Flash Of Unstyled Content), where the user briefly sees unstyled content before styles apply in the browser. Coulis provides two methods returning the style sheets to render in the `<head />`, as `{ attributes, content }` objects (`String()` on the result gives the `<style>` tags):
 
-Here's a vanilla React integration example generating HTML content:
+| Method                         | Returns                                                                                        | Use when                                                      |
+| ------------------------------ | ---------------------------------------------------------------------------------------------- | ------------------------------------------------------------- |
+| `getCriticalStyleSheets(html)` | The style sheets a rendered HTML needs: its atomic rules, plus every global rule and keyframes | The rendered HTML is available (e.g. `renderToString`)        |
+| `getStyleSheets()`             | Every style sheet generated so far by the instance                                             | The rendered HTML is not available (e.g. streaming rendering) |
+
+Styles are cached for the instance lifetime, so a server instance shares them across requests: prefer `getCriticalStyleSheets` so each page only ships its own CSS.
+
+With the rendered HTML (critical styles):
 
 ```tsx
 import { renderToString } from "react-dom/server";
@@ -157,7 +163,7 @@ import { coulis } from "./helpers/coulis"; // Factory instance created via `crea
 
 export const renderHtml = () => {
 	const bodyContent = renderToString(<App />);
-	const headContent = String(coulis.getMetadata()); // Must be get after the `renderToString` traversal to retrieve generated styles.
+	const headContent = String(coulis.getCriticalStyleSheets(bodyContent));
 
 	return `<html>
 		<head>
@@ -169,6 +175,24 @@ export const renderHtml = () => {
 	</html>`;
 };
 ```
+
+With streaming rendering (here, the Next.js app router), call `getStyleSheets` once the styles are generated:
+
+```tsx
+useServerInsertedHTML(() => {
+	return getStyleSheets().map(({ attributes, content }) => {
+		return (
+			<style
+				{...attributes}
+				key={attributes["data-coulis-type"]}
+				dangerouslySetInnerHTML={{ __html: content }}
+			/>
+		);
+	});
+});
+```
+
+In the browser, rules are inserted synchronously: styles apply as soon as `createStyles` returns, so layout reads made right after (for example, in React layout effects) see the styled layout.
 
 For more server-side integration recipes, the following examples can be checked:
 
@@ -183,6 +207,33 @@ For more server-side integration recipes, the following examples can be checked:
 - **...**
     - Welcome to any contribution.
 
+### How to update or remove global styles?
+
+`setGlobalStyles` returns a function that removes the rules. Calls with the same input are reference counted: rules are removed once every caller has removed them. It allows, for example, theme-dependent global styles set by nested providers:
+
+```tsx
+useInsertionEffect(() => {
+	return setGlobalStyles({
+		body: { backgroundColor: theme.surface, color: theme.text },
+	});
+}, [theme]);
+```
+
+### How to add vendor prefixes?
+
+Coulis outputs only the declarations you write, so prefixes follow your own browser targets instead of a built-in list. Declare prefixed properties and expand them with a shorthand of the same name (a shorthand creates one class name holding all its declarations):
+
+```ts
+const { createStyles } = createCoulis({
+	properties() {
+		return { userSelect: true, WebkitUserSelect: true };
+	},
+	shorthands: {
+		userSelect: ["WebkitUserSelect", "userSelect"], // `userSelect: "none"` outputs `.c1{-webkit-user-select:none;user-select:none;}`
+	},
+});
+```
+
 ### How to use Coulis with React Native?
 
 Import from the dedicated entry point:
@@ -193,12 +244,12 @@ import { createCoulis } from "coulis/react-native";
 
 The API is identical to the web adapter with the following differences:
 
-| Method            | Web                                           | React Native                                       |
-| ----------------- | --------------------------------------------- | -------------------------------------------------- |
-| `createStyles`    | Returns a CSS class name string               | Returns a style object (`Record<string, unknown>`) |
-| `createKeyframes` | Injects `@keyframes` rule, returns class name | ⚠️ Not supported — logs a warning and returns `{}` |
-| `setGlobalStyles` | Injects global CSS rules                      | ⚠️ Not supported — logs a warning and does nothing |
-| `getMetadata`     | Returns injected style sheets (for SSR)       | ⚠️ Not supported — logs a warning and returns `[]` |
+| Method                                     | Web                                           | React Native                                       |
+| ------------------------------------------ | --------------------------------------------- | -------------------------------------------------- |
+| `createStyles`                             | Returns a CSS class name string               | Returns a style object (`Record<string, unknown>`) |
+| `createKeyframes`                          | Injects `@keyframes` rule, returns class name | ⚠️ Not supported — logs a warning and returns `{}` |
+| `setGlobalStyles`                          | Injects global CSS rules                      | ⚠️ Not supported — logs a warning and does nothing |
+| `getStyleSheets`, `getCriticalStyleSheets` | Return style sheets to render (for SSR)       | ⚠️ Not supported — logs a warning and returns `[]` |
 
 Theme values are passed as-is (raw values, not CSS custom properties).
 
@@ -208,14 +259,14 @@ Theme values are passed as-is (raw values, not CSS custom properties).
 
 ### Runtime performance
 
-Single-run results from `pnpm --filter @coulis/benchmark benchmark`, rendering a 1,000-row React table. Higher throughput is better; dynamic styles are created during each render.
+Median of three runs of `pnpm --filter @coulis/benchmark benchmark`, rendering a 1,000-row React table. Higher throughput is better; dynamic styles are created during each render. The server case renders to a string and extracts its styles (critical styles for Coulis with `getCriticalStyleSheets(html)` and for Emotion with `extractCritical`).
 
 | Runtime         | Coulis |           Emotion |             Goober | styled-components |
 | --------------- | -----: | ----------------: | -----------------: | ----------------: |
-| Browser (ops/s) |  1,631 | 819 (2.0x slower) |  609 (2.7x slower) | 468 (3.5x slower) |
-| Server (ops/s)  |    162 | 144 (1.1x slower) | 156 (1.04x slower) |  76 (2.1x slower) |
+| Browser (ops/s) |  1,600 | 795 (2.0x slower) |  427 (3.7x slower) | 452 (3.5x slower) |
+| Server (ops/s)  |    154 | 140 (1.1x slower) | 153 (1.01x slower) |  75 (2.1x slower) |
 
-These results are hardware- and runtime-dependent. The benchmark also reports static-style baselines for context.
+These results are hardware- and runtime-dependent.
 
 ### Bundle size
 

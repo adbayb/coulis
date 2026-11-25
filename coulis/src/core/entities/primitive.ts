@@ -23,14 +23,6 @@ export type WithNewLeafNodes<Object_ extends RecordLike, LeafType> = {
  */
 type Ungreedify<U extends number | string> = Record<never, never> & U;
 
-export const isNumeric = (input: unknown): boolean => {
-	if (typeof input === "number") {
-		return true;
-	}
-
-	return typeof input === "string" && input.trim() !== "" && !Number.isNaN(Number(input));
-};
-
 export const isObject = (input: unknown): input is Record<string, unknown> => {
 	return typeof input === "object" && input !== null && !Array.isArray(input);
 };

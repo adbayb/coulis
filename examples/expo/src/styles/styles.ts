@@ -6,7 +6,7 @@ import { radii } from "./tokens/radii";
 import { boxShadows } from "./tokens/shadows";
 import { spacings } from "./tokens/spacings";
 
-export const { createStyles, getContract, getMetadata, setGlobalStyles } = createCoulis({
+export const { createStyles, getContract, setGlobalStyles } = createCoulis({
 	properties(theme) {
 		const spacingValues = {
 			...negateTokens(theme.spacings),

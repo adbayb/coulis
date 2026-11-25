@@ -200,17 +200,18 @@ describe("createCoulis (port)", () => {
 		expectTypeOf(coulis.createKeyframes).returns.toEqualTypeOf<string>();
 	});
 
-	test("should type `getMetadata`", () => {
-		expectTypeOf(coulis.getMetadata).returns.toEqualTypeOf<
-			{
-				attributes: Record<"data-coulis-cache" | "data-coulis-type", string>;
-				content: string;
-			}[] & { toString: () => string }
-		>();
+	test("should type `getStyleSheets` and `getCriticalStyleSheets`", () => {
+		type StyleSheets = {
+			attributes: Record<"data-coulis-cache" | "data-coulis-type", string>;
+			content: string;
+		}[] & { toString: () => string };
+
+		expectTypeOf(coulis.getStyleSheets).toEqualTypeOf<() => StyleSheets>();
+		expectTypeOf(coulis.getCriticalStyleSheets).toEqualTypeOf<(html: string) => StyleSheets>();
 	});
 
 	test("should type `setGlobalStyles`", () => {
-		expectTypeOf(coulis.setGlobalStyles).returns.toBeVoid();
+		expectTypeOf(coulis.setGlobalStyles).returns.toEqualTypeOf<() => void>();
 
 		coulis.setGlobalStyles({
 			"*,*::before,*::after": {
@@ -271,11 +272,16 @@ const createCoulisFake: CreateCoulis<{
 				propertyNames: [],
 			};
 		},
-		getMetadata() {
+		getCriticalStyleSheets() {
+			return [];
+		},
+		getStyleSheets() {
 			return [];
 		},
 		setGlobalStyles() {
-			// No op
+			return () => {
+				// No op
+			};
 		},
 	};
 };

@@ -88,33 +88,19 @@ describe("createCoulis (react-native adapter)", () => {
 		expect(getContract().propertyNames).toContain("size");
 	});
 
-	test("should createKeyframes log a warning and return an empty object", () => {
-		const { createKeyframes } = createInstance();
+	test.each([
+		["createKeyframes", {}],
+		["getCriticalStyleSheets", []],
+		["getStyleSheets", []],
+		["setGlobalStyles", expect.any(Function)],
+	] as const)("should %s log a warning and do nothing", (method, expected) => {
+		const instance = createInstance();
+		const call = instance[method] as (input?: unknown) => unknown;
 
-		expect(createKeyframes({})).toStrictEqual({});
-
-		expect(debugSpy).toHaveBeenCalledWith(
-			"The `react-native` platform does not support `createKeyframes` method. Ignoring the call...",
-		);
-	});
-
-	test("should getMetadata log a warning and return an empty array", () => {
-		const { getMetadata } = createInstance();
-
-		expect(getMetadata()).toStrictEqual([]);
+		expect(call({})).toStrictEqual(expected);
 
 		expect(debugSpy).toHaveBeenCalledWith(
-			"The `react-native` platform does not support `getMetadata` method. Ignoring the call...",
-		);
-	});
-
-	test("should setGlobalStyles log a warning and do nothing", () => {
-		const { setGlobalStyles } = createInstance();
-
-		setGlobalStyles({});
-
-		expect(debugSpy).toHaveBeenCalledWith(
-			"The `react-native` platform does not support `setGlobalStyles` method. Ignoring the call...",
+			`The \`react-native\` platform does not support \`${method}\` method. Ignoring the call...`,
 		);
 	});
 });

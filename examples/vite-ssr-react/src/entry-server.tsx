@@ -1,7 +1,7 @@
 import { StrictMode } from "react";
 import { renderToString } from "react-dom/server";
 import App from "./app";
-import { getMetadata } from "./helpers/coulis";
+import { getCriticalStyleSheets } from "./helpers/coulis";
 
 export const renderHtml = (_url: string) => {
 	const bodyContent = renderToString(
@@ -10,5 +10,5 @@ export const renderHtml = (_url: string) => {
 		</StrictMode>,
 	);
 
-	return { head: String(getMetadata()), html: bodyContent };
+	return { head: String(getCriticalStyleSheets(bodyContent)), html: bodyContent };
 };

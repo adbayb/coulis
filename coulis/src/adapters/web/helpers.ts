@@ -1,22 +1,7 @@
 import type { RecordLike, WithNewLeafNodes } from "../../core/entities/primitive";
 import { isObject } from "../../core/entities/primitive";
-import { UNITLESS_PROPERTIES } from "./constants";
 
 const TEMPLATE_MARKER = /coulis\[(selector|declaration)\]/u;
-
-/**
- * Escape invalid CSS characters to generate usable property names.
- *
- * @example
- * 	const safeCssVariable = escape("--spacings-1.5"); // Will generate `--spacings-1-5`
- *
- * @param input - The input to escape with potentially some unsafe characters.
- * @returns The escaped input.
- * @see https://mathiasbynens.be/notes/css-escapes
- */
-export const escape = (input: string) => {
-	return input.replaceAll(/[!"#$%&'()*+,./:;<=>?@[\]^`{|}~]/gu, "-");
-};
 
 export const createClassName = (input: string) => {
 	/**
@@ -73,7 +58,7 @@ export const createCustomProperties = <Theme extends RecordLike>(
 ) => {
 	for (const tokenName of Object.keys(theme) as (keyof Theme)[]) {
 		const value = theme[tokenName];
-		const tokenPath = [...path, String(tokenName)];
+		const tokenPath = [...path, tokenName as string];
 
 		if (isObject(value)) {
 			const nestedOutput = ((output as RecordLike)[tokenName as string] ??=
@@ -84,37 +69,14 @@ export const createCustomProperties = <Theme extends RecordLike>(
 			continue;
 		}
 
-		const name = `--${escape(tokenPath.join("-"))}`;
+		// Invalid CSS characters are replaced to generate usable property names (e.g. `spacings-1.5` -> `--spacings-1-5`).
+		const name = `--${tokenPath.join("-").replaceAll(/[!"#$%&'()*+,./:;<=>?@[\]^`{|}~]/gu, "-")}`;
 
 		(output as RecordLike)[tokenName as string] = `var(${name})`;
 		onCreateProperty(name, value);
 	}
 
 	return output;
-};
-
-/**
- * Converts a JS camelCase property name to CSS kebab-case. Runs once per property name (the
- * property metadata is memoized), so no caching is needed here.
- *
- * @param name - The JS property name.
- * @returns The CSS kebab-case name.
- */
-export const getKebabName = (name: string) => {
-	// From JS camelCase to CSS kebab-case
-	return name.replaceAll(/([A-Z])/gu, (matched) => {
-		return `-${matched.toLowerCase()}`;
-	});
-};
-
-export const createDeclaration = (kebabName: string, name: string, value: unknown) => {
-	// Format value to follow CSS specs (unitless number)
-	const transformedPropertyValue =
-		typeof value === "string" || UNITLESS_PROPERTIES.has(name)
-			? String(value)
-			: `${String(value)}px`;
-
-	return `${kebabName}:${transformedPropertyValue};`;
 };
 
 export type CompiledTemplate = {
@@ -165,8 +127,4 @@ export const getEvaluatedTemplate = (
 	}
 
 	return output;
-};
-
-export const minify = (input: string) => {
-	return input.replaceAll(/\s{2,}|\s+(?=\{)|\r?\n/gmu, "");
 };

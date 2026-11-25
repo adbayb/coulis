@@ -15,7 +15,7 @@ const tokens = Object.freeze({
 	},
 } as const);
 
-export const { createKeyframes, createStyles, getMetadata, setGlobalStyles } = createCoulis({
+export const { createKeyframes, createStyles, getStyleSheets, setGlobalStyles } = createCoulis({
 	properties(theme) {
 		return {
 			backgroundColor: theme.colors,

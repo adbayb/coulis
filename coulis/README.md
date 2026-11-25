@@ -157,7 +157,7 @@ import { coulis } from "./helpers/coulis"; // Factory instance created via `crea
 
 export const renderHtml = () => {
 	const bodyContent = renderToString(<App />);
-	const headContent = String(coulis.getMetadata(bodyContent)); // Must be get after the `renderToString` traversal to retrieve generated styles.
+	const headContent = String(coulis.getMetadata(bodyContent));
 
 	return `<html>
 		<head>

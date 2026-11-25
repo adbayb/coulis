@@ -35,11 +35,6 @@ export const createCoulis: CreateCoulis<{
 		}),
 	) as Record<StyleType, StyleSheet>;
 
-	/**
-	 * Class name by cache input, shared by all style types: cache inputs never collide across types
-	 * (declarations, state-prefixed declarations, and serialized global inputs).
-	 */
-	const classNameByCacheInput = new Map<string, ClassName>();
 	let rootDeclarations = "";
 
 	const properties = contract.properties(
@@ -63,6 +58,9 @@ export const createCoulis: CreateCoulis<{
 		compiledStateByName.set(name, createCompiledTemplate(template));
 	}
 
+	// Set last: `base` always applies unconditional values, whatever the contract states.
+	compiledStateByName.set(BASE_STATE_NAME, BASE_COMPILED_STATE);
+
 	/**
 	 * Resolves a style property name to the declarations it applies: a custom shorthand applies all
 	 * its properties at once (one declaration block, so one class name), any other name applies
@@ -84,7 +82,8 @@ export const createCoulis: CreateCoulis<{
 		});
 
 		return {
-			getDeclaration: memoize((value: unknown) => {
+			baseClassNameByValue: new Map(),
+			createDeclaration(value) {
 				let declaration = "";
 
 				if (value === undefined) {
@@ -99,6 +98,9 @@ export const createCoulis: CreateCoulis<{
 				}
 
 				return declaration;
+			},
+			getClassNameByValue: memoize(() => {
+				return new Map();
 			}),
 			// A block mixing CSS shorthands and longhands goes with shorthands, so it never overrides longhands set by other class names.
 			isCSSShorthand: names.some((propertyName) => {
@@ -107,78 +109,89 @@ export const createCoulis: CreateCoulis<{
 		};
 	});
 
-	const getOrCreateClassName = (
-		type: StyleType,
-		cacheInput: string,
-		createRule: (className: ClassName) => Rule,
+	const createAtomicClassName = (
+		property: Property,
+		stateName: string,
+		value: unknown,
 	): ClassName => {
-		let className = classNameByCacheInput.get(cacheInput);
+		const declaration = property.createDeclaration(value);
+		const compiledState = compiledStateByName.get(stateName);
 
-		if (className !== undefined) {
-			return className;
+		if (!declaration || !compiledState) {
+			return "";
 		}
 
-		className = createClassName(cacheInput);
-		sheets[type].setRule(className, createRule);
-		classNameByCacheInput.set(cacheInput, className);
+		/*
+		 * The base state hashes the declaration alone: `{ base: value }` and `value` share their class name.
+		 * Other state names are length-prefixed so that a name and its declaration never collide with another pair.
+		 */
+		const className = createClassName(
+			stateName === BASE_STATE_NAME
+				? declaration
+				: `${stateName.length}:${stateName}${declaration}`,
+		);
+
+		sheets[getStyleType(property.isCSSShorthand, compiledState.isAtRule)].setRule(
+			className,
+			() => {
+				return getEvaluatedTemplate(compiledState, `.${className}`, declaration);
+			},
+		);
 
 		return className;
 	};
 
-	const getOrCreateAtomicClassName = (
+	const getAtomicClassName = (
 		property: Property,
+		stateName: string,
 		value: unknown,
-		stateName = "base",
 	): ClassName => {
-		const declaration = property.getDeclaration(value);
+		const classNameByValue =
+			stateName === BASE_STATE_NAME
+				? property.baseClassNameByValue
+				: property.getClassNameByValue(stateName);
 
-		if (!declaration) {
-			return "";
+		let className = classNameByValue.get(value);
+
+		if (className === undefined) {
+			className = createAtomicClassName(property, stateName, value);
+
+			// Arrays are not cached: kept by reference, each call with a new array would add an entry.
+			if (typeof value !== "object") {
+				classNameByValue.set(value, className);
+			}
 		}
 
-		if (stateName === "base") {
-			/*
-			 * The state name is excluded from the cache input when it equals "base", as base is equivalent to an unconditional value.
-			 * This exclusion allows to recycle the cache if the style value has already been defined unconditionally.
-			 */
-			return getOrCreateClassName(
-				getStyleType(property.isCSSShorthand, false),
-				declaration,
-				(className) => {
-					return `.${className}{${declaration}}`;
-				},
-			);
-		}
-
-		const compiledState = compiledStateByName.get(stateName);
-
-		if (compiledState === undefined) {
-			return "";
-		}
-
-		const cacheInput = `${stateName.length}:${stateName}${declaration}`;
-
-		return getOrCreateClassName(
-			getStyleType(property.isCSSShorthand, compiledState.isAtRule),
-			cacheInput,
-			(className) => {
-				return getEvaluatedTemplate(compiledState, `.${className}`, declaration);
-			},
-		);
+		return className;
 	};
 
 	const createDeclarationBlock = (input: RecordLike) => {
 		let declarationBlock = "";
 
 		for (const name of Object.keys(input)) {
-			declarationBlock += getStyleProperty(name).getDeclaration(input[name]);
+			declarationBlock += getStyleProperty(name).createDeclaration(input[name]);
 		}
 
 		return declarationBlock;
 	};
 
+	// Serialized global inputs are long: looking them up is cheaper than hashing them on each call.
+	const globalClassNameByInput = new Map<string, ClassName>();
+
+	const getGlobalClassName = (input: string, createRule: (className: ClassName) => Rule) => {
+		let className = globalClassNameByInput.get(input);
+
+		if (className === undefined) {
+			className = createClassName(input);
+			sheets.global.setRule(className, createRule);
+			globalClassNameByInput.set(input, className);
+		}
+
+		return className;
+	};
+
 	if (rootDeclarations) {
-		getOrCreateClassName("global", rootDeclarations, () => {
+		getGlobalClassName(rootDeclarations, () => {
 			return `:root{${rootDeclarations}}`;
 		});
 	}
@@ -189,8 +202,7 @@ export const createCoulis: CreateCoulis<{
 		let styleElements = "";
 
 		const styleSheets = STYLE_TYPES.map((type) => {
-			const { classNames, content } = sheets[type].serialize(usedClassNames);
-			const cache = classNames.join(",");
+			const { cache, content } = sheets[type].serialize(usedClassNames);
 
 			styleElements += `<style data-coulis-cache="${cache}" data-coulis-type="${type}">${content}</style>`;
 
@@ -228,7 +240,7 @@ export const createCoulis: CreateCoulis<{
 		 * @returns Animation name.
 		 */
 		createKeyframes(input) {
-			return getOrCreateClassName("global", JSON.stringify(input), (className) => {
+			return getGlobalClassName(JSON.stringify(input), (className) => {
 				let rule = "";
 
 				for (const selector of Object.keys(input) as (keyof typeof input)[]) {
@@ -259,26 +271,28 @@ export const createCoulis: CreateCoulis<{
 		 * @returns Class name.
 		 */
 		createStyles(input) {
-			const classNames: ClassName[] = [];
+			let classNames = "";
 
 			for (const name of Object.keys(input)) {
 				const value: unknown = input[name as keyof typeof input];
 				const property = getStyleProperty(name);
 
-				for (const stateName of isObject(value) ? Object.keys(value) : ["base"]) {
-					const className = getOrCreateAtomicClassName(
-						property,
-						isObject(value) ? value[stateName] : value,
-						stateName,
-					);
-
-					if (className) {
-						classNames.push(className);
+				if (isObject(value)) {
+					for (const stateName of Object.keys(value)) {
+						classNames = joinClassNames(
+							classNames,
+							getAtomicClassName(property, stateName, value[stateName]),
+						);
 					}
+				} else {
+					classNames = joinClassNames(
+						classNames,
+						getAtomicClassName(property, BASE_STATE_NAME, value),
+					);
 				}
 			}
 
-			return classNames.join(" ");
+			return classNames;
 		},
 		/**
 		 * Returns the list of all property names (including shorthands) accepted by `createStyles`
@@ -355,7 +369,7 @@ export const createCoulis: CreateCoulis<{
 		 * @returns A function removing the rules.
 		 */
 		setGlobalStyles(input) {
-			const cacheInput = JSON.stringify(input);
+			const serializedInput = JSON.stringify(input);
 
 			const createRule = () => {
 				let rule = "";
@@ -376,7 +390,7 @@ export const createCoulis: CreateCoulis<{
 				return rule;
 			};
 
-			const className = getOrCreateClassName("global", cacheInput, createRule);
+			const className = getGlobalClassName(serializedInput, createRule);
 
 			globalReferenceCounts.set(className, (globalReferenceCounts.get(className) ?? 0) + 1);
 
@@ -386,7 +400,7 @@ export const createCoulis: CreateCoulis<{
 				globalReferenceCounts.set(className, count);
 
 				if (count === 0) {
-					classNameByCacheInput.delete(cacheInput);
+					globalClassNameByInput.delete(serializedInput);
 					sheets.global.removeRule(className, createRule());
 				}
 			};
@@ -396,12 +410,21 @@ export const createCoulis: CreateCoulis<{
 
 type Property = {
 	/**
-	 * Memoized `raw value -> declaration` builder: repeated values skip value resolution and string
-	 * building entirely.
+	 * Class names by raw value for the base state, the most used one: it skips the state lookup of
+	 * `getClassNameByValue`.
 	 */
-	getDeclaration: (value: unknown) => string;
+	baseClassNameByValue: Map<unknown, ClassName>;
+	createDeclaration: (value: unknown) => string;
+	/**
+	 * Class names by raw value for a given state name: repeated values skip value resolution,
+	 * hashing, and rule creation entirely.
+	 */
+	getClassNameByValue: (stateName: string) => Map<unknown, ClassName>;
 	isCSSShorthand: boolean;
 };
+
+const BASE_STATE_NAME = "base";
+const BASE_COMPILED_STATE = createCompiledTemplate("coulis[selector]{coulis[declaration]}");
 
 /**
  * Picks the style type from `STYLE_TYPES` order: (at-)shorthand types precede (at-)longhand ones.
@@ -412,4 +435,9 @@ type Property = {
  */
 const getStyleType = (isCSSShorthand: boolean, isAtRule: boolean): StyleType => {
 	return STYLE_TYPES[(isAtRule ? 3 : 1) + Number(!isCSSShorthand)] as StyleType;
+};
+
+const joinClassNames = (classNames: string, className: ClassName) => {
+	// An empty class name (unset value) is skipped.
+	return classNames && className ? `${classNames} ${className}` : classNames || className;
 };

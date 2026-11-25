@@ -34,7 +34,8 @@ export const memoize = <Key, Value>(create: (key: Key) => Value) => {
 };
 
 /**
- * Computes the djb2 hash of a given string.
+ * Computes the djb2 hash of a given string. `Math.imul` keeps the multiplication in 32-bit
+ * integers: same hash as `hash * 33`, without floating-point math.
  *
  * @param input - The input string to hash.
  * @returns The computed hash value.
@@ -44,39 +45,42 @@ const getDjb2Hash = (input: string) => {
 
 	for (let i = 0; i < input.length; i++) {
 		// oxlint-disable-next-line unicorn/prefer-code-point
-		hash = (hash * 33) ^ input.charCodeAt(i);
+		hash = Math.imul(hash, 33) ^ input.charCodeAt(i);
 	}
 
 	return hash >>> 0; // Ensure a positive integer
 };
 
+/**
+ * Creates the CSS custom properties of a theme: each leaf token becomes a property named after its
+ * path (e.g. `colors.primary` -> `--colors-primary`).
+ *
+ * @param theme - The theme tokens.
+ * @param onCreateProperty - Called with the name and value of each created property.
+ * @param namePrefix - The name prefix of the theme properties (the path of a nested theme).
+ * @returns The theme with its leaf tokens replaced by references to their property (`var(--name)`).
+ */
 export const createCustomProperties = <Theme extends RecordLike>(
 	theme: Theme,
 	onCreateProperty: (name: string, value: unknown) => void,
-	path: string[] = [],
-	output: WithNewLeafNodes<Theme, string> = {} as typeof output,
+	namePrefix = "-",
 ) => {
-	for (const tokenName of Object.keys(theme) as (keyof Theme)[]) {
+	const output: RecordLike = {};
+
+	for (const tokenName of Object.keys(theme)) {
 		const value = theme[tokenName];
-		const tokenPath = [...path, tokenName as string];
+		// Invalid CSS characters are replaced to generate usable property names (e.g. `spacings-1.5` -> `--spacings-1-5`).
+		const name = `${namePrefix}-${tokenName.replaceAll(/[!"#$%&'()*+,./:;<=>?@[\]^`{|}~]/gu, "-")}`;
 
 		if (isObject(value)) {
-			const nestedOutput = ((output as RecordLike)[tokenName as string] ??=
-				{}) as typeof output;
-
-			createCustomProperties(value as Theme, onCreateProperty, tokenPath, nestedOutput);
-
-			continue;
+			output[tokenName] = createCustomProperties(value, onCreateProperty, name);
+		} else {
+			output[tokenName] = `var(${name})`;
+			onCreateProperty(name, value);
 		}
-
-		// Invalid CSS characters are replaced to generate usable property names (e.g. `spacings-1.5` -> `--spacings-1-5`).
-		const name = `--${tokenPath.join("-").replaceAll(/[!"#$%&'()*+,./:;<=>?@[\]^`{|}~]/gu, "-")}`;
-
-		(output as RecordLike)[tokenName as string] = `var(${name})`;
-		onCreateProperty(name, value);
 	}
 
-	return output;
+	return output as WithNewLeafNodes<Theme, string>;
 };
 
 export type CompiledTemplate = {

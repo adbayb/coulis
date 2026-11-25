@@ -316,6 +316,54 @@ describe("createCoulis (web adapter)", () => {
 		expect(content).toContain(`.${classNames[1]}:hover{padding-left:2px;padding-right:2px;}`);
 	});
 
+	test("should share class names between unconditional and base state values", () => {
+		const { createStyles, getStyleSheets } = createCoulis({
+			properties() {
+				return { color: true };
+			},
+			states: {
+				// `base` is reserved: a contract state cannot make it conditional.
+				base: "coulis[selector]:hover{coulis[declaration]}",
+			},
+		});
+
+		const className = createStyles({ color: "red" });
+
+		expect(createStyles({ color: { base: "red" } })).toBe(className);
+		expect(String(getStyleSheets())).toContain(`>.${className}{color:red;}</style>`);
+	});
+
+	test("should create the same class name for equal array values", () => {
+		const { createStyles, getStyleSheets } = createCoulis({
+			properties() {
+				return {
+					margin(values: number[]) {
+						return values.join("px ");
+					},
+				};
+			},
+		});
+
+		const className = createStyles({ margin: [1, 2] });
+
+		expect(createStyles({ margin: [1, 2] })).toBe(className);
+		expect(String(getStyleSheets())).toContain(`>.${className}{margin:1px 2;}</style>`);
+	});
+
+	test("should extract the styles created after a previous extraction", () => {
+		const { createStyles, getStyleSheets } = createCoulis({
+			properties() {
+				return { color: true };
+			},
+		});
+
+		createStyles({ color: "red" });
+		expect(String(getStyleSheets())).not.toContain("color:blue;");
+		createStyles({ color: "blue" });
+		expect(String(getStyleSheets())).toContain("color:red;");
+		expect(String(getStyleSheets())).toContain("color:blue;");
+	});
+
 	test("should skip unset values", () => {
 		const { createStyles, getStyleSheets } = createCoulis({
 			properties() {

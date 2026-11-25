@@ -10,7 +10,7 @@ describe("createStyleSheet (server)", () => {
 		sheet.setRule("c1", createFlexDisplayRule);
 
 		expect(sheet.serialize()).toStrictEqual({
-			classNames: ["c1", "c2"],
+			cache: "c1,c2",
 			content: ".c1{color:red;}.c2{display:flex;}",
 		});
 	});
@@ -22,7 +22,7 @@ describe("createStyleSheet (server)", () => {
 		sheet.setRule("c2", createFlexDisplayRule);
 
 		expect(sheet.serialize(new Set(["c2"]))).toStrictEqual({
-			classNames: ["c2"],
+			cache: "c2",
 			content: ".c2{display:flex;}",
 		});
 	});
@@ -31,8 +31,20 @@ describe("createStyleSheet (server)", () => {
 		const sheet = createStyleSheet("global");
 
 		sheet.setRule("c1", createRedColorRule);
+		expect(sheet.serialize().content).toBe(".c1{color:red;}");
 		sheet.removeRule("c1", ".c1{color:red;}");
 		expect(sheet.serialize().content).toBe("");
+	});
+
+	test("should always keep global rules", () => {
+		const sheet = createStyleSheet("global");
+
+		sheet.setRule("c1", createRedColorRule);
+
+		expect(sheet.serialize(new Set())).toStrictEqual({
+			cache: "c1",
+			content: ".c1{color:red;}",
+		});
 	});
 });
 

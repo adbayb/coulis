@@ -9,16 +9,13 @@ export type StyleSheet = {
 	/** Removes a rule. Only supported for the `global` sheet: atomic rules are never removed. */
 	removeRule: (className: ClassName, rule: Rule) => void;
 	/**
-	 * Returns the class names and CSS text of the rules inserted by this runtime (rules hydrated
-	 * from server metadata are excluded).
+	 * Returns the comma-separated class names (`cache`) and CSS text (`content`) of the rules
+	 * inserted by this runtime (rules hydrated from server metadata are excluded).
 	 *
 	 * @param usedClassNames - If set, only keeps the rules of these class names (critical styles).
 	 *   Ignored by the `global` sheet, whose rules are always kept.
 	 */
-	serialize: (usedClassNames?: Set<ClassName>) => {
-		classNames: ClassName[];
-		content: string;
-	};
+	serialize: (usedClassNames?: Set<ClassName>) => SerializedRules;
 	/** Inserts a rule unless its class name is already in the sheet. */
 	setRule: (className: ClassName, createRule: (className: ClassName) => Rule) => void;
 };
@@ -29,6 +26,11 @@ type CoulisStyleElement = HTMLStyleElement & {
 	 * targeting it so that a rule is never inserted twice.
 	 */
 	coulisRules?: Map<ClassName, Rule>;
+};
+
+type SerializedRules = {
+	cache: string;
+	content: string;
 };
 
 /**
@@ -49,6 +51,8 @@ type CoulisStyleElement = HTMLStyleElement & {
 export const createStyleSheet = (type: StyleType): StyleSheet => {
 	let element: CoulisStyleElement | undefined;
 	let ruleByClassName = new Map<ClassName, Rule>();
+	// Serialization of every rule, reused until a rule is inserted or removed.
+	let serializedRules: SerializedRules | undefined;
 
 	if (!IS_SERVER_ENVIRONMENT) {
 		// `appendChild` returns the appended element (unlike `append`), keeping the code short.
@@ -71,6 +75,7 @@ export const createStyleSheet = (type: StyleType): StyleSheet => {
 	return {
 		removeRule(className, rule) {
 			ruleByClassName.delete(className);
+			serializedRules = undefined;
 
 			if (element) {
 				// Hydrated and client-inserted global rules share the same serialization.
@@ -78,20 +83,30 @@ export const createStyleSheet = (type: StyleType): StyleSheet => {
 			}
 		},
 		serialize(usedClassNames) {
-			const classNames: ClassName[] = [];
+			const keptClassNames = type === "global" ? undefined : usedClassNames;
+
+			if (!keptClassNames && serializedRules) {
+				return serializedRules;
+			}
+
+			let cache = "";
 			let content = "";
 
 			for (const [className, rule] of ruleByClassName) {
-				if (
-					rule &&
-					(!usedClassNames || type === "global" || usedClassNames.has(className))
-				) {
-					classNames.push(className);
+				if (rule && (!keptClassNames || keptClassNames.has(className))) {
+					cache += cache ? `,${className}` : className;
 					content += rule;
 				}
 			}
 
-			return { classNames, content };
+			const output = { cache, content };
+
+			// An element shares its rules with other instances, which change them without notice: only in-memory rules are reused.
+			if (!keptClassNames && !element) {
+				serializedRules = output;
+			}
+
+			return output;
 		},
 		setRule(className, createRule) {
 			if (ruleByClassName.has(className)) {
@@ -120,6 +135,7 @@ export const createStyleSheet = (type: StyleType): StyleSheet => {
 			}
 
 			ruleByClassName.set(className, rule);
+			serializedRules = undefined;
 		},
 	};
 };

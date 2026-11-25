@@ -32,7 +32,7 @@ describe("createStyleSheet (browser)", () => {
 		]);
 
 		expect(sheet.serialize()).toStrictEqual({
-			classNames: ["c1", "c2"],
+			cache: "c1,c2",
 			content: redColorRule + flexDisplayRule,
 		});
 	});
@@ -102,7 +102,7 @@ describe("createStyleSheet (browser)", () => {
 
 		sheet.setRule("c1", createRule);
 		expect(createRule).not.toHaveBeenCalled();
-		expect(sheet.serialize()).toStrictEqual({ classNames: [], content: "" });
+		expect(sheet.serialize()).toStrictEqual({ cache: "", content: "" });
 	});
 
 	test("should share inserted rules across sheets of the same element", () => {
@@ -115,6 +115,18 @@ describe("createStyleSheet (browser)", () => {
 		});
 
 		expect(getCssRules(longhandSelector)).toStrictEqual([".c1 { color: red; }"]);
+	});
+
+	test("should serialize the rules inserted by another sheet of the same element", () => {
+		const sheet = createStyleSheet("longhand");
+
+		expect(sheet.serialize()).toStrictEqual({ cache: "", content: "" });
+
+		createStyleSheet("longhand").setRule("c1", () => {
+			return redColorRule;
+		});
+
+		expect(sheet.serialize()).toStrictEqual({ cache: "c1", content: redColorRule });
 	});
 
 	test("should apply styles before the next layout read", () => {

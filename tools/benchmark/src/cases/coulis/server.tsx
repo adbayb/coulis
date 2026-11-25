@@ -3,6 +3,5 @@ import { CoulisComponent } from "./component";
 import { getMetadata } from "./helpers";
 
 export const CoulisCase = () => {
-	renderToString(<CoulisComponent />);
-	String(getMetadata());
+	String(getMetadata(renderToString(<CoulisComponent />)));
 };

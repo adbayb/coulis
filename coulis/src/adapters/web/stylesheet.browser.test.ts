@@ -130,7 +130,7 @@ describe("createStyleSheet (browser)", () => {
 	});
 
 	test("should apply styles before the next layout read", () => {
-		const { createStyles } = createStatefulWebInstance();
+		const { createStyles } = createInstance();
 		const element = document.createElement("div");
 
 		document.body.append(element);
@@ -139,7 +139,7 @@ describe("createStyleSheet (browser)", () => {
 	});
 
 	test("should not reinsert styles hydrated from server metadata", () => {
-		const server = createStatefulWebInstance();
+		const server = createInstance();
 		const className = server.createStyles({ color: "red" });
 		const serverStyleSheets = server.getStyleSheets();
 
@@ -153,7 +153,7 @@ describe("createStyleSheet (browser)", () => {
 			);
 		}
 
-		const client = createStatefulWebInstance();
+		const client = createInstance();
 
 		expect(client.createStyles({ color: "red" })).toBe(className);
 		expect(getCssRules(longhandSelector)).toStrictEqual([`.${className} { color: red; }`]);
@@ -187,13 +187,10 @@ const getCssRules = (selector: string) => {
 	});
 };
 
-const createStatefulWebInstance = () => {
+const createInstance = () => {
 	return createCoulis({
 		properties() {
 			return { color: true };
-		},
-		states: {
-			"": "@media print{coulis[selector]{coulis[declaration]}}",
 		},
 	});
 };

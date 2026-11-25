@@ -3,67 +3,17 @@ import { createCoulis } from "./create-coulis";
 
 describe("createCoulis (web adapter)", () => {
 	beforeAll(() => {
-		setGlobalStyles({
-			"*,*::before,*::after": {
-				boxSizing: "inherit",
-			},
-			".globalClass+.otherGlobalClass": {
-				colorScheme: "black",
-			},
-			"@charset": '"utf-8"',
-			"@font-face": {
-				fontFamily: "'AliasedHelvetica'",
-				src: "local(Helvetica)",
-			},
-			"@import": "url('https://fonts.googleapis.com/css?family=Open+Sans&display=swap')",
-			"div": {
-				backgroundColor: "red", // Non-theme-based value to check if set properly by `setGlobalStyles`
-			},
-			"html": {
-				boxSizing: "border-box",
-			},
-			"html,body": {
-				backgroundColor: "surfacePrimary",
-				fontFamily: "Open Sans, AliasedHelvetica",
-				margin: 0,
-				padding: 0,
-			},
-		});
+		setFixtureGlobalStyles();
+		createFixtureKeyframes();
+		createFixtureStyles();
 	});
 
 	test("should create keyframes", () => {
-		expect(
-			createKeyframes({
-				25: {
-					transform: "scale(1.25)",
-				},
-				"50%": {
-					transform: "scale(1.5)",
-				},
-				"from": {
-					transform: "scale(1)",
-				},
-				"to": {
-					transform: "scale(1)",
-				},
-			}),
-		).toBe("c8vmqaf");
+		expect(createFixtureKeyframes()).toBe("c8vmqaf");
 	});
 
 	test("should create styles", () => {
-		expect(
-			createStyles({
-				backgroundColor: {
-					alt: "surfacePrimary",
-					base: "surfaceSecondary",
-					hover: "neutralTransparent",
-				},
-				color: "neutralDark",
-				padding: {
-					base: 0,
-				},
-			}),
-		).toBe("c1uv4w8k ctbttxu c1lmv6o7 c1j2r6jb cvjbi4e");
+		expect(createFixtureStyles()).toBe("c1uv4w8k ctbttxu c1lmv6o7 c1j2r6jb cvjbi4e");
 	});
 
 	test("should extract styles", () => {
@@ -115,11 +65,7 @@ describe("createCoulis (web adapter)", () => {
 			transform: { "base": "rotate(0deg)", "h-webkit-": "rotate(1deg)" },
 		}).split(" ");
 
-		const cssContent = getStyleSheets()
-			.map(({ content }) => {
-				return content;
-			})
-			.join("");
+		const cssContent = getContent(getStyleSheets());
 
 		expect(focusClassNames[1]).not.toBe(hoverClassNames[1]);
 
@@ -155,14 +101,8 @@ describe("createCoulis (web adapter)", () => {
 
 		const className = createStyles(input);
 
-		const styleSheetsContent = getStyleSheets()
-			.map(({ content: stylesheetContent }) => {
-				return stylesheetContent;
-			})
-			.join("");
-
 		expect(createStyles(input)).toBe(className);
-		expect(styleSheetsContent).toContain(`.${className}{color:red;}`);
+		expect(getContent(getStyleSheets())).toContain(`.${className}{color:red;}`);
 	});
 
 	test("should only extract the atomic rules used in a given HTML", () => {
@@ -187,12 +127,7 @@ describe("createCoulis (web adapter)", () => {
 		const usedClassName = createStyles({ color: { base: "red", hover: "blue" } });
 		const unusedClassName = createStyles({ display: "flex" });
 		const styleSheets = getCriticalStyleSheets(`<div class="other ${usedClassName}"></div>`);
-
-		const content = styleSheets
-			.map(({ content: sheetContent }) => {
-				return sheetContent;
-			})
-			.join("");
+		const content = getContent(styleSheets);
 
 		const cachedClassNames = styleSheets.flatMap(({ attributes }) => {
 			return attributes["data-coulis-cache"].split(",");
@@ -214,24 +149,16 @@ describe("createCoulis (web adapter)", () => {
 			},
 		});
 
-		const getContent = () => {
-			return getStyleSheets()
-				.map(({ content }) => {
-					return content;
-				})
-				.join("");
-		};
-
 		const input = { body: { color: "red" } };
 		const removeFirst = setGlobalStyles(input);
 		const removeSecond = setGlobalStyles(input);
 
 		removeFirst();
-		expect(getContent()).toBe("body{color:red;}");
+		expect(getContent(getStyleSheets())).toBe("body{color:red;}");
 		removeSecond();
-		expect(getContent()).toBe("");
+		expect(getContent(getStyleSheets())).toBe("");
 		setGlobalStyles(input);
-		expect(getContent()).toBe("body{color:red;}");
+		expect(getContent(getStyleSheets())).toBe("body{color:red;}");
 	});
 
 	test.each([
@@ -393,13 +320,7 @@ describe("createCoulis (web adapter)", () => {
 		createStyles({ color: "red</style><script>globalThis.auditXss=1</script>" });
 
 		const styleSheets = getStyleSheets();
-
-		const styleSheetsContent = styleSheets
-			.map(({ content }) => {
-				return content;
-			})
-			.join("");
-
+		const styleSheetsContent = getContent(styleSheets);
 		// Without a closing tag, the `<style>` element keeps `<script>` as inert text.
 		const escapedStyleText = String.raw`red\3C /style><script>globalThis.auditXss=1\3C /script>`;
 
@@ -428,26 +349,13 @@ describe("createCoulis (web adapter)", () => {
 	});
 });
 
-const tokens = Object.freeze({
-	colors: {
-		black: "black",
-		blue: [
-			"rgb(241,244,248)",
-			"rgb(226,232,240)",
-			"rgb(201,212,227)",
-			"rgb(168,186,211)",
-			"rgb(119,146,185)",
-		],
-		transparent: "transparent",
-		white: "white",
-	},
-	spacings: {
-		0: "0px",
-		0.5: "0.5rem",
-		1: "1rem",
-		1.5: "2rem",
-	},
-} as const);
+const getContent = (styleSheets: { content: string }[]) => {
+	return styleSheets
+		.map(({ content }) => {
+			return content;
+		})
+		.join("");
+};
 
 const { createKeyframes, createStyles, getContract, getStyleSheets, setGlobalStyles } =
 	createCoulis({
@@ -477,12 +385,77 @@ const { createKeyframes, createStyles, getContract, getStyleSheets, setGlobalSty
 		},
 		theme: {
 			colors: {
-				neutralDark: tokens.colors.black,
-				neutralLight: tokens.colors.white,
-				neutralTransparent: tokens.colors.transparent,
-				surfacePrimary: tokens.colors.blue[4],
-				surfaceSecondary: tokens.colors.blue[2],
+				neutralDark: "black",
+				neutralLight: "white",
+				neutralTransparent: "transparent",
+				surfacePrimary: "rgb(119,146,185)",
+				surfaceSecondary: "rgb(201,212,227)",
 			},
-			spacings: tokens.spacings,
+			spacings: {
+				0: "0px",
+				0.5: "0.5rem",
+				1: "1rem",
+				1.5: "2rem",
+			},
 		},
 	});
+
+const setFixtureGlobalStyles = () => {
+	return setGlobalStyles({
+		"*,*::before,*::after": {
+			boxSizing: "inherit",
+		},
+		".globalClass+.otherGlobalClass": {
+			colorScheme: "black",
+		},
+		"@charset": '"utf-8"',
+		"@font-face": {
+			fontFamily: "'AliasedHelvetica'",
+			src: "local(Helvetica)",
+		},
+		"@import": "url('https://fonts.googleapis.com/css?family=Open+Sans&display=swap')",
+		"div": {
+			backgroundColor: "red", // Non-theme-based value to check if set properly by `setGlobalStyles`
+		},
+		"html": {
+			boxSizing: "border-box",
+		},
+		"html,body": {
+			backgroundColor: "surfacePrimary",
+			fontFamily: "Open Sans, AliasedHelvetica",
+			margin: 0,
+			padding: 0,
+		},
+	});
+};
+
+const createFixtureKeyframes = () => {
+	return createKeyframes({
+		25: {
+			transform: "scale(1.25)",
+		},
+		"50%": {
+			transform: "scale(1.5)",
+		},
+		"from": {
+			transform: "scale(1)",
+		},
+		"to": {
+			transform: "scale(1)",
+		},
+	});
+};
+
+const createFixtureStyles = () => {
+	return createStyles({
+		backgroundColor: {
+			alt: "surfacePrimary",
+			base: "surfaceSecondary",
+			hover: "neutralTransparent",
+		},
+		color: "neutralDark",
+		padding: {
+			base: 0,
+		},
+	});
+};

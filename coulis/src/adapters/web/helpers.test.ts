@@ -1,35 +1,35 @@
-import { describe, expect, test } from "vitest";
+import { describe, expect, test, vi } from "vitest";
 import { createCompiledTemplate, createCustomProperties, getEvaluatedTemplate } from "./helpers";
 
 describe(createCustomProperties, () => {
 	test("should escape special characters in key names", () => {
-		const collected: [string, unknown][] = [];
+		const onCreateProperty = vi.fn<(name: string, value: unknown) => void>();
 
-		createCustomProperties({ "spacings-1.5": "2rem" }, (name) => {
-			collected.push([name, undefined]);
-		});
-
-		expect(collected[0]?.[0]).toBe("--spacings-1-5");
+		createCustomProperties({ "spacings-1.5": "2rem" }, onCreateProperty);
+		expect(onCreateProperty).toHaveBeenCalledWith("--spacings-1-5", "2rem");
 	});
 
 	test("should handle deeply nested themes with sibling branches", () => {
-		const collected: [string, unknown][] = [];
+		const onCreateProperty = vi.fn<(name: string, value: unknown) => void>();
 
 		const output = createCustomProperties(
 			{
 				a: { nested: { x: "1px" }, sibling: "2px" },
 				b: { y: "3px" },
 			},
-			(name, value) => {
-				collected.push([name, value]);
-			},
+			onCreateProperty,
 		);
 
-		expect(collected).toContainEqual(["--a-nested-x", "1px"]);
-		expect(collected).toContainEqual(["--a-sibling", "2px"]);
-		expect(collected).toContainEqual(["--b-y", "3px"]);
-		expect(output.a.nested.x).toBe("var(--a-nested-x)");
-		expect(output.b.y).toBe("var(--b-y)");
+		expect(onCreateProperty.mock.calls).toStrictEqual([
+			["--a-nested-x", "1px"],
+			["--a-sibling", "2px"],
+			["--b-y", "3px"],
+		]);
+
+		expect(output).toStrictEqual({
+			a: { nested: { x: "var(--a-nested-x)" }, sibling: "var(--a-sibling)" },
+			b: { y: "var(--b-y)" },
+		});
 	});
 });
 

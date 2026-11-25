@@ -286,8 +286,47 @@ describe("createCoulis (web adapter)", () => {
 		const content = String(getMetadata());
 
 		expect(content).toContain("html{-webkit-text-size-adjust:100%;text-size-adjust:100%;}");
-		expect(content).toContain("{-webkit-user-select:none;}");
-		expect(content).toContain("{user-select:none;}");
+		expect(content).toContain("{-webkit-user-select:none;user-select:none;}");
+	});
+
+	test("should create one class name per shorthand and state", () => {
+		const { createStyles, getMetadata } = createCoulis({
+			properties() {
+				return { paddingLeft: true, paddingRight: true };
+			},
+			shorthands: {
+				paddingHorizontal: ["paddingLeft", "paddingRight"],
+			},
+			states: {
+				hover: "coulis[selector]:hover{coulis[declaration]}",
+			},
+		});
+
+		const classNames = createStyles({ paddingHorizontal: { base: 1, hover: 2 } }).split(" ");
+		const content = String(getMetadata());
+
+		expect(classNames).toHaveLength(2);
+		expect(content).toContain(`.${classNames[0]}{padding-left:1px;padding-right:1px;}`);
+		expect(content).toContain(`.${classNames[1]}:hover{padding-left:2px;padding-right:2px;}`);
+	});
+
+	test("should skip unset values", () => {
+		const { createStyles, getMetadata } = createCoulis({
+			properties() {
+				return { color: true, width: true };
+			},
+			states: {
+				hover: "coulis[selector]:hover{coulis[declaration]}",
+			},
+		});
+
+		const className = createStyles({
+			color: { base: "red", hover: undefined },
+			width: undefined,
+		});
+
+		expect(className.split(" ")).toHaveLength(1);
+		expect(String(getMetadata())).not.toContain("undefined");
 	});
 
 	test("should escape style text in metadata and its HTML string", () => {

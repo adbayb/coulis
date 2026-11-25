@@ -201,7 +201,7 @@ useInsertionEffect(() => {
 
 ### How to add vendor prefixes?
 
-Coulis outputs only the declarations you write. Declare prefixed properties and expand them with a shorthand of the same name:
+Coulis outputs only the declarations you write, so prefixes follow your own browser targets instead of a built-in list. Declare prefixed properties and expand them with a shorthand of the same name (a shorthand creates one class name holding all its declarations):
 
 ```ts
 const { createStyles } = createCoulis({
@@ -209,7 +209,7 @@ const { createStyles } = createCoulis({
 		return { userSelect: true, WebkitUserSelect: true };
 	},
 	shorthands: {
-		userSelect: ["WebkitUserSelect", "userSelect"], // `userSelect: "none"` outputs `-webkit-user-select:none` and `user-select:none`
+		userSelect: ["WebkitUserSelect", "userSelect"], // `userSelect: "none"` outputs `.c1{-webkit-user-select:none;user-select:none;}`
 	},
 });
 ```

@@ -8,6 +8,8 @@ Fill gaps found while migrating a design system from Emotion, without increasing
 - Browser rules are inserted synchronously (through `insertRule` for atomic rules), so layout reads made right after `createStyles` (for example, in React layout effects) see the styled layout. Invalid or unsupported rules are ignored instead of throwing.
 - `setGlobalStyles` returns a function removing the rules. Calls with the same input are reference counted, so nested callers can safely add and remove the same theme-dependent global styles.
 - Instances targeting the same `<style>` elements share their inserted rules, so a rule is never inserted twice.
+- A custom shorthand creates one class name holding all its declarations (instead of one class name per expanded property), shrinking HTML class attributes and making shorthand-heavy styles faster. It also makes vendor prefixes declared as same-name shorthands (`userSelect: ["WebkitUserSelect", "userSelect"]`) a single rule.
+- Unset (`undefined`) style values, including state values, are skipped instead of generating `undefined` declarations.
 - No empty `:root{}` rule is generated without a theme.
 - Instances share one class name cache across style types, making cached style creation up to ~10% faster.
 - Server rules are no longer whitespace-minified (generated rules are already compact).

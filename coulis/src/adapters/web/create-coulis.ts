@@ -50,7 +50,6 @@ export const createCoulis: CreateCoulis<{
 	);
 
 	const shorthands = (contract.shorthands ?? {}) as Record<string, readonly string[] | undefined>;
-	const shorthandNames = Object.keys(shorthands);
 	const states: StatesLike = contract.states ?? {};
 	const compiledStateByName = new Map<string, CompiledTemplate>();
 
@@ -64,34 +63,48 @@ export const createCoulis: CreateCoulis<{
 		compiledStateByName.set(name, createCompiledTemplate(template));
 	}
 
-	const getProperty = memoize((name: string): Property => {
-		const definition = (properties as RecordLike)[name];
-		// From JS camelCase to CSS kebab-case.
-		const declarationStart = `${name.replaceAll(/[A-Z]/gu, "-$&").toLowerCase()}:`;
-		// Numbers get a `px` unit unless the property is unitless (CSS specs).
-		const numberUnit = UNITLESS_PROPERTIES.has(name) ? "" : "px";
+	/**
+	 * Resolves a style property name to the declarations it applies: a custom shorthand applies all
+	 * its properties at once (one declaration block, so one class name), any other name applies
+	 * itself.
+	 */
+	const getStyleProperty = memoize((name: string): Property => {
+		const names = Object.hasOwn(shorthands, name) ? (shorthands[name] ?? []) : [name];
+
+		/*
+		 * Per property: its definition, its CSS kebab-case name, and the unit added to numbers
+		 * (none for unitless properties, as per CSS specs).
+		 */
+		const entries = names.map((propertyName) => {
+			return [
+				(properties as RecordLike)[propertyName],
+				propertyName.replaceAll(/[A-Z]/gu, "-$&").toLowerCase(),
+				UNITLESS_PROPERTIES.has(propertyName) ? "" : "px",
+			] as const;
+		});
 
 		return {
 			getDeclaration: memoize((value: unknown) => {
-				const resolvedValue = resolvePropertyValue(definition, value);
-				const unit = typeof resolvedValue === "string" ? "" : numberUnit;
+				let declaration = "";
 
-				return `${declarationStart}${resolvedValue as string}${unit};`;
+				if (value === undefined) {
+					return declaration; // Skip unset values.
+				}
+
+				for (const [definition, kebabName, numberUnit] of entries) {
+					const resolvedValue = resolvePropertyValue(definition, value);
+					const unit = typeof resolvedValue === "string" ? "" : numberUnit;
+
+					declaration += `${kebabName}:${resolvedValue as string}${unit};`;
+				}
+
+				return declaration;
 			}),
-			isCSSShorthand: SHORTHAND_PROPERTIES.has(name),
+			// A block mixing CSS shorthands and longhands goes with shorthands, so it never overrides longhands set by other class names.
+			isCSSShorthand: names.some((propertyName) => {
+				return SHORTHAND_PROPERTIES.has(propertyName);
+			}),
 		};
-	});
-
-	/**
-	 * Resolves a style property name to the properties it applies: the custom shorthand expansion
-	 * if any, the property itself otherwise.
-	 */
-	const getExpandedProperties = memoize((name: string): readonly Property[] => {
-		const names = Object.hasOwn(shorthands, name) ? (shorthands[name] ?? []) : [name];
-
-		return names.map((expandedName) => {
-			return getProperty(expandedName);
-		});
 	});
 
 	const getOrCreateClassName = (
@@ -118,6 +131,10 @@ export const createCoulis: CreateCoulis<{
 		stateName = "base",
 	): ClassName => {
 		const declaration = property.getDeclaration(value);
+
+		if (!declaration) {
+			return "";
+		}
 
 		if (stateName === "base") {
 			/*
@@ -154,15 +171,7 @@ export const createCoulis: CreateCoulis<{
 		let declarationBlock = "";
 
 		for (const name of Object.keys(input)) {
-			const value = input[name];
-
-			if (value === undefined) {
-				continue;
-			}
-
-			for (const property of getExpandedProperties(name)) {
-				declarationBlock += property.getDeclaration(value);
-			}
+			declarationBlock += getStyleProperty(name).getDeclaration(input[name]);
 		}
 
 		return declarationBlock;
@@ -229,24 +238,17 @@ export const createCoulis: CreateCoulis<{
 
 			for (const name of Object.keys(input)) {
 				const value: unknown = input[name as keyof typeof input];
+				const property = getStyleProperty(name);
 
-				for (const property of getExpandedProperties(name)) {
-					if (!isObject(value)) {
-						classNames.push(getOrCreateAtomicClassName(property, value));
+				for (const stateName of isObject(value) ? Object.keys(value) : ["base"]) {
+					const className = getOrCreateAtomicClassName(
+						property,
+						isObject(value) ? value[stateName] : value,
+						stateName,
+					);
 
-						continue;
-					}
-
-					for (const stateName of Object.keys(value)) {
-						const className = getOrCreateAtomicClassName(
-							property,
-							value[stateName],
-							stateName,
-						);
-
-						if (className) {
-							classNames.push(className);
-						}
+					if (className) {
+						classNames.push(className);
 					}
 				}
 			}
@@ -265,9 +267,10 @@ export const createCoulis: CreateCoulis<{
 		 */
 		getContract() {
 			return {
-				propertyNames: [...shorthandNames, ...Object.keys(properties)] as ReturnType<
-					typeof this.getContract
-				>["propertyNames"],
+				propertyNames: [
+					...Object.keys(shorthands),
+					...Object.keys(properties),
+				] as ReturnType<typeof this.getContract>["propertyNames"],
 			};
 		},
 		/**

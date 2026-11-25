@@ -17,7 +17,7 @@
 	"repository": {
 		"type": "git",
 		"url": "git@github.com:adbayb/coulis.git",
-		"directory": "packages/coulis"
+		"directory": "coulis"
 	},
 	"files": [
 		"dist"

@@ -197,14 +197,10 @@ In the browser, rules are inserted synchronously: styles apply as soon as `creat
 For more server-side integration recipes, the following examples can be checked:
 
 - **React**
-    - [Next.js with the app router](./examples/nextjs-app-router/), more specifically, [this snippet](./examples/nextjs-app-router/src/components/coulis-registry.tsx).
-    - [Next.js with the pages router](./examples/nextjs-pages-router/), more specifically, [this snippet](./examples/nextjs-pages-router/src/pages/_document.tsx).
-    - [Vite.js with server-side rendering](./examples/vite-ssr-react/), more specifically, [this snippet](./examples/vite-ssr-react/src/entry-server.tsx).
-- **Angular**
-    - Welcome to any contribution.
-- **Vue**
-    - Welcome to any contribution.
-- **...**
+    - [Next.js with the app router](https://github.com/adbayb/coulis/tree/main/examples/nextjs-app-router), more specifically, [this snippet](https://github.com/adbayb/coulis/tree/main/examples/nextjs-app-router/src/components/coulis-registry.tsx).
+    - [Next.js with the pages router](https://github.com/adbayb/coulis/tree/main/examples/nextjs-pages-router), more specifically, [this snippet](https://github.com/adbayb/coulis/tree/main/examples/nextjs-pages-router/src/pages/_document.tsx).
+    - [Vite.js with server-side rendering](https://github.com/adbayb/coulis/tree/main/examples/vite-ssr-react), more specifically, [this snippet](https://github.com/adbayb/coulis/tree/main/examples/vite-ssr-react/src/entry-server.tsx).
+- **Other frameworks** (Angular, Vue, ...)
     - Welcome to any contribution.
 
 ### How to update or remove global styles?
@@ -274,12 +270,12 @@ Minified, tree-shaken browser ESM bundles measured with esbuild 0.28.2 (`bundle:
 
 | Library                  | Version   | Minified + gzip |
 | ------------------------ | --------- | --------------: |
-| Coulis                   | workspace |         2.42 kB |
+| Coulis                   | workspace |         2.41 kB |
 | Emotion (`@emotion/css`) | 11.13.5   |         6.28 kB |
 | Goober                   | 2.1.19    |         1.11 kB |
 | styled-components        | 6.6.0     |        10.99 kB |
 
-Each bundle re-exports `createCoulis` (Coulis), `css` (Emotion and Goober), or `styled` (styled-components). Coulis includes its web factory's styling and metadata APIs; these libraries have different feature sets. Application bundles vary with imports, bundler settings, and library versions.
+Each bundle re-exports `createCoulis` (Coulis), `css` (Emotion and Goober), or `styled` (styled-components). Coulis includes its web factory's styling and style sheet APIs; these libraries have different feature sets. Application bundles vary with imports, bundler settings, and library versions.
 
 <br>
 

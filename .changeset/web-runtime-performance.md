@@ -9,5 +9,6 @@ Make the web runtime faster on the client and the server, with the same class na
 - Array values no longer add a cache entry on each call.
 - Fix range queries (e.g. `@media (width < 600px)`) in server-rendered and global rules: only `</` is escaped in CSS text (it is enough to prevent closing the `<style>` element), whereas every `<` was escaped before, turning comparisons into invalid queries.
 - Simplify the implementation: unconditional values are the `base` state of a single rule creation path, and theme custom properties are created without path arrays.
+- Publish the API documentation with the types: `createCoulis` methods are now documented in editors for both the web and React Native entry points.
 
-The web bundle grows from 2.34 kB to 2.42 kB (minified + gzip).
+The web bundle grows from 2.34 kB to 2.41 kB (minified + gzip).

@@ -62,11 +62,11 @@ This builds the `tools/benchmark` package and runs benchmarks against different 
 ```
 coulis/src/
   core/
-    entities/   # Platform-agnostic building blocks (cache, style, theme, …)
-    ports/      # Generic TypeScript interfaces that adapters must implement
+    entities/   # Platform-agnostic building blocks (style contract types, value resolution)
+    ports/      # Generic TypeScript interfaces that adapters must implement (and their API documentation)
   adapters/
-    web/        # Browser adapter — emits CSS class names and injects <style> tags
-    react-native/ # React Native adapter — emits StyleSheet objects
+    web/        # Web adapter: returns CSS class names, inserts rules in <style> elements (browser) or serializes them (server)
+    react-native/ # React Native adapter: returns style objects
 ```
 
 All public-facing behavior lives in the adapters.

@@ -257,10 +257,10 @@ Theme values are passed as-is (raw values, not CSS custom properties).
 
 Median of three runs of `pnpm --filter @coulis/benchmark benchmark`, rendering a 1,000-row React table. Higher throughput is better; dynamic styles are created during each render. The server case renders to a string and extracts its styles (critical styles for Coulis with `getCriticalStyleSheets(html)` and for Emotion with `extractCritical`).
 
-| Runtime         | Coulis |           Emotion |             Goober | styled-components |
-| --------------- | -----: | ----------------: | -----------------: | ----------------: |
-| Browser (ops/s) |  1,748 | 809 (2.2x slower) |  442 (3.9x slower) | 465 (3.8x slower) |
-| Server (ops/s)  |    157 | 146 (1.1x slower) | 159 (1.01x faster) |  75 (2.1x slower) |
+| Runtime         | Coulis |           Emotion |            Goober | styled-components |
+| --------------- | -----: | ----------------: | ----------------: | ----------------: |
+| Browser (ops/s) |  1,737 | 812 (2.1x slower) | 439 (4.0x slower) | 466 (3.7x slower) |
+| Server (ops/s)  |    156 | 146 (1.1x slower) |      156 (on par) |  75 (2.1x slower) |
 
 These results are hardware- and runtime-dependent.
 

@@ -83,11 +83,11 @@ describe("createStyleSheet (browser)", () => {
 	});
 
 	test("should remove a global rule serialized by the server", () => {
-		appendStyleElement("global", "g1", String.raw`a::after{content:"\3C ";}`);
+		appendStyleElement("global", "g1", String.raw`a::after{content:"\3C /b>";}`);
 
 		const sheet = createStyleSheet("global");
 
-		sheet.removeRule("g1", 'a::after{content:"<";}');
+		sheet.removeRule("g1", 'a::after{content:"</b>";}');
 		expect(getGlobalText()).toBe("");
 	});
 

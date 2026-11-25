@@ -141,11 +141,13 @@ export const createStyleSheet = (type: StyleType): StyleSheet => {
 };
 
 /**
- * Serializes a rule as text: `<` is escaped so the CSS text cannot close its `<style>` element.
+ * Serializes a rule as text: `</` is escaped so the CSS text cannot close its `<style>` element.
+ * Any other `<` is kept: escaped, it would no longer be a comparison in range queries (e.g. `@media
+ * (width < 600px)`).
  *
  * @param rule - The rule to serialize.
  * @returns The serialized rule.
  */
 const serializeRule = (rule: string) => {
-	return rule.replaceAll("<", String.raw`\3C `);
+	return rule.replaceAll("</", String.raw`\3C /`);
 };

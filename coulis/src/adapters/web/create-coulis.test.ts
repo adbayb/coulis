@@ -383,7 +383,7 @@ describe("createCoulis (web adapter)", () => {
 		expect(String(getStyleSheets())).not.toContain("undefined");
 	});
 
-	test("should escape style text in styleSheets and its HTML string", () => {
+	test("should escape closing tags in style sheets and their HTML string", () => {
 		const { createStyles, getStyleSheets } = createCoulis({
 			properties() {
 				return { color: true };
@@ -395,18 +395,36 @@ describe("createCoulis (web adapter)", () => {
 		const styleSheets = getStyleSheets();
 
 		const styleSheetsContent = styleSheets
-			.map(({ content: stylesheetContent }) => {
-				return stylesheetContent;
+			.map(({ content }) => {
+				return content;
 			})
 			.join("");
 
-		const serializedMetadata = String(styleSheets);
-		const escapedStyleText = String.raw`red\3C /style>\3C script>globalThis.auditXss=1\3C /script>`;
+		// Without a closing tag, the `<style>` element keeps `<script>` as inert text.
+		const escapedStyleText = String.raw`red\3C /style><script>globalThis.auditXss=1\3C /script>`;
 
 		expect(styleSheetsContent).toContain(escapedStyleText);
-		expect(styleSheetsContent).not.toContain("<script>");
-		expect(serializedMetadata).toContain(escapedStyleText);
-		expect(serializedMetadata).not.toContain("<script>");
+		expect(styleSheetsContent).not.toContain("</");
+		expect(String(styleSheets)).toContain(escapedStyleText);
+		// The only closing tags are the ones of the `<style>` elements.
+		expect(String(styleSheets).match(/<\//gu)).toHaveLength(styleSheets.length);
+	});
+
+	test("should keep range comparisons in style sheets", () => {
+		const { createStyles, getStyleSheets } = createCoulis({
+			properties() {
+				return { color: true };
+			},
+			states: {
+				narrow: "@media (width < 600px){coulis[selector]{coulis[declaration]}}",
+			},
+		});
+
+		const [, className] = createStyles({ color: { base: "red", narrow: "blue" } }).split(" ");
+
+		expect(String(getStyleSheets())).toContain(
+			`>@media (width < 600px){.${className}{color:blue;}}</style>`,
+		);
 	});
 });
 

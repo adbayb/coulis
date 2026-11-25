@@ -1,39 +1,36 @@
 import { Dimensions } from "react-native";
 
-type Transform = (input: { name: string; value: unknown }) => typeof input;
+type WindowDimensions = { height: number; width: number };
 
-let windowDimensions = Dimensions.get("window");
-
-const createUnitScales = () => {
+const createUnitScales = ({ height, width }: WindowDimensions) => {
 	return {
 		em: 16,
 		rem: 16,
-		vh: windowDimensions.height / 100,
-		vmax: Math.max(windowDimensions.width, windowDimensions.height) / 100,
-		vmin: Math.min(windowDimensions.width, windowDimensions.height) / 100,
-		vw: windowDimensions.width / 100,
+		vh: height / 100,
+		vmax: Math.max(width, height) / 100,
+		vmin: Math.min(width, height) / 100,
+		vw: width / 100,
 	};
 };
 
-let unitScales = createUnitScales();
+let unitScales = createUnitScales(Dimensions.get("window"));
 
-Dimensions.addEventListener("change", ({ window }: { window: typeof windowDimensions }) => {
-	windowDimensions = window;
-	unitScales = createUnitScales();
+Dimensions.addEventListener("change", ({ window }: { window: WindowDimensions }) => {
+	unitScales = createUnitScales(window);
 });
 
-export const transformDimension: Transform = (input) => {
-	if (typeof input.value !== "string") {
+/**
+ * Transforms a CSS dimension into a React Native one: `px` values and viewport/font relative units
+ * become numbers. Any other value is returned as is.
+ *
+ * @param input - The style value.
+ * @returns The transformed value.
+ */
+export const transformDimension = (input: unknown) => {
+	if (typeof input !== "string") {
 		return input;
 	}
 
-	return {
-		name: input.name,
-		value: getDimensionValue(input.value),
-	};
-};
-
-const getDimensionValue = (input: string) => {
 	// oxlint-disable-next-line unicorn/prefer-number-coercion
 	const value = Number.parseFloat(input);
 

@@ -1,8 +1,7 @@
 import type { RecordLike } from "../../core/entities/primitive";
 import { isObject } from "../../core/entities/primitive";
-import type { StatesLike } from "../../core/entities/state";
-import type { StyleType } from "../../core/entities/style";
-import { resolvePropertyValue, STYLE_TYPES } from "../../core/entities/style";
+import type { StatesLike } from "../../core/entities/style";
+import { resolvePropertyValue } from "../../core/entities/style";
 import type { CreateCoulis } from "../../core/ports/create-coulis";
 import { SHORTHAND_PROPERTIES, UNITLESS_PROPERTIES } from "./constants";
 import type { CompiledTemplate } from "./helpers";
@@ -13,8 +12,8 @@ import {
 	getEvaluatedTemplate,
 	memoize,
 } from "./helpers";
-import type { ClassName, Rule, StyleSheet } from "./stylesheet";
-import { createStyleSheet } from "./stylesheet";
+import type { ClassName, Rule, StyleSheet, StyleType } from "./stylesheet";
+import { createStyleSheet, getStyleType, STYLE_TYPES } from "./stylesheet";
 
 /**
  * Creates a web instance that generates atomic CSS rules for browser injection and server-side
@@ -223,22 +222,6 @@ export const createCoulis: CreateCoulis<{
 	};
 
 	return {
-		/**
-		 * Creates a CSS `@keyframes` animation rule from a map of keyframe selectors (e.g.
-		 * `"from"`, `"to"`, `"50%"`, or a plain number interpreted as a percentage) to style
-		 * objects. Returns the generated animation name, which can be passed directly to an
-		 * `animation` or `animationName` property.
-		 *
-		 * @example
-		 * 	const spin = createKeyframes({
-		 * 		from: { transform: "rotate(0deg)" },
-		 * 		to: { transform: "rotate(360deg)" },
-		 * 	});
-		 * 	createStyles({ animation: `${spin} 1s linear infinite` });
-		 *
-		 * @param input - Style properties.
-		 * @returns Animation name.
-		 */
 		createKeyframes(input) {
 			return getGlobalClassName(JSON.stringify(input), (className) => {
 				let rule = "";
@@ -258,18 +241,6 @@ export const createCoulis: CreateCoulis<{
 				return `@keyframes ${className}{${rule}}`;
 			});
 		},
-		/**
-		 * Generates atomic CSS class names for a given style object. Each property/value pair
-		 * produces its own class name and CSS rule. Identical inputs always return the same
-		 * space-separated class name string (cached). State variants (e.g. `{ base: "red", hover:
-		 * "blue" }`) are supported when `states` is configured in the contract.
-		 *
-		 * @example
-		 * 	const className = createStyles({ color: "neutralDark", display: "flex" });
-		 *
-		 * @param input - Style properties.
-		 * @returns Class name.
-		 */
 		createStyles(input) {
 			let classNames = "";
 
@@ -294,16 +265,6 @@ export const createCoulis: CreateCoulis<{
 
 			return classNames;
 		},
-		/**
-		 * Returns the list of all property names (including shorthands) accepted by `createStyles`
-		 * and `setGlobalStyles`. Useful for runtime introspection or building tooling on top of a
-		 * coulis instance.
-		 *
-		 * @example
-		 * 	const contract = getContract();
-		 *
-		 * @returns The list of all property names.
-		 */
 		getContract() {
 			return {
 				propertyNames: [
@@ -312,18 +273,6 @@ export const createCoulis: CreateCoulis<{
 				] as ReturnType<typeof this.getContract>["propertyNames"],
 			};
 		},
-		/**
-		 * Returns the style sheets a rendered HTML needs (critical styles): the atomic rules whose
-		 * class names are used in the HTML, plus every global rule and keyframes. Same output as
-		 * `getStyleSheets`.
-		 *
-		 * @example
-		 * 	const body = renderToString(<App />);
-		 * 	const html = `<head>${String(getCriticalStyleSheets(body))}</head><body>${body}</body>`;
-		 *
-		 * @param html - The rendered HTML.
-		 * @returns The style sheets.
-		 */
 		getCriticalStyleSheets(html) {
 			/*
 			 * Class attributes repeat a lot: they are deduplicated before collecting their words (class
@@ -333,41 +282,7 @@ export const createCoulis: CreateCoulis<{
 
 			return serializeStyleSheets(new Set(classAttributes.match(/\w+/gu)));
 		},
-		/**
-		 * Returns every style sheet generated so far by the instance, as an array of `{ attributes,
-		 * content }` objects to render as `<style>` elements. `String()` on the result gives the
-		 * `<style>` tags.
-		 *
-		 * Styles are cached for the instance lifetime and shared by every request on a server: use
-		 * it when the rendered HTML is not available (e.g. streaming rendering). Call it after
-		 * rendering to include the styles generated during the render.
-		 *
-		 * @example
-		 * 	useServerInsertedHTML(() => {
-		 * 		return <div dangerouslySetInnerHTML={{ __html: String(getStyleSheets()) }} />;
-		 * 	});
-		 *
-		 * @returns The style sheets.
-		 */
 		getStyleSheets: serializeStyleSheets,
-		/**
-		 * Injects global (non-component) CSS rules: element selectors, `@import`, `@font-face`,
-		 * `@charset`, and any other top-level CSS constructs. Rules are deduplicated — calling this
-		 * multiple times with the same input only injects once.
-		 *
-		 * Returns a function removing the rules, to call once. Calls with the same input are
-		 * reference counted: the rules are removed once every caller has removed them (e.g. nested
-		 * providers setting the same theme-dependent rules).
-		 *
-		 * @example
-		 * 	const removeGlobalStyles = setGlobalStyles({
-		 * 		"html,body": { margin: "none", padding: "none" },
-		 * 		"@import": "url('https://fonts.googleapis.com/css?family=Open+Sans')",
-		 * 	});
-		 *
-		 * @param input - Style properties.
-		 * @returns A function removing the rules.
-		 */
 		setGlobalStyles(input) {
 			const serializedInput = JSON.stringify(input);
 
@@ -425,17 +340,6 @@ type Property = {
 
 const BASE_STATE_NAME = "base";
 const BASE_COMPILED_STATE = createCompiledTemplate("coulis[selector]{coulis[declaration]}");
-
-/**
- * Picks the style type from `STYLE_TYPES` order: (at-)shorthand types precede (at-)longhand ones.
- *
- * @param isCSSShorthand - Whether the property is a CSS shorthand.
- * @param isAtRule - Whether the rule is an at-rule.
- * @returns The style type.
- */
-const getStyleType = (isCSSShorthand: boolean, isAtRule: boolean): StyleType => {
-	return STYLE_TYPES[(isAtRule ? 3 : 1) + Number(!isCSSShorthand)] as StyleType;
-};
 
 const joinClassNames = (classNames: string, className: ClassName) => {
 	// An empty class name (unset value) is skipped.

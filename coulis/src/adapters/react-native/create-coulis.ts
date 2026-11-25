@@ -25,21 +25,17 @@ export const createCoulis: CreateCoulis<{
 	const shorthands = (contract.shorthands ?? {}) as NonNullable<typeof contract.shorthands>;
 	const stylesCache = new Map<string, CreateCoulisOutput>();
 
-	const getResolvedPropertyValue = (name: string, value: unknown) => {
-		return transformDimension({
-			name,
-			value: resolvePropertyValue(properties[name as keyof typeof properties], value),
-		}).value;
-	};
-
 	const getStyleValue = (name: string, value: unknown) => {
+		let baseValue = value;
+
 		if (isObject(value)) {
 			unsupportedLogger.warn("States are not supported, ignoring non-base values.");
-
-			return getResolvedPropertyValue(name, value.base);
+			baseValue = value.base;
 		}
 
-		return getResolvedPropertyValue(name, value);
+		return transformDimension(
+			resolvePropertyValue(properties[name as keyof typeof properties], baseValue),
+		);
 	};
 
 	return {

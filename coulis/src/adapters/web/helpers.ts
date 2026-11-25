@@ -3,12 +3,25 @@ import { isObject } from "../../core/entities/primitive";
 
 const TEMPLATE_MARKER = /coulis\[(selector|declaration)\]/u;
 
+/**
+ * Creates a class name from the djb2 hash of a given string. `Math.imul` keeps the multiplication
+ * in 32-bit integers (same hash as `hash * 33`, without floating-point math), and the base-36
+ * encoding keeps class names short (up to 7 characters versus 10 in decimal), shrinking HTML class
+ * attributes, CSS selectors, and cache metadata.
+ *
+ * @param input - The string to hash.
+ * @returns The class name.
+ */
 export const createClassName = (input: string) => {
-	/**
-	 * Base-36 encoding keeps class names short (up to 7 chars vs up to 10 in decimal), shrinking
-	 * HTML class attributes, generated CSS selectors and cache metadata.
-	 */
-	return `c${getDjb2Hash(input).toString(36)}`;
+	let hash = 5381;
+
+	for (let index = 0; index < input.length; index++) {
+		// oxlint-disable-next-line unicorn/prefer-code-point
+		hash = Math.imul(hash, 33) ^ input.charCodeAt(index);
+	}
+
+	// `>>> 0` makes the hash a positive integer.
+	return `c${(hash >>> 0).toString(36)}`;
 };
 
 /**
@@ -31,24 +44,6 @@ export const memoize = <Key, Value>(create: (key: Key) => Value) => {
 
 		return value;
 	};
-};
-
-/**
- * Computes the djb2 hash of a given string. `Math.imul` keeps the multiplication in 32-bit
- * integers: same hash as `hash * 33`, without floating-point math.
- *
- * @param input - The input string to hash.
- * @returns The computed hash value.
- */
-const getDjb2Hash = (input: string) => {
-	let hash = 5381; // Initial hash value
-
-	for (let i = 0; i < input.length; i++) {
-		// oxlint-disable-next-line unicorn/prefer-code-point
-		hash = Math.imul(hash, 33) ^ input.charCodeAt(i);
-	}
-
-	return hash >>> 0; // Ensure a positive integer
 };
 
 /**

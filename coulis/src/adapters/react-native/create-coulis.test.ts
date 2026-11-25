@@ -3,20 +3,8 @@ import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 import { createCoulis } from "./create-coulis";
 
 // @ts-expect-error Partial mocking for testing purposes
-vi.mock(import("react-native"), (): { Dimensions: Dimensions } => {
-	return {
-		Dimensions: {
-			addEventListener: vi.fn(),
-			get: vi.fn(() => {
-				return {
-					fontScale: 0,
-					height: 800,
-					scale: 0,
-					width: 400,
-				};
-			}),
-		},
-	};
+vi.mock(import("react-native"), async () => {
+	return import("./react-native.mock");
 });
 
 const createInstance = () => {

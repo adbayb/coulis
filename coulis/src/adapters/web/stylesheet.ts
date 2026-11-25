@@ -1,6 +1,18 @@
-import type { StyleType } from "../../core/entities/style";
+const IS_BROWSER_ENVIRONMENT = typeof window !== "undefined";
 
-const IS_SERVER_ENVIRONMENT = typeof window === "undefined";
+/**
+ * Style sheets are rendered in this order so that the more precise rules take precedence over the
+ * less precise ones: global (e.g. `div { background-color }`) < shorthand (e.g. `background`) <
+ * longhand (e.g. `background-color`) < conditional shorthand (e.g. `@media { background }`) <
+ * conditional longhand (e.g. `@media { background-color }`).
+ */
+export const STYLE_TYPES = [
+	"global",
+	"shorthand",
+	"longhand",
+	"atShorthand",
+	"atLonghand",
+] as const;
 
 export type ClassName = string;
 export type Rule = string;
@@ -19,6 +31,8 @@ export type StyleSheet = {
 	/** Inserts a rule unless its class name is already in the sheet. */
 	setRule: (className: ClassName, createRule: (className: ClassName) => Rule) => void;
 };
+
+export type StyleType = (typeof STYLE_TYPES)[number];
 
 type CoulisStyleElement = HTMLStyleElement & {
 	/**
@@ -54,7 +68,7 @@ export const createStyleSheet = (type: StyleType): StyleSheet => {
 	// Serialization of every rule, reused until a rule is inserted or removed.
 	let serializedRules: SerializedRules | undefined;
 
-	if (!IS_SERVER_ENVIRONMENT) {
+	if (IS_BROWSER_ENVIRONMENT) {
 		// `appendChild` returns the appended element (unlike `append`), keeping the code short.
 		element =
 			document.querySelector<CoulisStyleElement>(`style[data-coulis-type="${type}"]`) ??
@@ -138,6 +152,18 @@ export const createStyleSheet = (type: StyleType): StyleSheet => {
 			serializedRules = undefined;
 		},
 	};
+};
+
+/**
+ * Picks the style type of an atomic rule from the `STYLE_TYPES` order: (at-)shorthand types precede
+ * (at-)longhand ones.
+ *
+ * @param isCSSShorthand - Whether the rule sets a CSS shorthand property.
+ * @param isAtRule - Whether the rule is an at-rule.
+ * @returns The style type.
+ */
+export const getStyleType = (isCSSShorthand: boolean, isAtRule: boolean): StyleType => {
+	return STYLE_TYPES[(isAtRule ? 3 : 1) + Number(!isCSSShorthand)] as StyleType;
 };
 
 /**

@@ -14,13 +14,19 @@
 		}
 	},
 	"scripts": {
-		"benchmark": "pnpm benchmark:browser && pnpm benchmark:server",
+		"benchmark": "pnpm build && pnpm benchmark:browser && pnpm benchmark:server",
 		"benchmark:browser": "quickbundle build --minification && playwright test ./src/cases/browser.spec.ts",
-		"benchmark:server": "NODE_ENV=production tsx ./src/cases/server.spec.ts"
+		"benchmark:server": "NODE_ENV=production tsx ./src/cases/server.spec.ts",
+		"build": "tsx ./src/cases/stylex/build.ts"
 	},
 	"devDependencies": {
+		"@babel/core": "8.1.0",
+		"@babel/plugin-syntax-jsx": "8.0.1",
+		"@babel/plugin-syntax-typescript": "8.0.3",
 		"@emotion/css": "11.13.5",
 		"@emotion/server": "11.11.0",
+		"@stylexjs/babel-plugin": "0.19.2",
+		"@stylexjs/stylex": "0.19.2",
 		"coulis": "workspace:*",
 		"goober": "2.1.19",
 		"playwright": "1.65.0",

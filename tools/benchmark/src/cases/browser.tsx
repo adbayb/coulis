@@ -7,6 +7,7 @@
 import type { JSX } from "react";
 import { flushSync } from "react-dom";
 import { createRoot } from "react-dom/client";
+import { StyleXComponent } from "../../dist/stylex/component";
 import { createBenchmark } from "../helpers";
 import { CoulisComponent } from "./coulis/component";
 import { EmotionComponent } from "./emotion/component";
@@ -57,6 +58,10 @@ const benchmark = createBenchmark([
 	{
 		name: "styled-components",
 		handler: createHandler(StyledComponentsComponent),
+	},
+	{
+		name: "stylex",
+		handler: createHandler(StyleXComponent),
 	},
 ]);
 

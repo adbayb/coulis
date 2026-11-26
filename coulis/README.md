@@ -264,14 +264,14 @@ export const List = ({ items }: { items: string[] }) => {
 };
 ```
 
-It brings the rendering time down to the one of static class names, which is what a build-time CSS-in-JS library such as [StyleX](https://stylexjs.com) leaves in the bundle. Mounting then unmounting a list of 6,000 elements, each setting nine properties (one with a media query state) and alternating between two background colors:
+It brings the rendering time down to the one of a build-time CSS-in-JS library such as [StyleX](https://stylexjs.com), whose compiler leaves static class names in the bundle. Mounting then unmounting a list of 6,000 elements, each setting nine properties (one with a media query state) and alternating between two background colors:
 
 | Styles                                                 |    Time |
 | ------------------------------------------------------ | ------: |
-| Static class names (build-time CSS-in-JS library)      |  4.9 ms |
+| StyleX, styles compiled at build time                  |  4.9 ms |
 | Coulis, `createStyles` called once in the module scope |  4.9 ms |
-| Coulis, `createStyles` called during render            |  7.3 ms |
-| Emotion, `css` called during render                    | 16.8 ms |
+| Coulis, `createStyles` called during render            |  7.4 ms |
+| Emotion, `css` called during render                    | 16.7 ms |
 
 Median of three runs in headless Chromium with React production builds. These results are hardware- and runtime-dependent.
 
@@ -310,12 +310,12 @@ Theme values are passed as-is (raw values, not CSS custom properties).
 
 ### Runtime performance
 
-Median of three runs of `pnpm --filter @coulis/benchmark benchmark`, rendering a 1,000-row React table with React production builds. Higher throughput is better; dynamic styles are created during each render. The server case renders to a string and extracts its styles (critical styles for Coulis with `getCriticalStyleSheets(html)` and for Emotion with `extractCritical`).
+Median of three runs of `pnpm --filter @coulis/benchmark benchmark`, rendering a 1,000-row React table with React production builds. Higher throughput is better; dynamic styles are created during each render, except for StyleX whose styles are compiled at build time (one per value, selected during render with `props`). The server case renders to a string and extracts its styles (critical styles for Coulis with `getCriticalStyleSheets(html)` and for Emotion with `extractCritical`; none for StyleX, whose styles are a build-time style sheet).
 
-| Runtime         | Coulis |           Emotion |              Goober | styled-components |
-| --------------- | -----: | ----------------: | ------------------: | ----------------: |
-| Browser (ops/s) |  1,747 | 796 (2.2x slower) |   438 (4.0x slower) | 458 (3.8x slower) |
-| Server (ops/s)  |  1,172 | 615 (1.9x slower) | 1,041 (1.1x slower) | 256 (4.6x slower) |
+| Runtime         | Coulis |           Emotion |              Goober | styled-components |              StyleX |
+| --------------- | -----: | ----------------: | ------------------: | ----------------: | ------------------: |
+| Browser (ops/s) |  1,751 | 809 (2.2x slower) |   446 (3.9x slower) | 461 (3.8x slower) | 1,635 (1.1x slower) |
+| Server (ops/s)  |  1,181 | 609 (1.9x slower) | 1,061 (1.1x slower) | 259 (4.6x slower) | 1,317 (1.1x faster) |
 
 These results are hardware- and runtime-dependent.
 
@@ -323,14 +323,15 @@ These results are hardware- and runtime-dependent.
 
 Minified, tree-shaken browser ESM bundles measured with esbuild 0.28.2 (`bundle: true`, `minify: true`, `target: "es2020"`) and Node.js gzip at level 9, with `process.env.NODE_ENV` set to `"production"` and React/React DOM excluded. Sizes include bundled dependencies and use decimal kB (1 kB = 1,000 bytes).
 
-| Library                  | Version   | Minified + gzip |
-| ------------------------ | --------- | --------------: |
-| Coulis                   | workspace |         2.58 kB |
-| Emotion (`@emotion/css`) | 11.13.5   |         6.28 kB |
-| Goober                   | 2.1.19    |         1.11 kB |
-| styled-components        | 6.6.0     |        10.99 kB |
+| Library                     | Version   | Minified + gzip |
+| --------------------------- | --------- | --------------: |
+| Coulis                      | workspace |         2.58 kB |
+| Emotion (`@emotion/css`)    | 11.13.5   |         6.28 kB |
+| Goober                      | 2.1.19    |         1.11 kB |
+| styled-components           | 6.6.0     |        10.99 kB |
+| StyleX (`@stylexjs/stylex`) | 0.19.2    |         0.85 kB |
 
-Each bundle re-exports `createCoulis` (Coulis), `css` (Emotion and Goober), or `styled` (styled-components). Coulis includes its web factory's styling and style sheet APIs; these libraries have different feature sets. Application bundles vary with imports, bundler settings, and library versions.
+Each bundle re-exports `createCoulis` (Coulis), `css` (Emotion and Goober), `styled` (styled-components), or `props` (StyleX, whose compiled styles ship in a separate style sheet). Coulis includes its web factory's styling and style sheet APIs; these libraries have different feature sets. Application bundles vary with imports, bundler settings, and library versions.
 
 <br>
 

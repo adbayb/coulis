@@ -6,7 +6,6 @@ export const UNITLESS_PROPERTIES = new Set([
 	"borderImageWidth",
 	"columnCount",
 	"columns",
-	// SVG properties
 	"fillOpacity",
 	"flex",
 	"flexGrow",
@@ -32,7 +31,6 @@ export const UNITLESS_PROPERTIES = new Set([
 	"strokeOpacity",
 	"strokeWidth",
 	"tabSize",
-	// Property prefixes
 	"WebkitLineClamp",
 	"widows",
 	"zIndex",

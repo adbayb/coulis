@@ -6,3 +6,11 @@ export type BenchmarkOutput = {
 	"Throughput mean (ops/s)": number;
 	"Throughput med (ops/s)": number;
 };
+
+export type Measure = {
+	name: string;
+	latencyMean: number;
+	latencyMedian: number;
+	throughputMean: number;
+	throughputMedian: number;
+};

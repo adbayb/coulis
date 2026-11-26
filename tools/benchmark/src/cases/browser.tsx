@@ -1,63 +1,37 @@
-/**
- * @file This file is bundled as a self-contained script and injected into a headless browser page
- *   by `browser.spec.ts` via `page.addScriptTag`. Keep it standalone: do not merge it in
- *   `browser.spec.ts` or rely on any module that cannot be bundled into the single
- *   `dist/browser.js` output.
- */
 import type { JSX } from "react";
 import { flushSync } from "react-dom";
 import { createRoot } from "react-dom/client";
-import { createBenchmark } from "../helpers";
-import { CoulisComponent } from "./coulis/component";
-import { EmotionComponent } from "./emotion/component";
-import { GooberComponent } from "./goober/component";
-import { StyledComponentsComponent } from "./styled-components/component";
+import { measureCases } from "../helpers";
 
-let sharedRoot: ReturnType<typeof createRoot> | undefined;
+/**
+ * Bootstraps a case in its page. Each case folder bundles its own `browser.tsx` entry as a
+ * self-contained script, injected by `browser.spec.ts` into a page of its own: a library never
+ * shares its document (style sheets, caches) with another one.
+ *
+ * @param name - The case name.
+ * @param Component - The component rendered by the case.
+ */
+export const bootstrapBrowserCase = (name: string, Component: () => JSX.Element) => {
+	const rootElement = document.createElement("div");
 
-const getSharedRoot = () => {
-	if (!sharedRoot) {
-		document.body.innerHTML = "";
+	document.body.append(rootElement);
 
-		const rootElement = document.createElement("div");
+	const root = createRoot(rootElement);
 
-		document.body.append(rootElement);
-		sharedRoot = createRoot(rootElement);
-	}
-
-	return sharedRoot;
-};
-
-const createHandler = (Component: () => JSX.Element) => {
-	return () => {
-		/**
-		 * All cases render into the same container so only one table lives in the DOM at a time.
-		 * FlushSync forces each render to complete synchronously before tinybench proceeds to the
-		 * next iteration, preventing pending React tasks from flooding the event loop.
-		 */
+	const handler = () => {
+		// `flushSync` completes each render before the next iteration, so pending React tasks never flood the event loop.
 		flushSync(() => {
-			getSharedRoot().render(<Component />);
+			root.render(<Component />);
 		});
 	};
+
+	globalThis.__RUN_BENCHMARK__ = async () => {
+		const [measure] = await measureCases([{ name, handler }]);
+
+		if (!measure) {
+			throw new Error(`Unable to measure: ${name}`);
+		}
+
+		return measure;
+	};
 };
-
-const benchmark = createBenchmark([
-	{
-		name: "coulis",
-		handler: createHandler(CoulisComponent),
-	},
-	{
-		name: "emotion",
-		handler: createHandler(EmotionComponent),
-	},
-	{
-		name: "goober",
-		handler: createHandler(GooberComponent),
-	},
-	{
-		name: "styled-components",
-		handler: createHandler(StyledComponentsComponent),
-	},
-]);
-
-globalThis.__RUN_BENCHMARK__ = benchmark.run.bind(benchmark);

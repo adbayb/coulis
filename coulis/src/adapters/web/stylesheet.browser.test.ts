@@ -32,7 +32,7 @@ describe("createStyleSheet (browser)", () => {
 		]);
 
 		expect(sheet.serialize()).toStrictEqual({
-			classNames: ["c1", "c2"],
+			cache: "c1,c2",
 			content: redColorRule + flexDisplayRule,
 		});
 	});
@@ -83,11 +83,11 @@ describe("createStyleSheet (browser)", () => {
 	});
 
 	test("should remove a global rule serialized by the server", () => {
-		appendStyleElement("global", "g1", String.raw`a::after{content:"\3C ";}`);
+		appendStyleElement("global", "g1", String.raw`a::after{content:"\3C /b>";}`);
 
 		const sheet = createStyleSheet("global");
 
-		sheet.removeRule("g1", 'a::after{content:"<";}');
+		sheet.removeRule("g1", 'a::after{content:"</b>";}');
 		expect(getGlobalText()).toBe("");
 	});
 
@@ -102,7 +102,7 @@ describe("createStyleSheet (browser)", () => {
 
 		sheet.setRule("c1", createRule);
 		expect(createRule).not.toHaveBeenCalled();
-		expect(sheet.serialize()).toStrictEqual({ classNames: [], content: "" });
+		expect(sheet.serialize()).toStrictEqual({ cache: "", content: "" });
 	});
 
 	test("should share inserted rules across sheets of the same element", () => {
@@ -117,8 +117,20 @@ describe("createStyleSheet (browser)", () => {
 		expect(getCssRules(longhandSelector)).toStrictEqual([".c1 { color: red; }"]);
 	});
 
+	test("should serialize the rules inserted by another sheet of the same element", () => {
+		const sheet = createStyleSheet("longhand");
+
+		expect(sheet.serialize()).toStrictEqual({ cache: "", content: "" });
+
+		createStyleSheet("longhand").setRule("c1", () => {
+			return redColorRule;
+		});
+
+		expect(sheet.serialize()).toStrictEqual({ cache: "c1", content: redColorRule });
+	});
+
 	test("should apply styles before the next layout read", () => {
-		const { createStyles } = createStatefulWebInstance();
+		const { createStyles } = createInstance();
 		const element = document.createElement("div");
 
 		document.body.append(element);
@@ -127,7 +139,7 @@ describe("createStyleSheet (browser)", () => {
 	});
 
 	test("should not reinsert styles hydrated from server metadata", () => {
-		const server = createStatefulWebInstance();
+		const server = createInstance();
 		const className = server.createStyles({ color: "red" });
 		const serverStyleSheets = server.getStyleSheets();
 
@@ -141,7 +153,7 @@ describe("createStyleSheet (browser)", () => {
 			);
 		}
 
-		const client = createStatefulWebInstance();
+		const client = createInstance();
 
 		expect(client.createStyles({ color: "red" })).toBe(className);
 		expect(getCssRules(longhandSelector)).toStrictEqual([`.${className} { color: red; }`]);
@@ -175,13 +187,10 @@ const getCssRules = (selector: string) => {
 	});
 };
 
-const createStatefulWebInstance = () => {
+const createInstance = () => {
 	return createCoulis({
 		properties() {
 			return { color: true };
-		},
-		states: {
-			"": "@media print{coulis[selector]{coulis[declaration]}}",
 		},
 	});
 };

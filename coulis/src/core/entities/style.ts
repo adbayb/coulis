@@ -1,23 +1,6 @@
 import type { AtRule, Properties as CSSProperties } from "csstype";
 import type { EmptyRecord, UngreedyString } from "./primitive";
 import { isObject } from "./primitive";
-import type { ShorthandsLike } from "./shorthand";
-import type { StatesLike } from "./state";
-
-/**
- * The order is important to enforce the more precise properties take precedence over less precise
- * ones. Global properties has a lesser specificity than (<) shorthand ones: global (e.g div {
- * background-color }) < shorthand (e.g background) < longhand (e.g background-color) <
- * conditional-shorthand (e.g @media { background }) < conditional-longhand (e.g @media {
- * background-color }) properties.
- */
-export const STYLE_TYPES = [
-	"global",
-	"shorthand",
-	"longhand",
-	"atShorthand",
-	"atLonghand",
-] as const;
 
 export type GlobalStyles<
 	P extends PropertiesLike,
@@ -27,9 +10,17 @@ export type GlobalStyles<
 	Record<string, string> | string | WithUngreedyString<Styles<P, Shorthands, undefined>>
 >;
 
+export type Keyframes<
+	P extends PropertiesLike,
+	Shorthands extends ShorthandsLike<P> | undefined,
+> = Partial<Record<"from" | "to" | `${number}%` | number, Styles<P, Shorthands, undefined>>>;
+
 export type PropertiesLike = {
 	[K in keyof NativeProperties]?: CustomPropertyValue<NativeProperties[K]> | NativePropertyValue;
 };
+
+export type ShorthandsLike<P extends PropertiesLike> = Record<string, (keyof P)[]>;
+export type StatesLike = Record<string, string>;
 
 export type Styles<
 	P extends PropertiesLike,
@@ -44,8 +35,6 @@ export type Styles<
 		}) & {
 	[PropertyName in keyof P]?: PropertyValue<PropertyName, P, States>;
 };
-
-export type StyleType = (typeof STYLE_TYPES)[number];
 
 /**
  * Resolves a style value against its contract property definition: functions are invoked, records

@@ -1,8 +1,9 @@
 import { extractCss } from "goober";
 import { renderToString } from "react-dom/server";
+import { bootstrapServerCase } from "../server";
 import { GooberComponent } from "./component";
 
-export const GooberCase = () => {
+bootstrapServerCase("goober", () => {
 	renderToString(<GooberComponent />);
 	extractCss();
-};
+});

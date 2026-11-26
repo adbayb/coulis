@@ -1,18 +1,42 @@
 import { strict as assert } from "node:assert";
-import fs from "node:fs/promises";
 import { test } from "playwright/test";
+import { createReport } from "../helpers";
+import type { Measure } from "../types";
 
-test("browser", async ({ page }) => {
-	await page.addScriptTag({
-		content: await fs.readFile("./dist/browser.js", "utf8"),
-	});
+/** Each case runs in a page of its own, with the script and the style sheet of its folder only. */
+const CASES: { name: string; styleSheetPath?: string }[] = [
+	{ name: "coulis" },
+	{ name: "emotion" },
+	{ name: "goober" },
+	{ name: "styled-components" },
+	// StyleX styles are compiled into a style sheet at build time, the other libraries insert theirs at runtime.
+	{ name: "stylex", styleSheetPath: "./dist/stylex/stylex.css" },
+];
 
-	const output = await page.evaluate(async () => {
-		return globalThis.__RUN_BENCHMARK__();
-	});
+test("browser", async ({ browser }) => {
+	const measures: Measure[] = [];
 
-	assert.equal(output.results.length, 4);
-	assert.ok(typeof output.fastestCase === "string" && output.fastestCase.length > 0);
+	for (const { name, styleSheetPath } of CASES) {
+		const page = await browser.newPage();
+
+		if (styleSheetPath) {
+			await page.addStyleTag({ path: styleSheetPath });
+		}
+
+		await page.addScriptTag({ path: `./dist/${name}.js` });
+
+		measures.push(
+			await page.evaluate(async () => {
+				return globalThis.__RUN_BENCHMARK__();
+			}),
+		);
+
+		await page.close();
+	}
+
+	const output = createReport(measures);
+
+	assert.equal(output.results.length, CASES.length);
 	console.log(`Fastest is ${output.fastestCase} ✨`);
 	console.table(output.results);
 });

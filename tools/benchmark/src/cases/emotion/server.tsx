@@ -1,7 +1,8 @@
 import { extractCritical } from "@emotion/server";
 import { renderToString } from "react-dom/server";
+import { bootstrapServerCase } from "../server";
 import { EmotionComponent } from "./component";
 
-export const EmotionCase = () => {
+bootstrapServerCase("emotion", () => {
 	extractCritical(renderToString(<EmotionComponent />));
-};
+});

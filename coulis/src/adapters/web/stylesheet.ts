@@ -1,6 +1,18 @@
-import type { StyleType } from "../../core/entities/style";
+const IS_BROWSER_ENVIRONMENT = typeof window !== "undefined";
 
-const IS_SERVER_ENVIRONMENT = typeof window === "undefined";
+/**
+ * Style sheets are rendered in this order so that the more precise rules take precedence over the
+ * less precise ones: global (e.g. `div { background-color }`) < shorthand (e.g. `background`) <
+ * longhand (e.g. `background-color`) < conditional shorthand (e.g. `@media { background }`) <
+ * conditional longhand (e.g. `@media { background-color }`).
+ */
+export const STYLE_TYPES = [
+	"global",
+	"shorthand",
+	"longhand",
+	"atShorthand",
+	"atLonghand",
+] as const;
 
 export type ClassName = string;
 export type Rule = string;
@@ -9,19 +21,19 @@ export type StyleSheet = {
 	/** Removes a rule. Only supported for the `global` sheet: atomic rules are never removed. */
 	removeRule: (className: ClassName, rule: Rule) => void;
 	/**
-	 * Returns the class names and CSS text of the rules inserted by this runtime (rules hydrated
-	 * from server metadata are excluded).
+	 * Returns the comma-separated class names (`cache`) and CSS text (`content`) of the rules
+	 * inserted by this runtime (rules hydrated from server metadata are excluded).
 	 *
 	 * @param usedClassNames - If set, only keeps the rules of these class names (critical styles).
-	 *   Ignored by the `global` sheet, whose rules are always kept.
+	 *   Ignored by the `global` sheet, whose rules are always kept. Not to change once given: its
+	 *   serialization is reused when given again.
 	 */
-	serialize: (usedClassNames?: Set<ClassName>) => {
-		classNames: ClassName[];
-		content: string;
-	};
+	serialize: (usedClassNames?: Set<ClassName>) => SerializedRules;
 	/** Inserts a rule unless its class name is already in the sheet. */
 	setRule: (className: ClassName, createRule: (className: ClassName) => Rule) => void;
 };
+
+export type StyleType = (typeof STYLE_TYPES)[number];
 
 type CoulisStyleElement = HTMLStyleElement & {
 	/**
@@ -29,6 +41,11 @@ type CoulisStyleElement = HTMLStyleElement & {
 	 * targeting it so that a rule is never inserted twice.
 	 */
 	coulisRules?: Map<ClassName, Rule>;
+};
+
+type SerializedRules = {
+	cache: string;
+	content: string;
 };
 
 /**
@@ -49,8 +66,12 @@ type CoulisStyleElement = HTMLStyleElement & {
 export const createStyleSheet = (type: StyleType): StyleSheet => {
 	let element: CoulisStyleElement | undefined;
 	let ruleByClassName = new Map<ClassName, Rule>();
+	// Serializations reused until a rule is inserted or removed: the one of every rule, and the one of the last used class names.
+	let serializedRules: SerializedRules | undefined;
+	let serializedUsedRules: SerializedRules | undefined;
+	let serializedUsedClassNames: Set<ClassName> | undefined;
 
-	if (!IS_SERVER_ENVIRONMENT) {
+	if (IS_BROWSER_ENVIRONMENT) {
 		// `appendChild` returns the appended element (unlike `append`), keeping the code short.
 		element =
 			document.querySelector<CoulisStyleElement>(`style[data-coulis-type="${type}"]`) ??
@@ -71,6 +92,8 @@ export const createStyleSheet = (type: StyleType): StyleSheet => {
 	return {
 		removeRule(className, rule) {
 			ruleByClassName.delete(className);
+			serializedRules = undefined;
+			serializedUsedRules = undefined;
 
 			if (element) {
 				// Hydrated and client-inserted global rules share the same serialization.
@@ -78,20 +101,37 @@ export const createStyleSheet = (type: StyleType): StyleSheet => {
 			}
 		},
 		serialize(usedClassNames) {
-			const classNames: ClassName[] = [];
+			const keptClassNames = type === "global" ? undefined : usedClassNames;
+
+			const reusedRules = keptClassNames
+				? keptClassNames === serializedUsedClassNames && serializedUsedRules
+				: serializedRules;
+
+			if (reusedRules) {
+				return reusedRules;
+			}
+
+			let cache = "";
 			let content = "";
 
 			for (const [className, rule] of ruleByClassName) {
-				if (
-					rule &&
-					(!usedClassNames || type === "global" || usedClassNames.has(className))
-				) {
-					classNames.push(className);
+				if (rule && (!keptClassNames || keptClassNames.has(className))) {
+					cache += cache ? `,${className}` : className;
 					content += rule;
 				}
 			}
 
-			return { classNames, content };
+			const output = { cache, content };
+
+			// An element shares its rules with other instances, which change them without notice: only in-memory rules are reused.
+			if (!element && keptClassNames) {
+				serializedUsedRules = output;
+				serializedUsedClassNames = keptClassNames;
+			} else if (!element) {
+				serializedRules = output;
+			}
+
+			return output;
 		},
 		setRule(className, createRule) {
 			if (ruleByClassName.has(className)) {
@@ -120,16 +160,32 @@ export const createStyleSheet = (type: StyleType): StyleSheet => {
 			}
 
 			ruleByClassName.set(className, rule);
+			serializedRules = undefined;
+			serializedUsedRules = undefined;
 		},
 	};
 };
 
 /**
- * Serializes a rule as text: `<` is escaped so the CSS text cannot close its `<style>` element.
+ * Picks the style type of an atomic rule from the `STYLE_TYPES` order: (at-)shorthand types precede
+ * (at-)longhand ones.
+ *
+ * @param isCSSShorthand - Whether the rule sets a CSS shorthand property.
+ * @param isAtRule - Whether the rule is an at-rule.
+ * @returns The style type.
+ */
+export const getStyleType = (isCSSShorthand: boolean, isAtRule: boolean): StyleType => {
+	return STYLE_TYPES[(isAtRule ? 3 : 1) + Number(!isCSSShorthand)] as StyleType;
+};
+
+/**
+ * Serializes a rule as text: `</` is escaped so the CSS text cannot close its `<style>` element.
+ * Any other `<` is kept: escaped, it would no longer be a comparison in range queries (e.g. `@media
+ * (width < 600px)`).
  *
  * @param rule - The rule to serialize.
  * @returns The serialized rule.
  */
 const serializeRule = (rule: string) => {
-	return rule.replaceAll("<", String.raw`\3C `);
+	return rule.replaceAll("</", String.raw`\3C /`);
 };

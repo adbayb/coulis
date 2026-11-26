@@ -1,35 +1,66 @@
-import { describe, expect, test } from "vitest";
-import { createCompiledTemplate, createCustomProperties, getEvaluatedTemplate } from "./helpers";
+import { describe, expect, test, vi } from "vitest";
+import {
+	createCompiledTemplate,
+	createCustomProperties,
+	findClassNames,
+	getEvaluatedTemplate,
+} from "./helpers";
 
 describe(createCustomProperties, () => {
 	test("should escape special characters in key names", () => {
-		const collected: [string, unknown][] = [];
+		const onCreateProperty = vi.fn<(name: string, value: unknown) => void>();
 
-		createCustomProperties({ "spacings-1.5": "2rem" }, (name) => {
-			collected.push([name, undefined]);
-		});
-
-		expect(collected[0]?.[0]).toBe("--spacings-1-5");
+		createCustomProperties({ "spacings-1.5": "2rem" }, onCreateProperty);
+		expect(onCreateProperty).toHaveBeenCalledWith("--spacings-1-5", "2rem");
 	});
 
 	test("should handle deeply nested themes with sibling branches", () => {
-		const collected: [string, unknown][] = [];
+		const onCreateProperty = vi.fn<(name: string, value: unknown) => void>();
 
 		const output = createCustomProperties(
 			{
 				a: { nested: { x: "1px" }, sibling: "2px" },
 				b: { y: "3px" },
 			},
-			(name, value) => {
-				collected.push([name, value]);
-			},
+			onCreateProperty,
 		);
 
-		expect(collected).toContainEqual(["--a-nested-x", "1px"]);
-		expect(collected).toContainEqual(["--a-sibling", "2px"]);
-		expect(collected).toContainEqual(["--b-y", "3px"]);
-		expect(output.a.nested.x).toBe("var(--a-nested-x)");
-		expect(output.b.y).toBe("var(--b-y)");
+		expect(onCreateProperty.mock.calls).toStrictEqual([
+			["--a-nested-x", "1px"],
+			["--a-sibling", "2px"],
+			["--b-y", "3px"],
+		]);
+
+		expect(output).toStrictEqual({
+			a: { nested: { x: "var(--a-nested-x)" }, sibling: "var(--a-sibling)" },
+			b: { y: "var(--b-y)" },
+		});
+	});
+});
+
+describe(findClassNames, () => {
+	test("should find the class names of every class attribute", () => {
+		const classNames = findClassNames(
+			'<p class="c1 c2" title="c3"><b class="c4">c5</b><i class="c1 c2"></i><u class="c2 c1"></u></p>',
+		);
+
+		expect([...classNames]).toStrictEqual(["class", "c1", "c2", "c4"]);
+	});
+
+	test("should find the class names of attributes sharing their length and last characters", () => {
+		const classNames = findClassNames(
+			'<p class="c1abc"></p><p class="c2abc"></p><p class="c1abc"></p><p class="c3abc"></p>',
+		);
+
+		expect([...classNames]).toStrictEqual(["class", "c1abc", "c2abc", "c3abc"]);
+	});
+
+	test("should find the class names of an unclosed class attribute", () => {
+		expect([...findClassNames('<p class="c1 c2')]).toStrictEqual(["class", "c1", "c2"]);
+	});
+
+	test("should not find any class name without class attributes", () => {
+		expect(findClassNames("<p>c1</p>").size).toBe(0);
 	});
 });
 

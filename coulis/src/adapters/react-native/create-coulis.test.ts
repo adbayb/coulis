@@ -2,19 +2,16 @@ import type { MockInstance } from "vitest";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 import { createCoulis } from "./create-coulis";
 
-// @ts-expect-error Partial mocking for testing purposes
-vi.mock(import("react-native"), (): { Dimensions: Dimensions } => {
+// @ts-expect-error Partial mocking for testing purposes (the real module cannot be loaded outside React Native): a 400x800 window that never changes.
+vi.mock(import("react-native"), () => {
 	return {
 		Dimensions: {
-			addEventListener: vi.fn(),
-			get: vi.fn(() => {
-				return {
-					fontScale: 0,
-					height: 800,
-					scale: 0,
-					width: 400,
-				};
-			}),
+			addEventListener() {
+				// No window change to listen to.
+			},
+			get() {
+				return { height: 800, width: 400 };
+			},
 		},
 	};
 });

@@ -313,8 +313,8 @@ Median of three runs of `pnpm --filter @coulis/benchmark benchmark`, rendering a
 
 | Runtime         | Coulis |           Emotion |              Goober | styled-components |              StyleX |
 | --------------- | -----: | ----------------: | ------------------: | ----------------: | ------------------: |
-| Browser (ops/s) |  1,824 | 819 (2.2x slower) |   871 (2.1x slower) | 461 (4.0x slower) | 1,677 (1.1x slower) |
-| Server (ops/s)  |  1,165 | 607 (1.9x slower) | 1,043 (1.1x slower) | 257 (4.5x slower) | 1,321 (1.1x faster) |
+| Browser (ops/s) |  1,843 | 815 (2.3x slower) |   878 (2.1x slower) | 469 (3.9x slower) | 1,685 (1.1x slower) |
+| Server (ops/s)  |  1,183 | 602 (2.0x slower) | 1,032 (1.1x slower) | 249 (4.8x slower) | 1,360 (1.1x faster) |
 
 These results are hardware- and runtime-dependent.
 

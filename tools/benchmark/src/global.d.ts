@@ -1,10 +1,7 @@
-import type { BenchmarkOutput } from "./types";
+import type { Measure } from "./types";
 
 declare global {
-	var __RUN_BENCHMARK__: () => Promise<{
-		fastestCase: string;
-		results: BenchmarkOutput[];
-	}>;
+	var __RUN_BENCHMARK__: () => Promise<Measure>;
 }
 
 export {};

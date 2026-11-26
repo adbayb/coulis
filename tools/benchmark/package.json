@@ -8,9 +8,25 @@
 	"author": "Ayoub Adib <adbayb@gmail.com>",
 	"type": "module",
 	"exports": {
-		"./browser": {
-			"source": "./src/cases/browser.tsx",
-			"default": "./dist/browser.js"
+		"./coulis": {
+			"source": "./src/cases/coulis/browser.tsx",
+			"default": "./dist/coulis.js"
+		},
+		"./emotion": {
+			"source": "./src/cases/emotion/browser.tsx",
+			"default": "./dist/emotion.js"
+		},
+		"./goober": {
+			"source": "./src/cases/goober/browser.tsx",
+			"default": "./dist/goober.js"
+		},
+		"./styled-components": {
+			"source": "./src/cases/styled-components/browser.tsx",
+			"default": "./dist/styled-components.js"
+		},
+		"./stylex": {
+			"source": "./src/cases/stylex/browser.tsx",
+			"default": "./dist/stylex.js"
 		}
 	},
 	"scripts": {

@@ -291,6 +291,41 @@ describe("createCoulis (web adapter)", () => {
 		expect(String(getStyleSheets())).toContain("color:blue;");
 	});
 
+	test("should extract the critical styles of an HTML extracted several times", () => {
+		const { createStyles, getCriticalStyleSheets } = createCoulis({
+			properties() {
+				return { color: true };
+			},
+		});
+
+		const redHtml = createFixtureHtml(createStyles({ color: "red" }));
+		const blueHtml = createFixtureHtml(createStyles({ color: "blue" }));
+		const redStyleSheets = String(getCriticalStyleSheets(redHtml));
+
+		expect(redStyleSheets).toContain("color:red;");
+		expect(redStyleSheets).not.toContain("color:blue;");
+		expect(String(getCriticalStyleSheets(redHtml))).toBe(redStyleSheets);
+		expect(String(getCriticalStyleSheets(blueHtml))).toContain("color:blue;");
+		expect(String(getCriticalStyleSheets(blueHtml))).not.toContain("color:red;");
+		expect(String(getCriticalStyleSheets(redHtml))).toBe(redStyleSheets);
+	});
+
+	test("should extract the critical styles created after a previous extraction of the same HTML", () => {
+		const contract = {
+			properties() {
+				return { color: true as const };
+			},
+		};
+
+		const { createStyles, getCriticalStyleSheets } = createCoulis(contract);
+		// Another instance gives the class name without creating the rule in the tested one.
+		const html = createFixtureHtml(createCoulis(contract).createStyles({ color: "red" }));
+
+		expect(String(getCriticalStyleSheets(html))).not.toContain("color:red;");
+		createStyles({ color: "red" });
+		expect(String(getCriticalStyleSheets(html))).toContain("color:red;");
+	});
+
 	test("should skip unset values", () => {
 		const { createStyles, getStyleSheets } = createCoulis({
 			properties() {
@@ -463,6 +498,10 @@ const createFixtureKeyframes = () => {
 			transform: "scale(1)",
 		},
 	});
+};
+
+const createFixtureHtml = (className: string) => {
+	return `<p class="${className}"></p>`;
 };
 
 const createFixtureStyles = () => {

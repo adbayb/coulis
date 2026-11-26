@@ -197,6 +197,12 @@ export const createCoulis: CreateCoulis<{
 	}
 
 	const globalReferenceCounts = new Map<ClassName, number>();
+	/*
+	 * The class names of the last HTML are kept: a page rendered again with the same content skips
+	 * their search (comparing two HTML is far cheaper than searching one).
+	 */
+	let lastHtml: string | undefined;
+	let lastClassNames: Set<ClassName> | undefined;
 
 	const serializeStyleSheets = (usedClassNames?: Set<ClassName>) => {
 		let styleElements = "";
@@ -285,7 +291,12 @@ export const createCoulis: CreateCoulis<{
 			};
 		},
 		getCriticalStyleSheets(html) {
-			return serializeStyleSheets(findClassNames(html));
+			if (html !== lastHtml) {
+				lastClassNames = findClassNames(html);
+				lastHtml = html;
+			}
+
+			return serializeStyleSheets(lastClassNames);
 		},
 		getStyleSheets: serializeStyleSheets,
 		setGlobalStyles(input) {

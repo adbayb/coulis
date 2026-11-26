@@ -27,6 +27,20 @@ describe("createStyleSheet (server)", () => {
 		});
 	});
 
+	test("should keep the rules included after a previous serialization of the same class names", () => {
+		const sheet = createStyleSheet("longhand");
+		const usedClassNames = new Set(["c1", "c2"]);
+
+		sheet.setRule("c1", createRedColorRule);
+		expect(sheet.serialize(usedClassNames).cache).toBe("c1");
+		expect(sheet.serialize(usedClassNames)).toBe(sheet.serialize(usedClassNames));
+		expect(sheet.serialize().cache).toBe("c1");
+		sheet.setRule("c2", createFlexDisplayRule);
+		expect(sheet.serialize(usedClassNames).cache).toBe("c1,c2");
+		expect(sheet.serialize(new Set(["c2"])).cache).toBe("c2");
+		expect(sheet.serialize().cache).toBe("c1,c2");
+	});
+
 	test("should remove rules", () => {
 		const sheet = createStyleSheet("global");
 

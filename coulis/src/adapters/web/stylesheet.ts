@@ -25,7 +25,8 @@ export type StyleSheet = {
 	 * inserted by this runtime (rules hydrated from server metadata are excluded).
 	 *
 	 * @param usedClassNames - If set, only keeps the rules of these class names (critical styles).
-	 *   Ignored by the `global` sheet, whose rules are always kept.
+	 *   Ignored by the `global` sheet, whose rules are always kept. Not to change once given: its
+	 *   serialization is reused when given again.
 	 */
 	serialize: (usedClassNames?: Set<ClassName>) => SerializedRules;
 	/** Inserts a rule unless its class name is already in the sheet. */
@@ -65,8 +66,10 @@ type SerializedRules = {
 export const createStyleSheet = (type: StyleType): StyleSheet => {
 	let element: CoulisStyleElement | undefined;
 	let ruleByClassName = new Map<ClassName, Rule>();
-	// Serialization of every rule, reused until a rule is inserted or removed.
+	// Serializations reused until a rule is inserted or removed: the one of every rule, and the one of the last used class names.
 	let serializedRules: SerializedRules | undefined;
+	let serializedUsedRules: SerializedRules | undefined;
+	let serializedUsedClassNames: Set<ClassName> | undefined;
 
 	if (IS_BROWSER_ENVIRONMENT) {
 		// `appendChild` returns the appended element (unlike `append`), keeping the code short.
@@ -90,6 +93,7 @@ export const createStyleSheet = (type: StyleType): StyleSheet => {
 		removeRule(className, rule) {
 			ruleByClassName.delete(className);
 			serializedRules = undefined;
+			serializedUsedRules = undefined;
 
 			if (element) {
 				// Hydrated and client-inserted global rules share the same serialization.
@@ -99,8 +103,12 @@ export const createStyleSheet = (type: StyleType): StyleSheet => {
 		serialize(usedClassNames) {
 			const keptClassNames = type === "global" ? undefined : usedClassNames;
 
-			if (!keptClassNames && serializedRules) {
-				return serializedRules;
+			const reusedRules = keptClassNames
+				? keptClassNames === serializedUsedClassNames && serializedUsedRules
+				: serializedRules;
+
+			if (reusedRules) {
+				return reusedRules;
 			}
 
 			let cache = "";
@@ -116,7 +124,10 @@ export const createStyleSheet = (type: StyleType): StyleSheet => {
 			const output = { cache, content };
 
 			// An element shares its rules with other instances, which change them without notice: only in-memory rules are reused.
-			if (!keptClassNames && !element) {
+			if (!element && keptClassNames) {
+				serializedUsedRules = output;
+				serializedUsedClassNames = keptClassNames;
+			} else if (!element) {
 				serializedRules = output;
 			}
 
@@ -150,6 +161,7 @@ export const createStyleSheet = (type: StyleType): StyleSheet => {
 
 			ruleByClassName.set(className, rule);
 			serializedRules = undefined;
+			serializedUsedRules = undefined;
 		},
 	};
 };

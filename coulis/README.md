@@ -255,12 +255,12 @@ Theme values are passed as-is (raw values, not CSS custom properties).
 
 ### Runtime performance
 
-Median of three runs of `pnpm --filter @coulis/benchmark benchmark`, rendering a 1,000-row React table. Higher throughput is better; dynamic styles are created during each render. The server case renders to a string and extracts its styles (critical styles for Coulis with `getCriticalStyleSheets(html)` and for Emotion with `extractCritical`).
+Median of three runs of `pnpm --filter @coulis/benchmark benchmark`, rendering a 1,000-row React table with React production builds. Higher throughput is better; dynamic styles are created during each render. The server case renders to a string and extracts its styles (critical styles for Coulis with `getCriticalStyleSheets(html)` and for Emotion with `extractCritical`).
 
 | Runtime         | Coulis |           Emotion |            Goober | styled-components |
 | --------------- | -----: | ----------------: | ----------------: | ----------------: |
-| Browser (ops/s) |  1,737 | 812 (2.1x slower) | 439 (4.0x slower) | 466 (3.7x slower) |
-| Server (ops/s)  |    156 | 146 (1.1x slower) |      156 (on par) |  75 (2.1x slower) |
+| Browser (ops/s) |  1,751 | 802 (2.2x slower) | 443 (4.0x slower) | 465 (3.8x slower) |
+| Server (ops/s)  |  1,023 | 604 (1.7x slower) |    1,032 (on par) | 262 (3.9x slower) |
 
 These results are hardware- and runtime-dependent.
 
@@ -270,7 +270,7 @@ Minified, tree-shaken browser ESM bundles measured with esbuild 0.28.2 (`bundle:
 
 | Library                  | Version   | Minified + gzip |
 | ------------------------ | --------- | --------------: |
-| Coulis                   | workspace |         2.41 kB |
+| Coulis                   | workspace |         2.53 kB |
 | Emotion (`@emotion/css`) | 11.13.5   |         6.28 kB |
 | Goober                   | 2.1.19    |         1.11 kB |
 | styled-components        | 6.6.0     |        10.99 kB |

@@ -309,12 +309,12 @@ Theme values are passed as-is (raw values, not CSS custom properties).
 
 ### Runtime performance
 
-Median of three runs of `pnpm --filter @coulis/benchmark benchmark`, rendering a 1,000-row React table with React production builds (in the browser, each library runs in a page of its own). Higher throughput is better; dynamic styles are created during each render, except for StyleX whose styles are compiled at build time (one per value, selected during render with `props`). The server case renders to a string and extracts its styles (critical styles for Coulis with `getCriticalStyleSheets(html)` and for Emotion with `extractCritical`; none for StyleX, whose styles are a build-time style sheet).
+Median of three runs of `pnpm --filter @coulis/benchmark benchmark`, rendering a 1,000-row React table with React production builds (each library runs in a page of its own in the browser, and in a process of its own on the server). Higher throughput is better; dynamic styles are created during each render, except for StyleX whose styles are compiled at build time (one per value, selected during render with `props`). The server case renders to a string and extracts its styles (critical styles for Coulis with `getCriticalStyleSheets(html)` and for Emotion with `extractCritical`; none for StyleX, whose styles are a build-time style sheet).
 
 | Runtime         | Coulis |           Emotion |              Goober | styled-components |              StyleX |
 | --------------- | -----: | ----------------: | ------------------: | ----------------: | ------------------: |
-| Browser (ops/s) |  1,852 | 822 (2.3x slower) |   870 (2.1x slower) | 470 (3.9x slower) | 1,688 (1.1x slower) |
-| Server (ops/s)  |  1,174 | 616 (1.9x slower) | 1,048 (1.1x slower) | 256 (4.6x slower) | 1,300 (1.1x faster) |
+| Browser (ops/s) |  1,824 | 819 (2.2x slower) |   871 (2.1x slower) | 461 (4.0x slower) | 1,677 (1.1x slower) |
+| Server (ops/s)  |  1,165 | 607 (1.9x slower) | 1,043 (1.1x slower) | 257 (4.5x slower) | 1,321 (1.1x faster) |
 
 These results are hardware- and runtime-dependent.
 

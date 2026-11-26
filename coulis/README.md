@@ -266,12 +266,11 @@ export const List = ({ items }: { items: string[] }) => {
 
 It brings the rendering time down to the one of a build-time CSS-in-JS library such as [StyleX](https://stylexjs.com), whose compiler leaves static class names in the bundle. Mounting then unmounting a list of 6,000 elements, each setting nine properties (one with a media query state) and alternating between two background colors:
 
-| Styles                                                 |    Time |
-| ------------------------------------------------------ | ------: |
-| StyleX, styles compiled at build time                  |  4.9 ms |
-| Coulis, `createStyles` called once in the module scope |  4.9 ms |
-| Coulis, `createStyles` called during render            |  7.4 ms |
-| Emotion, `css` called during render                    | 16.7 ms |
+| Styles                                                 |   Time |
+| ------------------------------------------------------ | -----: |
+| StyleX, styles compiled at build time                  | 4.9 ms |
+| Coulis, `createStyles` called once in the module scope | 4.9 ms |
+| Coulis, `createStyles` called during render            | 7.4 ms |
 
 Median of three runs in headless Chromium with React production builds. These results are hardware- and runtime-dependent.
 
@@ -310,12 +309,12 @@ Theme values are passed as-is (raw values, not CSS custom properties).
 
 ### Runtime performance
 
-Median of three runs of `pnpm --filter @coulis/benchmark benchmark`, rendering a 1,000-row React table with React production builds. Higher throughput is better; dynamic styles are created during each render, except for StyleX whose styles are compiled at build time (one per value, selected during render with `props`). The server case renders to a string and extracts its styles (critical styles for Coulis with `getCriticalStyleSheets(html)` and for Emotion with `extractCritical`; none for StyleX, whose styles are a build-time style sheet).
+Median of three runs of `pnpm --filter @coulis/benchmark benchmark`, rendering a 1,000-row React table with React production builds (in the browser, each library runs in a page of its own). Higher throughput is better; dynamic styles are created during each render, except for StyleX whose styles are compiled at build time (one per value, selected during render with `props`). The server case renders to a string and extracts its styles (critical styles for Coulis with `getCriticalStyleSheets(html)` and for Emotion with `extractCritical`; none for StyleX, whose styles are a build-time style sheet).
 
 | Runtime         | Coulis |           Emotion |              Goober | styled-components |              StyleX |
 | --------------- | -----: | ----------------: | ------------------: | ----------------: | ------------------: |
-| Browser (ops/s) |  1,751 | 809 (2.2x slower) |   446 (3.9x slower) | 461 (3.8x slower) | 1,635 (1.1x slower) |
-| Server (ops/s)  |  1,181 | 609 (1.9x slower) | 1,061 (1.1x slower) | 259 (4.6x slower) | 1,317 (1.1x faster) |
+| Browser (ops/s) |  1,852 | 822 (2.3x slower) |   870 (2.1x slower) | 470 (3.9x slower) | 1,688 (1.1x slower) |
+| Server (ops/s)  |  1,174 | 616 (1.9x slower) | 1,048 (1.1x slower) | 256 (4.6x slower) | 1,300 (1.1x faster) |
 
 These results are hardware- and runtime-dependent.
 

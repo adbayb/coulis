@@ -230,7 +230,7 @@ const { createStyles } = createCoulis({
 });
 ```
 
-### How to create styles only once?
+### How to speed up rendering with styles created once?
 
 `createStyles` can be called during render: class names are cached, so a repeated value only costs cache lookups (its property, then its value) instead of creating a rule. This cost still grows with the number of values and of rendered elements. For styles that do not depend on props or state, call `createStyles` in the module scope: the class names are created once, when the module is evaluated, and a render only reads a string.
 

@@ -230,6 +230,61 @@ const { createStyles } = createCoulis({
 });
 ```
 
+### How to create styles only once?
+
+`createStyles` can be called during render: class names are cached, so a repeated value only costs cache lookups (its property, then its value) instead of creating a rule. This cost still grows with the number of values and of rendered elements. For styles that do not depend on props or state, call `createStyles` in the module scope: the class names are created once, when the module is evaluated, and a render only reads a string.
+
+```tsx
+const itemClassName = createStyles({
+	alignItems: "center",
+	display: "flex",
+	paddingHorizontal: "large",
+});
+
+const evenItemClassName = createStyles({ backgroundColor: "neutralLight" });
+const oddItemClassName = createStyles({ backgroundColor: "neutralTransparent" });
+
+export const List = ({ items }: { items: string[] }) => {
+	return (
+		<ul>
+			{items.map((item, index) => {
+				const backgroundClassName = index % 2 === 0 ? evenItemClassName : oddItemClassName;
+
+				return (
+					<li
+						key={item}
+						className={`${itemClassName} ${backgroundClassName}`}
+					>
+						{item}
+					</li>
+				);
+			})}
+		</ul>
+	);
+};
+```
+
+It brings the rendering time down to the one of static class names, which is what a build-time CSS-in-JS library such as [StyleX](https://stylexjs.com) leaves in the bundle. Mounting then unmounting a list of 6,000 elements, each setting nine properties (one with a media query state) and alternating between two background colors:
+
+| Styles                                                 |    Time |
+| ------------------------------------------------------ | ------: |
+| Static class names (build-time CSS-in-JS library)      |  4.9 ms |
+| Coulis, `createStyles` called once in the module scope |  4.9 ms |
+| Coulis, `createStyles` called during render            |  7.3 ms |
+| Emotion, `css` called during render                    | 16.8 ms |
+
+Median of three runs in headless Chromium with React production builds. These results are hardware- and runtime-dependent.
+
+A value only known during render keeps its own call, next to the class names created once:
+
+```tsx
+<li className={`${itemClassName} ${createStyles({ color })}`}>{item}</li>
+```
+
+Set each property in a single call: class names from separate calls are not merged, so two rules setting the same property apply in the order they were created, whatever the order of the class names.
+
+Rules created in the module scope are part of the instance like any other: `getCriticalStyleSheets(html)` returns them for the pages using their class names.
+
 ### How to use Coulis with React Native?
 
 Import from the dedicated entry point:

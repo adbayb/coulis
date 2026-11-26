@@ -62,7 +62,7 @@ This builds the `tools/benchmark` package and runs benchmarks against different 
 ```
 coulis/src/
   core/
-    entities/   # Platform-agnostic building blocks (style contract types, value resolution)
+    entities/   # Style model shared by every adapter: contract types (properties, shorthands, states, styles) and value resolution
     ports/      # Generic TypeScript interfaces that adapters must implement (and their API documentation)
   adapters/
     web/        # Web adapter: returns CSS class names, inserts rules in <style> elements (browser) or serializes them (server)

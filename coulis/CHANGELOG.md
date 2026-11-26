@@ -1,5 +1,38 @@
 # Change Log
 
+## 0.24.0
+
+### Minor Changes
+
+- [#92](https://github.com/adbayb/coulis/pull/92) [`8a47e89`](https://github.com/adbayb/coulis/commit/8a47e890c094ab9d23ca4498e212cddb7e13d16e) Thanks [@adbayb](https://github.com/adbayb)! - Fill gaps found while migrating a design system from Emotion, without increasing the web bundle size (2.34 kB minified + gzip) nor degrading cached style creation.
+
+    - **Breaking:** `getMetadata` is replaced by two methods with the same output (`{ attributes, content }` style sheets, `String()` giving the `<style>` tags):
+        - `getCriticalStyleSheets(html)` returns the style sheets a rendered HTML needs (its atomic rules, plus every global rule and keyframes), so pages no longer ship every style generated since the server started.
+        - `getStyleSheets()` returns every style sheet generated so far, as `getMetadata()` did (e.g. for streaming rendering, where the HTML is not available).
+    - Browser rules are inserted synchronously (through `insertRule` for atomic rules), so layout reads made right after `createStyles` (for example, in React layout effects) see the styled layout. Invalid or unsupported rules are ignored instead of throwing.
+    - `setGlobalStyles` returns a function removing the rules. Calls with the same input are reference counted, so nested callers can safely add and remove the same theme-dependent global styles.
+    - Instances targeting the same `<style>` elements share their inserted rules, so a rule is never inserted twice.
+    - A custom shorthand creates one class name holding all its declarations (instead of one class name per expanded property), shrinking HTML class attributes and making shorthand-heavy styles faster. It also makes vendor prefixes declared as same-name shorthands (`userSelect: ["WebkitUserSelect", "userSelect"]`) a single rule.
+    - Unset (`undefined`) style values, including state values, are skipped instead of generating `undefined` declarations.
+    - No empty `:root{}` rule is generated without a theme.
+    - Server rules are no longer whitespace-minified (generated rules are already compact).
+
+### Patch Changes
+
+- [#94](https://github.com/adbayb/coulis/pull/94) [`443819b`](https://github.com/adbayb/coulis/commit/443819b720462129012dd17230aa35ac08aaf93a) Thanks [@adbayb](https://github.com/adbayb)! - Make the web runtime faster on the client and the server, with the same class names and rules.
+
+    - `createStyles` caches class names by property, state, and value: repeated values skip value resolution, hashing, and rule lookups. Cached style creation is ~1.2x to ~3x faster (a single property: ~3x on Node.js, ~2x on Chromium; state variants: ~2x on Node.js, ~1.7x on Chromium), and new rules are created ~13% faster.
+    - `createStyles` reads style objects without creating the array of their names: cached style creation is a further ~15% to ~25% faster on Node.js.
+    - `getCriticalStyleSheets` compares repeated class attributes before hashing them: finding the class names of a rendered HTML is ~35% to ~50% faster on repetitive markup (lists, tables), and unchanged otherwise.
+    - `getCriticalStyleSheets` keeps the class names of the last HTML and, on the server, their serialization until a rule is inserted or removed: a page rendered again with the same content skips both the search and the filtering of every rule.
+    - `getStyleSheets` reuses its serialization on the server until a rule is inserted or removed (constant time instead of re-serializing every rule on each call).
+    - Array values no longer add a cache entry on each call.
+    - Fix range queries (e.g. `@media (width < 600px)`) in server-rendered and global rules: only `</` is escaped in CSS text (it is enough to prevent closing the `<style>` element), whereas every `<` was escaped before, turning comparisons into invalid queries.
+    - Simplify the implementation: unconditional values are the `base` state of a single rule creation path, and theme custom properties are created without path arrays.
+    - Publish the API documentation with the types: `createCoulis` methods are now documented in editors for both the web and React Native entry points.
+
+    The web bundle grows from 2.34 kB to 2.58 kB (minified + gzip).
+
 ## 0.23.0
 
 ### Minor Changes

@@ -66,14 +66,6 @@ export const createReport = (measures: Measure[]) => {
 	};
 };
 
-export const createBenchmark = (cases: Case[]) => {
-	return {
-		async run() {
-			return createReport(await measureCases(cases));
-		},
-	};
-};
-
 const byThroughputDescending = (a: Measure, b: Measure) => {
 	return b.throughputMean - a.throughputMean;
 };

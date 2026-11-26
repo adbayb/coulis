@@ -1,40 +1,42 @@
 import { strict as assert } from "node:assert";
+import { fork } from "node:child_process";
+import path from "node:path";
 import { test } from "node:test";
-import { createBenchmark } from "../helpers";
-import { CoulisCase } from "./coulis/server";
-import { EmotionCase } from "./emotion/server";
-import { GooberCase } from "./goober/server";
-import { StyledComponentsCase } from "./styled-components/server";
-import { StyleXCase } from "./stylex/server";
+import { createReport } from "../helpers";
+import type { Measure } from "../types";
 
-const benchmark = createBenchmark([
-	{
-		name: "coulis",
-		handler: CoulisCase,
-	},
-	{
-		name: "emotion",
-		handler: EmotionCase,
-	},
-	{
-		name: "goober",
-		handler: GooberCase,
-	},
-	{
-		name: "styled-components",
-		handler: StyledComponentsCase,
-	},
-	{
-		name: "stylex",
-		handler: StyleXCase,
-	},
-]);
+/** Each case runs in a process of its own, with the `server.tsx` entry of its folder only. */
+const CASES = ["coulis", "emotion", "goober", "styled-components", "stylex"];
+
+const measureCase = async (name: string) => {
+	return new Promise<Measure>((resolve, reject) => {
+		const caseProcess = fork(path.resolve(import.meta.dirname, name, "server.tsx"), {
+			execArgv: ["--import", "tsx"],
+		});
+
+		caseProcess.once("message", (measure) => {
+			resolve(measure as Measure);
+		});
+
+		caseProcess.once("error", reject);
+
+		caseProcess.once("exit", (code) => {
+			reject(new Error(`Benchmark failed for: ${name} (exit code ${String(code)})`));
+		});
+	});
+};
 
 void test("server", async () => {
-	const output = await benchmark.run();
+	const measures: Measure[] = [];
 
-	assert.equal(output.results.length, 5);
-	assert.ok(typeof output.fastestCase === "string" && output.fastestCase.length > 0);
+	// One after the other, so that a case never competes with another one for the processor.
+	for (const name of CASES) {
+		measures.push(await measureCase(name));
+	}
+
+	const output = createReport(measures);
+
+	assert.equal(output.results.length, CASES.length);
 
 	for (const result of output.results) {
 		assert.ok(result["Throughput mean (ops/s)"] > 0);

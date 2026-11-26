@@ -30,9 +30,9 @@
 		}
 	},
 	"scripts": {
-		"benchmark": "pnpm build && pnpm benchmark:browser && pnpm benchmark:server",
-		"benchmark:browser": "quickbundle build --minification && playwright test ./src/cases/browser.spec.ts",
-		"benchmark:server": "NODE_ENV=production tsx ./src/cases/server.spec.ts",
+		"benchmark": "pnpm benchmark:browser && pnpm benchmark:server",
+		"benchmark:browser": "pnpm build && quickbundle build --minification && playwright test ./src/cases/browser.spec.ts",
+		"benchmark:server": "pnpm build && NODE_ENV=production tsx ./src/cases/server.spec.ts",
 		"build": "tsx ./src/cases/stylex/build.ts"
 	},
 	"devDependencies": {

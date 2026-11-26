@@ -324,7 +324,7 @@ Minified, tree-shaken browser ESM bundles measured with esbuild 0.28.2 (`bundle:
 
 | Library                     | Version   | Minified + gzip |
 | --------------------------- | --------- | --------------: |
-| Coulis                      | workspace |         2.58 kB |
+| Coulis                      | workspace |         2.66 kB |
 | Emotion (`@emotion/css`)    | 11.13.5   |         6.28 kB |
 | Goober                      | 2.1.19    |         1.11 kB |
 | styled-components           | 6.6.0     |        10.99 kB |

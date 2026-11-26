@@ -326,6 +326,31 @@ describe("createCoulis (web adapter)", () => {
 		expect(String(getCriticalStyleSheets(html))).toContain("color:red;");
 	});
 
+	test("should join the class names of each call, whatever the previous calls", () => {
+		const { createStyles } = createCoulis({
+			properties() {
+				return { color: true, height: true, width: true };
+			},
+		});
+
+		const color = createStyles({ color: "red" });
+		const height = createStyles({ height: 2 });
+		const width = createStyles({ width: 1 });
+
+		expect(createStyles({ color: "red", width: 1 })).toBe(`${color} ${width}`);
+		expect(createStyles({ color: "red", height: 2 })).toBe(`${color} ${height}`);
+
+		expect(createStyles({ color: "red", height: 2, width: 1 })).toBe(
+			`${color} ${height} ${width}`,
+		);
+
+		expect(createStyles({ color: "red", width: 1 })).toBe(`${color} ${width}`);
+		expect(createStyles({ height: 2, width: 1 })).toBe(`${height} ${width}`);
+		expect(createStyles({ color: undefined, height: 2, width: 1 })).toBe(`${height} ${width}`);
+		expect(createStyles({ color: "red" })).toBe(color);
+		expect(createStyles({})).toBe("");
+	});
+
 	test("should skip unset values", () => {
 		const { createStyles, getStyleSheets } = createCoulis({
 			properties() {

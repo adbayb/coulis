@@ -197,6 +197,7 @@ export const createCoulis: CreateCoulis<{
 	}
 
 	const globalReferenceCounts = new Map<ClassName, number>();
+	const rootClassNames: ClassNames = { value: "" };
 	/*
 	 * The class names of the last HTML are kept: a page rendered again with the same content skips
 	 * their search (comparing two HTML is far cheaper than searching one).
@@ -249,7 +250,7 @@ export const createCoulis: CreateCoulis<{
 			});
 		},
 		createStyles(input) {
-			let classNames = "";
+			let classNames: ClassName | ClassNames = "";
 
 			/*
 			 * `for...in` guarded by `hasOwnProperty` visits the same names as `Object.keys`, without
@@ -267,6 +268,7 @@ export const createCoulis: CreateCoulis<{
 					for (const stateName in value) {
 						if (hasOwnProperty(value, stateName)) {
 							classNames = joinClassNames(
+								rootClassNames,
 								classNames,
 								getAtomicClassName(property, stateName, value[stateName]),
 							);
@@ -274,13 +276,14 @@ export const createCoulis: CreateCoulis<{
 					}
 				} else {
 					classNames = joinClassNames(
+						rootClassNames,
 						classNames,
 						getAtomicClassName(property, BASE_STATE_NAME, value),
 					);
 				}
 			}
 
-			return classNames;
+			return typeof classNames === "string" ? classNames : classNames.value;
 		},
 		getContract() {
 			return {
@@ -366,7 +369,49 @@ const hasOwnProperty = (input: object, name: string) => {
 	return Object.prototype.hasOwnProperty.call(input, name);
 };
 
-const joinClassNames = (classNames: string, className: ClassName) => {
+/**
+ * Class names joined so far, and the ones they lead to by class name: the same sequence of class
+ * names always gives the same string instead of a new one, which the browser recognizes without
+ * reading it again.
+ */
+type ClassNames = {
+	next?: Map<ClassName, ClassNames>;
+	value: string;
+};
+
+const getNextClassNames = (classNames: ClassNames, className: ClassName) => {
+	classNames.next ??= new Map();
+
+	let nextClassNames = classNames.next.get(className);
+
+	if (!nextClassNames) {
+		nextClassNames = {
+			value: classNames.value ? `${classNames.value} ${className}` : className,
+		};
+
+		classNames.next.set(className, nextClassNames);
+	}
+
+	return nextClassNames;
+};
+
+const joinClassNames = (
+	rootClassNames: ClassNames,
+	classNames: ClassName | ClassNames,
+	className: ClassName,
+) => {
 	// An empty class name (unset value) is skipped.
-	return classNames && className ? `${classNames} ${className}` : classNames || className;
+	if (!className) {
+		return classNames;
+	}
+
+	// A single class name is already the same string on each call: it only joins the others once a second one comes.
+	if (classNames === "") {
+		return className;
+	}
+
+	return getNextClassNames(
+		typeof classNames === "string" ? getNextClassNames(rootClassNames, classNames) : classNames,
+		className,
+	);
 };

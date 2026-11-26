@@ -1,7 +1,13 @@
+/* oxlint-disable unicorn/prefer-code-point -- UTF-16 code units are enough to hash and fingerprint strings. */
 import type { RecordLike, WithNewLeafNodes } from "../../core/entities/primitive";
 import { isObject } from "../../core/entities/primitive";
 
 const TEMPLATE_MARKER = /coulis\[(selector|declaration)\]/u;
+/**
+ * Enough slots to tell apart the class attributes of a typical page, for a negligible allocation (a
+ * few kilobytes per search).
+ */
+const RECENT_CLASS_ATTRIBUTES_LENGTH = 1024;
 
 /**
  * Creates a class name from the djb2 hash of a given string. `Math.imul` keeps the multiplication
@@ -16,7 +22,6 @@ export const createClassName = (input: string) => {
 	let hash = 5381;
 
 	for (let index = 0; index < input.length; index++) {
-		// oxlint-disable-next-line unicorn/prefer-code-point
 		hash = Math.imul(hash, 33) ^ input.charCodeAt(index);
 	}
 
@@ -76,6 +81,42 @@ export const createCustomProperties = <Theme extends RecordLike>(
 	}
 
 	return output as WithNewLeafNodes<Theme, string>;
+};
+
+/**
+ * Finds the class names used by a given HTML: every word of its class attributes (class names are
+ * base-36 hashes, so words are enough to find them).
+ *
+ * @param html - The HTML to search.
+ * @returns The words of the HTML class attributes: its class names, among other words.
+ */
+export const findClassNames = (html: string) => {
+	const classAttributes = new Set<string>();
+	/*
+	 * Class attributes repeat a lot (lists, tables...) and adding a new string to a set hashes it,
+	 * which costs more than comparing it. So an attribute is first compared to the last one seen
+	 * with the same fingerprint (its length and two of its last characters, where class names
+	 * differ): only the others reach the set.
+	 */
+	// oxlint-disable-next-line unicorn/no-new-array -- It reserves the slots at once, whereas `Array.from` fills them one by one.
+	const recentClassAttributes = new Array<string | undefined>(RECENT_CLASS_ATTRIBUTES_LENGTH);
+
+	for (const classAttribute of html.match(/class="[^"]*/gu) ?? []) {
+		const { length } = classAttribute;
+
+		const fingerprint =
+			(length * 31 +
+				classAttribute.charCodeAt(length - 1) * 7 +
+				classAttribute.charCodeAt(length - 3)) %
+			RECENT_CLASS_ATTRIBUTES_LENGTH;
+
+		if (recentClassAttributes[fingerprint] !== classAttribute) {
+			recentClassAttributes[fingerprint] = classAttribute;
+			classAttributes.add(classAttribute);
+		}
+	}
+
+	return new Set([...classAttributes].join(" ").match(/\w+/gu));
 };
 
 export type CompiledTemplate = {

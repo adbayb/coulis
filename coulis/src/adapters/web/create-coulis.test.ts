@@ -310,6 +310,25 @@ describe("createCoulis (web adapter)", () => {
 		expect(String(getStyleSheets())).not.toContain("undefined");
 	});
 
+	test("should ignore inherited properties and states", () => {
+		const { createStyles } = createCoulis({
+			properties() {
+				return { color: true, width: true };
+			},
+			states: {
+				hover: "coulis[selector]:hover{coulis[declaration]}",
+			},
+		});
+
+		const color = Object.assign(Object.create({ hover: "blue" }) as { hover?: string }, {
+			base: "red",
+		});
+
+		const styles = Object.assign(Object.create({ width: 1 }) as { width?: number }, { color });
+
+		expect(createStyles(styles)).toBe(createStyles({ color: "red" }));
+	});
+
 	test("should escape closing tags in style sheets and their HTML string", () => {
 		const { createStyles, getStyleSheets } = createCoulis({
 			properties() {

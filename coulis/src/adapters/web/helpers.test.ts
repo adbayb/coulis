@@ -1,5 +1,10 @@
 import { describe, expect, test, vi } from "vitest";
-import { createCompiledTemplate, createCustomProperties, getEvaluatedTemplate } from "./helpers";
+import {
+	createCompiledTemplate,
+	createCustomProperties,
+	findClassNames,
+	getEvaluatedTemplate,
+} from "./helpers";
 
 describe(createCustomProperties, () => {
 	test("should escape special characters in key names", () => {
@@ -30,6 +35,32 @@ describe(createCustomProperties, () => {
 			a: { nested: { x: "var(--a-nested-x)" }, sibling: "var(--a-sibling)" },
 			b: { y: "var(--b-y)" },
 		});
+	});
+});
+
+describe(findClassNames, () => {
+	test("should find the class names of every class attribute", () => {
+		const classNames = findClassNames(
+			'<p class="c1 c2" title="c3"><b class="c4">c5</b><i class="c1 c2"></i><u class="c2 c1"></u></p>',
+		);
+
+		expect([...classNames]).toStrictEqual(["class", "c1", "c2", "c4"]);
+	});
+
+	test("should find the class names of attributes sharing their length and last characters", () => {
+		const classNames = findClassNames(
+			'<p class="c1abc"></p><p class="c2abc"></p><p class="c1abc"></p><p class="c3abc"></p>',
+		);
+
+		expect([...classNames]).toStrictEqual(["class", "c1abc", "c2abc", "c3abc"]);
+	});
+
+	test("should find the class names of an unclosed class attribute", () => {
+		expect([...findClassNames('<p class="c1 c2')]).toStrictEqual(["class", "c1", "c2"]);
+	});
+
+	test("should not find any class name without class attributes", () => {
+		expect(findClassNames("<p>c1</p>").size).toBe(0);
 	});
 });
 

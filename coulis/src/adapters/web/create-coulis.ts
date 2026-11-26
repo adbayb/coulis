@@ -9,6 +9,7 @@ import {
 	createClassName,
 	createCompiledTemplate,
 	createCustomProperties,
+	findClassNames,
 	getEvaluatedTemplate,
 	memoize,
 } from "./helpers";
@@ -244,16 +245,26 @@ export const createCoulis: CreateCoulis<{
 		createStyles(input) {
 			let classNames = "";
 
-			for (const name of Object.keys(input)) {
+			/*
+			 * `for...in` guarded by `hasOwnProperty` visits the same names as `Object.keys`, without
+			 * creating their array: engines also read the values straight from the object layout.
+			 */
+			for (const name in input) {
+				if (!hasOwnProperty(input, name)) {
+					continue;
+				}
+
 				const value: unknown = input[name as keyof typeof input];
 				const property = getStyleProperty(name);
 
 				if (isObject(value)) {
-					for (const stateName of Object.keys(value)) {
-						classNames = joinClassNames(
-							classNames,
-							getAtomicClassName(property, stateName, value[stateName]),
-						);
+					for (const stateName in value) {
+						if (hasOwnProperty(value, stateName)) {
+							classNames = joinClassNames(
+								classNames,
+								getAtomicClassName(property, stateName, value[stateName]),
+							);
+						}
 					}
 				} else {
 					classNames = joinClassNames(
@@ -274,13 +285,7 @@ export const createCoulis: CreateCoulis<{
 			};
 		},
 		getCriticalStyleSheets(html) {
-			/*
-			 * Class attributes repeat a lot: they are deduplicated before collecting their words (class
-			 * names are base-36 hashes, so words are enough to find them).
-			 */
-			const classAttributes = [...new Set(html.match(/class="[^"]*/gu))].join(" ");
-
-			return serializeStyleSheets(new Set(classAttributes.match(/\w+/gu)));
+			return serializeStyleSheets(findClassNames(html));
 		},
 		getStyleSheets: serializeStyleSheets,
 		setGlobalStyles(input) {
@@ -340,6 +345,15 @@ type Property = {
 
 const BASE_STATE_NAME = "base";
 const BASE_COMPILED_STATE = createCompiledTemplate("coulis[selector]{coulis[declaration]}");
+
+/*
+ * `Object.prototype.hasOwnProperty` is preferred over `Object.hasOwn`: within a `for...in` loop over
+ * the same object, engines know its outcome without looking the property up.
+ */
+const hasOwnProperty = (input: object, name: string) => {
+	// oxlint-disable-next-line e18e/prefer-object-has-own
+	return Object.prototype.hasOwnProperty.call(input, name);
+};
 
 const joinClassNames = (classNames: string, className: ClassName) => {
 	// An empty class name (unset value) is skipped.

@@ -268,9 +268,9 @@ It brings the rendering time down to the one of a build-time CSS-in-JS library s
 
 | Styles                                                 |   Time |
 | ------------------------------------------------------ | -----: |
-| StyleX, styles compiled at build time                  | 4.9 ms |
-| Coulis, `createStyles` called once in the module scope | 4.9 ms |
-| Coulis, `createStyles` called during render            | 7.4 ms |
+| StyleX, styles compiled at build time                  | 5.4 ms |
+| Coulis, `createStyles` called once in the module scope | 5.3 ms |
+| Coulis, `createStyles` called during render            | 7.0 ms |
 
 Median of three runs in headless Chromium with React production builds. These results are hardware- and runtime-dependent.
 
@@ -313,8 +313,8 @@ Median of three runs of `pnpm --filter @coulis/benchmark benchmark`, rendering a
 
 | Runtime         | Coulis |           Emotion |              Goober | styled-components |              StyleX |
 | --------------- | -----: | ----------------: | ------------------: | ----------------: | ------------------: |
-| Browser (ops/s) |  1,843 | 815 (2.3x slower) |   878 (2.1x slower) | 469 (3.9x slower) | 1,685 (1.1x slower) |
-| Server (ops/s)  |  1,183 | 602 (2.0x slower) | 1,032 (1.1x slower) | 249 (4.8x slower) | 1,360 (1.1x faster) |
+| Browser (ops/s) |  1,848 | 825 (2.2x slower) |   873 (2.1x slower) | 469 (3.9x slower) | 1,705 (1.1x slower) |
+| Server (ops/s)  |  1,187 | 608 (2.0x slower) | 1,055 (1.1x slower) | 255 (4.7x slower) | 1,308 (1.1x faster) |
 
 These results are hardware- and runtime-dependent.
 

@@ -28,3 +28,4 @@ permissions:
 skills:
     dirs:
         - .agents/skills
+        - .claude/skills

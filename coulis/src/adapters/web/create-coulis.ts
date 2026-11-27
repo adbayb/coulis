@@ -366,7 +366,42 @@ const hasOwnProperty = (input: object, name: string) => {
 	return Object.prototype.hasOwnProperty.call(input, name);
 };
 
+/**
+ * Joined class names by their two parts (the class names so far, then the one added). A repeated
+ * style input gets the very same string back instead of a new concatenation on each call: nothing
+ * to allocate, and consumers (e.g. React escaping a `class` attribute) read a string already
+ * flattened by its first use.
+ */
+const joinedClassNamesByPrefix = new Map<string, Map<ClassName, string>>();
+/**
+ * Enough prefixes for the static styles of a large application. Beyond (e.g. unbounded dynamic
+ * values followed by other properties), class names are concatenated without being kept.
+ */
+const JOINED_CLASS_NAMES_LENGTH = 8192;
+
 const joinClassNames = (classNames: string, className: ClassName) => {
 	// An empty class name (unset value) is skipped.
-	return classNames && className ? `${classNames} ${className}` : classNames || className;
+	if (!classNames || !className) {
+		return classNames || className;
+	}
+
+	let joinedClassNamesByClassName = joinedClassNamesByPrefix.get(classNames);
+
+	if (!joinedClassNamesByClassName) {
+		if (joinedClassNamesByPrefix.size >= JOINED_CLASS_NAMES_LENGTH) {
+			return `${classNames} ${className}`;
+		}
+
+		joinedClassNamesByClassName = new Map();
+		joinedClassNamesByPrefix.set(classNames, joinedClassNamesByClassName);
+	}
+
+	let joinedClassNames = joinedClassNamesByClassName.get(className);
+
+	if (!joinedClassNames) {
+		joinedClassNames = `${classNames} ${className}`;
+		joinedClassNamesByClassName.set(className, joinedClassNames);
+	}
+
+	return joinedClassNames;
 };

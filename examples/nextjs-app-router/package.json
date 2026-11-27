@@ -9,12 +9,12 @@
 	},
 	"dependencies": {
 		"coulis": "workspace:^",
-		"next": "^16.4.5",
+		"next": "^16.4.6",
 		"react": "^19.3.1",
 		"react-dom": "^19.3.1"
 	},
 	"devDependencies": {
-		"@types/react": "19.3.0",
+		"@types/react": "19.3.3",
 		"@types/react-dom": "19.3.0"
 	}
 }

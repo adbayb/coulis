@@ -1,9 +1,23 @@
 <div align="center">
     <h1>🍩 Coulis</h1>
-    <strong>Atomic CSS-in-JS library with a tiny runtime</strong>
+    <strong>Atomic CSS-in-JS library with a tiny runtime and no build setup</strong>
 	<p><img src="https://deno.bundlejs.com/?q=coulis&badge" alt="Package size" /></p>
 </div>
 <br>
+<br>
+
+## ✨ Features
+
+`Coulis` styles web and React Native applications from JavaScript, with:
+
+- **No build setup**: styles are created at runtime, so there is no compiler, bundler plugin, or CSS extraction step to install, configure, and keep in sync with your toolchain. Install the package, import it, and style: it works the same way whatever the bundler (see the [examples](#-examples) with Vite, Next.js, and Expo, none of which configures anything for Coulis), and a library styled with Coulis is consumed like any other JavaScript dependency.
+- Atomic CSS: each property and value pair creates one rule and one class name, reused by every component setting it, so the style sheet grows with the number of distinct values instead of the number of components.
+- A typed contract: the properties, theme tokens (exposed as CSS custom properties on the web), custom shorthands, and states (pseudo-classes, media or container queries, ...) accepted by your styles are declared once and checked by TypeScript.
+- Global styles and keyframes with the same contract (`setGlobalStyles` and `createKeyframes`).
+- [Server-side rendering](#how-to-implement-server-side-rendering), with either the critical styles of a rendered HTML or every style created so far (for streaming).
+- [React Native support](#how-to-use-coulis-with-react-native) through a dedicated entry point sharing the same contract.
+- A tiny runtime without any dependency, measured against other CSS-in-JS libraries in the [benchmarks](#-benchmarks) (runtime performance and bundle size).
+
 <br>
 
 ## 🤔 Motivation

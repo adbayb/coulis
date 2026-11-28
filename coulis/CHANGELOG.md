@@ -1,5 +1,14 @@
 # Change Log
 
+## 0.24.1
+
+### Patch Changes
+
+- [#97](https://github.com/adbayb/coulis/pull/97) [`0291edc`](https://github.com/adbayb/coulis/commit/0291edcea4174aa332629ad0bfdfe41e711e0a79) Thanks [@adbayb](https://github.com/adbayb)! - Make `createStyles` faster on the web for style objects with several properties, with the same class names and rules.
+
+    - Joined class names are kept by their parts: a repeated style input gets the very same string back instead of a new concatenation on each call. Server rendering of components calling `createStyles` during render is ~4% to ~10% faster (the returned string is already flattened when React escapes the `class` attribute), single-property inputs are unchanged.
+    - Bundle size: +20 bytes (minified + gzip).
+
 ## 0.24.0
 
 ### Minor Changes

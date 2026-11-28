@@ -1,6 +1,6 @@
 <div align="center">
     <h1>🍩 Coulis</h1>
-    <strong>Blazing fast atomic CSS-in-JS library with a tiny runtime and no build setup</strong>
+    <strong>Blazing fast and tiny atomic CSS-in-JS runtime, with no build setup</strong>
 	<p><img src="https://deno.bundlejs.com/?q=coulis&badge" alt="Package size" /></p>
 </div>
 <br>

@@ -345,6 +345,26 @@ describe("createCoulis (web adapter)", () => {
 		expect(String(getStyleSheets())).not.toContain("undefined");
 	});
 
+	test("should join the class names of each value in the input order", () => {
+		const { createStyles } = createCoulis({
+			properties() {
+				return { color: true, width: true };
+			},
+			states: {
+				hover: "coulis[selector]:hover{coulis[declaration]}",
+			},
+		});
+
+		const color = createStyles({ color: "red" });
+		const hoverColor = createStyles({ color: { base: undefined, hover: "blue" } });
+		const width = createStyles({ width: 10 });
+		const input = { color: { base: "red", hover: "blue" }, width: 10 } as const;
+
+		expect(createStyles(input)).toBe(`${color} ${hoverColor} ${width}`);
+		// A repeated input gives the same class names.
+		expect(createStyles(input)).toBe(createStyles(input));
+	});
+
 	test("should ignore inherited properties and states", () => {
 		const { createStyles } = createCoulis({
 			properties() {

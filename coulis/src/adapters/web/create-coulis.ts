@@ -366,7 +366,27 @@ const hasOwnProperty = (input: object, name: string) => {
 	return Object.prototype.hasOwnProperty.call(input, name);
 };
 
+/**
+ * Joins class names (the ones so far, then the one added), once per pair: a repeated style input
+ * gets the very same string back instead of a new concatenation on each call.
+ *
+ * Why it is faster: engines concatenate lazily (the result is a tree pointing to its two parts,
+ * called a rope), and the characters are only copied into one flat string when something reads
+ * them. A renderer does so for each element (e.g. React runs a regular expression on the `class`
+ * attribute to escape it). Without the cache, every call builds a new rope, so the copy is paid for
+ * each element on each render, and each rope is one more object to collect. With it, the string of
+ * a given input is flattened by its first read only: later calls cost two lookups per class name
+ * and allocate nothing.
+ */
+const getJoinedClassNames = memoize((classNames: string) => {
+	return memoize((className: ClassName) => {
+		return `${classNames} ${className}`;
+	});
+});
+
 const joinClassNames = (classNames: string, className: ClassName) => {
 	// An empty class name (unset value) is skipped.
-	return classNames && className ? `${classNames} ${className}` : classNames || className;
+	return classNames && className
+		? getJoinedClassNames(classNames)(className)
+		: classNames || className;
 };

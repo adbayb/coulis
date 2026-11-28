@@ -309,12 +309,12 @@ Theme values are passed as-is (raw values, not CSS custom properties).
 
 ### Runtime performance
 
-Median of three runs of `pnpm --filter @coulis/benchmark benchmark`, rendering a 1,000-row React table with React production builds (each library runs in a page of its own in the browser, and in a process of its own on the server). Higher throughput is better; dynamic styles are created during each render, except for StyleX whose styles are compiled at build time (one per value, selected during render with `props`). The server case renders to a string and extracts its styles (critical styles for Coulis with `getCriticalStyleSheets(html)` and for Emotion with `extractCritical`; none for StyleX, whose styles are a build-time style sheet).
+Median of three runs of `pnpm --filter @coulis/benchmark benchmark`, rendering a 1,000-row React table with React production builds (each library runs in a page of its own in the browser, and in a process of its own on the server). Higher throughput is better; dynamic styles are created during each render, except for StyleX whose styles are compiled at build time (one per value, selected during render with `props`). The server case renders to a string, extracts its styles (critical styles for Coulis with `getCriticalStyleSheets(html)` and for Emotion with `extractCritical`; none for StyleX, whose styles are a build-time style sheet), and encodes the response (the styles, then the HTML) as a server does to send it: every library then bears the cost of putting the rendered HTML together, instead of only the ones reading it to extract their styles.
 
-| Runtime         | Coulis |           Emotion |              Goober | styled-components |              StyleX |
-| --------------- | -----: | ----------------: | ------------------: | ----------------: | ------------------: |
-| Browser (ops/s) |  1,843 | 815 (2.3x slower) |   878 (2.1x slower) | 469 (3.9x slower) | 1,685 (1.1x slower) |
-| Server (ops/s)  |  1,183 | 602 (2.0x slower) | 1,032 (1.1x slower) | 249 (4.8x slower) | 1,360 (1.1x faster) |
+| Runtime         | Coulis |           Emotion |            Goober | styled-components |              StyleX |
+| --------------- | -----: | ----------------: | ----------------: | ----------------: | ------------------: |
+| Browser (ops/s) |  1,815 | 816 (2.2x slower) | 867 (2.1x slower) | 625 (2.9x slower) | 1,689 (1.1x slower) |
+| Server (ops/s)  |  1,130 | 580 (1.9x slower) | 887 (1.3x slower) | 252 (4.5x slower) | 1,076 (1.1x slower) |
 
 These results are hardware- and runtime-dependent.
 
@@ -324,7 +324,7 @@ Minified, tree-shaken browser ESM bundles measured with esbuild 0.28.2 (`bundle:
 
 | Library                     | Version   | Minified + gzip |
 | --------------------------- | --------- | --------------: |
-| Coulis                      | workspace |         2.58 kB |
+| Coulis                      | workspace |         2.61 kB |
 | Emotion (`@emotion/css`)    | 11.13.5   |         6.28 kB |
 | Goober                      | 2.1.19    |         1.11 kB |
 | styled-components           | 6.6.0     |        10.99 kB |

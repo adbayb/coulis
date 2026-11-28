@@ -4,6 +4,7 @@ import { bootstrapServerCase } from "../server";
 import { GooberComponent } from "./component";
 
 bootstrapServerCase("goober", () => {
-	renderToString(<GooberComponent />);
-	extractCss();
+	const html = renderToString(<GooberComponent />);
+
+	return `<style>${extractCss()}</style>${html}`;
 });

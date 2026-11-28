@@ -4,5 +4,7 @@ import { CoulisComponent } from "./component";
 import { getCriticalStyleSheets } from "./helpers";
 
 bootstrapServerCase("coulis", () => {
-	String(getCriticalStyleSheets(renderToString(<CoulisComponent />)));
+	const html = renderToString(<CoulisComponent />);
+
+	return `${String(getCriticalStyleSheets(html))}${html}`;
 });

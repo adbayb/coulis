@@ -8,7 +8,7 @@
 
 ## ✨ Features
 
-`Coulis` styles web and React Native applications from JavaScript, with:
+`Coulis` styles web applications from JavaScript **whatever the framework** (it returns plain class names and imports no framework), and React Native applications as well, with:
 
 - **No build setup**: styles are created at runtime, so there is no compiler, bundler plugin, or CSS extraction step to install, configure, and keep in sync with your toolchain. Install the package, import it, and style: it works the same way whatever the bundler (see the [examples](#-examples) with Vite, Next.js, and Expo, none of which configures anything for Coulis), and a library styled with Coulis is consumed like any other JavaScript dependency.
 - **Blazing fast runtime**: class names are cached per value, so a repeated style only costs cache lookups. Rendering a 1,000-row React table in the browser, Coulis is about 2x faster than Emotion and Goober and on par with StyleX, whose styles are compiled at build time (see the [benchmarks](#-benchmarks)). Styles that do not depend on props can also be [created once in the module scope](#how-to-speed-up-rendering-with-styles-created-once): a render then only reads a string.

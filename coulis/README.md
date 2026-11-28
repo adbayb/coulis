@@ -1,6 +1,6 @@
 <div align="center">
     <h1>🍩 Coulis</h1>
-    <strong>Atomic CSS-in-JS library with a tiny runtime and no build setup</strong>
+    <strong>Blazing fast atomic CSS-in-JS library with a tiny runtime and no build setup</strong>
 	<p><img src="https://deno.bundlejs.com/?q=coulis&badge" alt="Package size" /></p>
 </div>
 <br>
@@ -11,12 +11,14 @@
 `Coulis` styles web and React Native applications from JavaScript, with:
 
 - **No build setup**: styles are created at runtime, so there is no compiler, bundler plugin, or CSS extraction step to install, configure, and keep in sync with your toolchain. Install the package, import it, and style: it works the same way whatever the bundler (see the [examples](#-examples) with Vite, Next.js, and Expo, none of which configures anything for Coulis), and a library styled with Coulis is consumed like any other JavaScript dependency.
+- **Blazing fast runtime**: class names are cached per value, so a repeated style only costs cache lookups. Rendering a 1,000-row React table in the browser, Coulis is about 2x faster than Emotion and Goober and on par with StyleX, whose styles are compiled at build time (see the [benchmarks](#-benchmarks)). Styles that do not depend on props can also be [created once in the module scope](#how-to-speed-up-rendering-with-styles-created-once): a render then only reads a string.
 - Atomic CSS: each property and value pair creates one rule and one class name, reused by every component setting it, so the style sheet grows with the number of distinct values instead of the number of components.
 - A typed contract: the properties, theme tokens (exposed as CSS custom properties on the web), custom shorthands, and states (pseudo-classes, media or container queries, ...) accepted by your styles are declared once and checked by TypeScript.
 - Global styles and keyframes with the same contract (`setGlobalStyles` and `createKeyframes`).
-- [Server-side rendering](#how-to-implement-server-side-rendering), with either the critical styles of a rendered HTML or every style created so far (for streaming).
+- [Server-side rendering](#how-to-implement-server-side-rendering) without flash of unstyled content: `getCriticalStyleSheets(html)` returns only the styles a rendered HTML needs, so each page ships its own CSS.
+- **Streaming rendering support**: `getStyleSheets()` returns the styles created so far without needing the rendered HTML, so they can be sent while the page is still streaming, for example with the Next.js App Router (see the [`useServerInsertedHTML` snippet](https://github.com/adbayb/coulis/tree/main/examples/nextjs-app-router/src/components/coulis-registry.tsx)).
 - [React Native support](#how-to-use-coulis-with-react-native) through a dedicated entry point sharing the same contract.
-- A tiny runtime without any dependency, measured against other CSS-in-JS libraries in the [benchmarks](#-benchmarks) (runtime performance and bundle size).
+- A tiny runtime without any dependency (see the [bundle size comparison](#bundle-size)).
 
 <br>
 

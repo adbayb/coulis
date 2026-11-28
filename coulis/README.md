@@ -1,9 +1,24 @@
 <div align="center">
     <h1>🍩 Coulis</h1>
-    <strong>Atomic CSS-in-JS library with a tiny runtime</strong>
+    <strong>Blazing fast and tiny atomic CSS-in-JS runtime, with no build setup</strong>
 	<p><img src="https://deno.bundlejs.com/?q=coulis&badge" alt="Package size" /></p>
 </div>
 <br>
+<br>
+
+## ✨ Features
+
+`Coulis` is a CSS-in-JS runtime with:
+
+- Atomic CSS: one rule and one class name per property and value pair, reused by every component, so the style sheet grows with the number of distinct values instead of the number of components.
+- **No build setup**: styles are created at runtime, so there is no compiler, bundler plugin, or CSS extraction step to configure (see the [examples](#-examples) with Vite, Next.js, and Expo).
+- A typed contract: properties, theme tokens, custom shorthands, and states (pseudo-classes, media queries, ...) are declared once, checked by TypeScript, and shared by styles, global styles, and keyframes.
+- **Blazing fast runtime**: about 2x faster than Emotion and Goober in the browser, and on par with StyleX, whose styles are compiled at build time (see the [benchmarks](#-benchmarks)).
+- A tiny runtime without any dependency (see the [bundle size comparison](#bundle-size)).
+- **Framework independent** on the web: it returns plain class names and imports no framework.
+- [React Native support](#how-to-use-coulis-with-react-native) through a dedicated entry point sharing the same contract.
+- [Server-side rendering](#how-to-implement-server-side-rendering), **including streaming rendering**: the critical styles of a rendered HTML, or every style created so far when the HTML is not available yet.
+
 <br>
 
 ## 🤔 Motivation

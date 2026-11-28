@@ -313,8 +313,8 @@ Median of three runs of `pnpm --filter @coulis/benchmark benchmark`, rendering a
 
 | Runtime         | Coulis |           Emotion |              Goober | styled-components |              StyleX |
 | --------------- | -----: | ----------------: | ------------------: | ----------------: | ------------------: |
-| Browser (ops/s) |  1,843 | 815 (2.3x slower) |   878 (2.1x slower) | 469 (3.9x slower) | 1,685 (1.1x slower) |
-| Server (ops/s)  |  1,183 | 602 (2.0x slower) | 1,032 (1.1x slower) | 249 (4.8x slower) | 1,360 (1.1x faster) |
+| Browser (ops/s) |  1,826 | 822 (2.2x slower) |   873 (2.1x slower) | 626 (2.9x slower) | 1,724 (1.1x slower) |
+| Server (ops/s)  |  1,181 | 610 (1.9x slower) | 1,042 (1.1x slower) | 268 (4.4x slower) | 1,318 (1.1x faster) |
 
 These results are hardware- and runtime-dependent.
 
@@ -324,7 +324,7 @@ Minified, tree-shaken browser ESM bundles measured with esbuild 0.28.2 (`bundle:
 
 | Library                     | Version   | Minified + gzip |
 | --------------------------- | --------- | --------------: |
-| Coulis                      | workspace |         2.66 kB |
+| Coulis                      | workspace |         2.61 kB |
 | Emotion (`@emotion/css`)    | 11.13.5   |         6.28 kB |
 | Goober                      | 2.1.19    |         1.11 kB |
 | styled-components           | 6.6.0     |        10.99 kB |

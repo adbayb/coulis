@@ -367,41 +367,26 @@ const hasOwnProperty = (input: object, name: string) => {
 };
 
 /**
- * Joined class names by their two parts (the class names so far, then the one added). A repeated
- * style input gets the very same string back instead of a new concatenation on each call: nothing
- * to allocate, and consumers (e.g. React escaping a `class` attribute) read a string already
- * flattened by its first use.
+ * Joins class names (the ones so far, then the one added), once per pair: a repeated style input
+ * gets the very same string back instead of a new concatenation on each call.
+ *
+ * Why it is faster: engines concatenate lazily (the result is a tree pointing to its two parts,
+ * called a rope), and the characters are only copied into one flat string when something reads
+ * them. A renderer does so for each element (e.g. React runs a regular expression on the `class`
+ * attribute to escape it). Without the cache, every call builds a new rope, so the copy is paid for
+ * each element on each render, and each rope is one more object to collect. With it, the string of
+ * a given input is flattened by its first read only: later calls cost two lookups per class name
+ * and allocate nothing.
  */
-const joinedClassNamesByPrefix = new Map<string, Map<ClassName, string>>();
-/**
- * Enough prefixes for the static styles of a large application. Beyond (e.g. unbounded dynamic
- * values followed by other properties), class names are concatenated without being kept.
- */
-const JOINED_CLASS_NAMES_LENGTH = 8192;
+const getJoinedClassNames = memoize((classNames: string) => {
+	return memoize((className: ClassName) => {
+		return `${classNames} ${className}`;
+	});
+});
 
 const joinClassNames = (classNames: string, className: ClassName) => {
 	// An empty class name (unset value) is skipped.
-	if (!classNames || !className) {
-		return classNames || className;
-	}
-
-	let joinedClassNamesByClassName = joinedClassNamesByPrefix.get(classNames);
-
-	if (!joinedClassNamesByClassName) {
-		if (joinedClassNamesByPrefix.size >= JOINED_CLASS_NAMES_LENGTH) {
-			return `${classNames} ${className}`;
-		}
-
-		joinedClassNamesByClassName = new Map();
-		joinedClassNamesByPrefix.set(classNames, joinedClassNamesByClassName);
-	}
-
-	let joinedClassNames = joinedClassNamesByClassName.get(className);
-
-	if (!joinedClassNames) {
-		joinedClassNames = `${classNames} ${className}`;
-		joinedClassNamesByClassName.set(className, joinedClassNames);
-	}
-
-	return joinedClassNames;
+	return classNames && className
+		? getJoinedClassNames(classNames)(className)
+		: classNames || className;
 };

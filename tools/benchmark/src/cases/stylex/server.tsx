@@ -4,5 +4,5 @@ import { bootstrapServerCase } from "../server";
 
 /** No style extraction: the styles are compiled into a style sheet at build time. */
 bootstrapServerCase("stylex", () => {
-	renderToString(<StyleXComponent />);
+	return renderToString(<StyleXComponent />);
 });

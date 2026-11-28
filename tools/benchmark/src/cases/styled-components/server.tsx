@@ -5,8 +5,10 @@ import { StyledComponentsComponent } from "./component";
 
 bootstrapServerCase("styled-components", () => {
 	const sheet = new ServerStyleSheet();
+	const html = renderToString(sheet.collectStyles(<StyledComponentsComponent />));
+	const styles = sheet.getStyleTags();
 
-	renderToString(sheet.collectStyles(<StyledComponentsComponent />));
-	sheet.getStyleTags();
 	sheet.seal();
+
+	return `${styles}${html}`;
 });

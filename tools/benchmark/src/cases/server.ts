@@ -5,10 +5,19 @@ import { measureCases } from "../helpers";
  * folder in a process of its own, which sends its measure back: a library never shares its runtime
  * (heap, compiled code, caches) with another one.
  *
+ * The response of each rendering is encoded, as a server does to send it. Otherwise, the rendered
+ * HTML (a string React concatenates lazily) would only be read, so only be put together, by the
+ * libraries extracting their styles from it: they alone would bear a cost every server pays.
+ *
  * @param name - The case name.
- * @param handler - The server rendering measured by the case.
+ * @param render - The server rendering measured by the case: it returns the response (the styles to
+ *   send, if any, then the HTML).
  */
-export const bootstrapServerCase = (name: string, handler: () => void) => {
+export const bootstrapServerCase = (name: string, render: () => string) => {
+	const handler = () => {
+		Buffer.from(render());
+	};
+
 	const sendMeasure = async () => {
 		const [measure] = await measureCases([{ name, handler }]);
 

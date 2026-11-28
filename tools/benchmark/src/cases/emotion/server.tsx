@@ -4,5 +4,7 @@ import { bootstrapServerCase } from "../server";
 import { EmotionComponent } from "./component";
 
 bootstrapServerCase("emotion", () => {
-	extractCritical(renderToString(<EmotionComponent />));
+	const { css, html } = extractCritical(renderToString(<EmotionComponent />));
+
+	return `<style>${css}</style>${html}`;
 });
